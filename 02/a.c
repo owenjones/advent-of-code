@@ -17,13 +17,7 @@ int main(void) {
   int amount = 0;
 
   for(size_t i = 0; i < 1000; i++) {
-    // printf("Line %i\n", i);
     fscanf(fptr, "%s %i", command, &amount);
-    //
-    // if(command == NULL) {
-    //   printf("NO COMMAND\n");
-    //   return 1;
-    // }
 
     if(strcmp(command, "forward") == 0) {
       x += amount;
