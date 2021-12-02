@@ -10,7 +10,7 @@ int main(void) {
     exit(1);
   }
 
-  int* window = calloc(2000, sizeof(int));
+  int* window = calloc(1998, sizeof(int));
 
   int current;
   int last = 0;
