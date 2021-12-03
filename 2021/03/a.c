@@ -45,7 +45,7 @@ int main(void) {
 
   gamma = strtol(output, NULL, 2);
   epsilon = ~gamma - 61440; // ignore 4 MSB of gamma (not set by inputs)
-  power = gamma * epsilon;
+  power = gamma * epsilon; // answer: 2972336
 
   printf("\nGamma: %i\nEpsilon: %i\nPower: %i\n", gamma, epsilon, power);
   return 0;
