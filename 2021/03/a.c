@@ -13,19 +13,18 @@ int main(void) {
   }
 
   char* input = calloc(13, sizeof(char));
-  int zeros[12];
-  int ones[12];
+  int* zeros = calloc(12, sizeof(int));
+  int* ones = calloc(12, sizeof(int));
 
   for(size_t i = 0; i < l; i++) {
     fscanf(fptr, "%s", input);
 
-    printf("Test: %s (%i)\n", input, strlen(input));
     for(size_t j = 0; j < strlen(input); j++) {
-      if(strcmp(&input[j], "0") == 0) {
+      if(input[j] == '0') {
         zeros[j]++;
       }
 
-      if(strcmp(&input[j], "1") == 0) {
+      if(input[j] == '1') {
         ones[j]++;
       }
     }
@@ -34,7 +33,8 @@ int main(void) {
   fclose(fptr);
 
   char* output = calloc(13, sizeof(char));
-  for(size_t i = 0; i < 13; i++) {
+  for(size_t i = 0; i < 12; i++) {
+    printf("%i: %i/%i\n", i, zeros[i], ones[i]);
     output[i] = (zeros[i] > ones[i]) ? '0' : '1';
   }
 
