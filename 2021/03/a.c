@@ -34,11 +34,8 @@ int main(void) {
 
   char* output = calloc(13, sizeof(char));
   for(size_t i = 0; i < 12; i++) {
-    printf("%i: %i/%i\n", i, zeros[i], ones[i]);
     output[i] = (zeros[i] > ones[i]) ? '0' : '1';
   }
-
-  printf("Output: %s\n", output);
 
   u_int32_t power;
   u_int16_t gamma, epsilon = 0;
@@ -47,6 +44,6 @@ int main(void) {
   epsilon = ~gamma - 61440; // ignore 4 MSB of gamma (not set by inputs)
   power = gamma * epsilon; // answer: 2972336
 
-  printf("\nGamma: %i\nEpsilon: %i\nPower: %i\n", gamma, epsilon, power);
+  printf("Gamma: %i\nEpsilon: %i\nPower: %i\n", gamma, epsilon, power);
   return 0;
 }
