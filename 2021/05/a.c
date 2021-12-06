@@ -10,40 +10,21 @@ int coordToIndex(int x, int y) {
   return (y * 1000) + x;
 }
 
-int inX(coord* a, coord* b) {
-  return (a->x == b->x);
-}
-
-int inY(coord* a, coord* b) {
-  return (a->y == b->y);
-}
-
-void sort(coord* a, coord* b) {
-  // sort smallest x/y coord into a
-  if((inX(a, b) && (a->y > b->y)) || (inY(a, b) && (a->x > b->x))) {
-    coord temp = *a;
-    *a = *b;
-    *b = temp;
-  }
-}
-
 void mark(int* seafloor, coord* a, coord* b) {
-  if(inX(a, b)) {
-    int x = a->x;
-    int diff = (b->y - a->y) + 1;
-    for(int i = 0; i < diff; i++) {
-      int y = a->y + i;
-      seafloor[coordToIndex(x, y)] += 1;
-    }
-  } else if(inY(a, b)) {
-    int y = a->y;
-    int diff = (b->x - a->x) + 1;
-    for(int i = 0; i < diff; i++) {
-      int x = a->x + i;
-      seafloor[coordToIndex(x, y)] += 1;
-    }
-  } else {
-    exit(1); // line must either be in x or y
+  int xraw = b->x - a->x;
+  int yraw = b->y - a->y;
+  int xdiff = abs(xraw);
+  int ydiff = abs(yraw);
+  int xchng = (xdiff > 0) ? 1 : 0;
+  int ychng = (ydiff > 0) ? 1 : 0;
+  int xsign = (xraw > 0) ? 1 : -1;
+  int ysign = (yraw > 0) ? 1 : -1;
+  int maxdiff = (xdiff > ydiff) ? xdiff : ydiff;
+  
+  for(int i = 0; i <= maxdiff; i++) {
+    int x = a->x + (i * xsign * xchng);
+    int y = a->y + (i * ysign * ychng);
+    seafloor[coordToIndex(x, y)] += 1;
   }
 }
 
@@ -78,7 +59,6 @@ int main(void) {
 
     // only accept coordinate pairs on the same x/y line
     if(a.x == b.x || a.y == b.y) {
-      sort(&a, &b);
       mark(seafloor, &a, &b);
     }
   }
