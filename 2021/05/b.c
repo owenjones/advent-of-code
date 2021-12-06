@@ -57,7 +57,6 @@ int main(void) {
   coord a, b;
   for(size_t i = 0; i < l; i++) {
     fscanf(fptr, "%i,%i -> %i,%i", &a.x, &a.y, &b.x, &b.y);
-    // sort(&a, &b);
     mark(seafloor, &a, &b);
   }
 
