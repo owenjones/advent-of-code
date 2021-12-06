@@ -7,10 +7,6 @@ typedef struct {
   int x, y;
 } coord;
 
-int coordToIndex(int x, int y) {
-  return (y * 1000) + x;
-}
-
 void mark(int* seafloor, coord* a, coord* b) {
   int xraw = b->x - a->x;
   int yraw = b->y - a->y;
@@ -25,18 +21,14 @@ void mark(int* seafloor, coord* a, coord* b) {
   for(int i = 0; i <= maxdiff; i++) {
     int x = a->x + (i * xsign * xchng);
     int y = a->y + (i * ysign * ychng);
-    seafloor[coordToIndex(x, y)] += 1;
+    seafloor[(y * 1000) + x] += 1;
   }
 }
 
 int finddanger(int* seafloor) {
   int dangers = 0;
-  for(int x = 0; x < 1000; x++) {
-    for(int y = 0; y < 1000; y++) {
-      int ind = coordToIndex(x, y);
-      if(seafloor[ind] > 1) dangers++;
-    }
-  }
+  for(int i = 0; i < (1000 * 1000); i++)
+    if(seafloor[i] > 1) dangers++;
   
   return dangers;
 }
