@@ -12,20 +12,54 @@ int main(void) {
     exit(1);
   }
 
-  char* input = calloc(13, sizeof(char));
-
+  char* inputs[l];
   for(size_t i = 0; i < l; i++) {
-    fscanf(fptr, "%s", input);
-
+    inputs[i] = calloc(13, sizeof(char));
+    fscanf(fptr, "%s", inputs[i]);
   }
 
   fclose(fptr);
 
+  char* keep = calloc((l * 13), sizeof(char));
+  memcpy(keep, inputs, sizeof(inputs));
+  
+  size_t m,n;
+  int zeros = 0;
+  int ones = 0;
+  char keep;
+  int pass = 0;
+  
+  for(size_t i = 0; i < 12; i++) {
+    for(size_t j = 0; j < l; j++) {
+      if(inputs[j][i] == '0') zeros++;
+      if(inputs[j][i] == '1') ones++;
+    }
+    
+    if(pass == 0) {
+      if(zeros > ones) keep = '0';
+      if(ones > zeros || ones == zeros) keep = '1';
+      pass = 1;
+    } else {
+      if(zeros > ones) keep = '1';
+      if(ones > zeros || ones == zeros) keep = '0';
+    }
+    
+    for(size_t j = 0; j < l; j++) {
+      m = 0;
+      if(inputs[j][i] == keep) {
+        
+      }
+      
+      n = m;
+    }
+  }
 
-  int o2, co2, life;
+  int o2 = 0;
+  int co2 = 0;
+  int life = 0;
 
 
   life = o2 * co2;
-  printf("\nO2 Generator: %i\nCO2 Scrubber: %i\nLife Support Rating: %i\n", o2, co2, life);
+  printf("O2 Generator: %i\nCO2 Scrubber: %i\nLife Support Rating: %i\n", o2, co2, life);
   return 0;
 }
