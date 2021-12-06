@@ -7,7 +7,7 @@ typedef struct {
 } coord;
 
 int coordToIndex(int x, int y) {
-  return (x * 1000) + y;
+  return (y * 1000) + x;
 }
 
 int inX(coord* a, coord* b) {
@@ -21,24 +21,23 @@ int inY(coord* a, coord* b) {
 void sort(coord* a, coord* b) {
   // sort smallest x/y coord into a
   if((inX(a, b) && (a->y > b->y)) || (inY(a, b) && (a->x > b->x))) {
-    coord* temp = a;
-    a = b;
-    b = temp;
+    coord temp = *a;
+    *a = *b;
+    *b = temp;
   }
 }
 
 void mark(int* seafloor, coord* a, coord* b) {
-  printf("Marking from %i,%i to %i,%i\n", a->x, a->y);
   if(inX(a, b)) {
     int x = a->x;
-    int diff = b->y - a->y;
+    int diff = (b->y - a->y) + 1;
     for(int i = 0; i < diff; i++) {
       int y = a->y + i;
       seafloor[coordToIndex(x, y)] += 1;
     }
   } else if(inY(a, b)) {
     int y = a->y;
-    int diff = b->x - a->x;
+    int diff = (b->x - a->x) + 1;
     for(int i = 0; i < diff; i++) {
       int x = a->x + i;
       seafloor[coordToIndex(x, y)] += 1;
@@ -56,6 +55,8 @@ int finddanger(int* seafloor) {
       if(seafloor[ind] > 1) dangers++;
     }
   }
+  
+  return dangers;
 }
 
 int main(void) {
