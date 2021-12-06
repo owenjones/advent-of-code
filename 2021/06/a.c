@@ -4,7 +4,6 @@
 
 typedef struct {
   int count;
-  int _size;
   int* members;
 } population;
 
@@ -23,10 +22,6 @@ void disp_population(population* p) {
 void add_to_population(population* p, int age) {
   p->members[p->count] = age;
   p->count++;
-  
-  // if(p->count > p->_size) {
-  //   exit(1);
-  // }
 }
 
 void tick(population* p) {
@@ -62,7 +57,6 @@ int main(void) {
   for(int d = 1; d <= 80; d++) {
     tick(p);
     printf("population after %i days = %i\n", d, p->count);
-    // disp_population(p);
   }
 
   return 0;
