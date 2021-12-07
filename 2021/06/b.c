@@ -11,7 +11,7 @@ typedef struct fish {
 int count(fish_t* head) {
   fish_t* fish = head;
   int count = 0;
-  while(fish->next != NULL) {
+  while(fish != NULL) {
     count++;
     fish = fish->next;
   }
@@ -28,7 +28,7 @@ void disp_pop(fish_t* head) {
 }
 
 int main(void) {
-  char file[] = "test_input.txt";
+  char file[] = "input.txt";
   FILE* fptr;
 
   if((fptr = fopen(file, "r")) == NULL) {
@@ -36,25 +36,31 @@ int main(void) {
     exit(1);
   }
 
-  fish_t* head = (fish_t*) calloc(1, sizeof(fish_t));
-  fish_t* fish = head;
+  fish_t* head = NULL;
+  fish_t* fish;
   int n;
   while(fscanf(fptr, "%i,", &n) > 0) {
+    if(!head) {
+      fish = (fish_t*) malloc(sizeof(fish_t));
+      head = fish;
+    } else {
+      fish->next = (fish_t*) malloc(sizeof(fish_t));
+      fish = fish->next;
+    }
     fish->value = n;
-    fish->next = (fish_t*) calloc(1, sizeof(fish_t));
-    fish = fish->next;
-  } // CREATING AN OFF-BY-ONE HERE WITH FINAL POINTER
+  }
 
   fclose(fptr);
 
   printf("Initial size = %i\n", count(head));
-  disp_pop(head);
+  // disp_pop(head);
 
-  for(int d = 0; d < 18; d++) {
-    printf("Day %i = %i\n", d, count(head));
-    fish_t* fish = head;
+  fish_t* last;
+  for(int d = 0; d < 256; d++) {
+    printf("Day %i\n", d);
+    fish = head;
     int add = 0;
-    while(fish->next != NULL) {
+    while(fish != NULL) {
       fish->value--;
       
       if(fish->value < 0) {
@@ -62,18 +68,19 @@ int main(void) {
         add++;
       }
       
+      last = fish;
       fish = fish->next;
     }
     
     for(int i = 0; i < add; i++) {
-      fish->next = (fish_t*) calloc(1, sizeof(fish_t));
-      fish = fish->next;
-      fish->value = 8;
+      last->next = (fish_t*) malloc(sizeof(fish_t));
+      last = last->next;
+      last->value = 8;
     }
   }
   
   int c = count(head);
-  printf("population after 80 days = %i\n", c);
+  printf("population after 256 days = %i\n", c);
 
   return 0;
 }
