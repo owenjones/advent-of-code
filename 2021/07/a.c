@@ -31,8 +31,9 @@ int main(void) {
     costs[i] = cost;
   }
 
-  uint32_t lowest = 10000000;
+  uint32_t lowest;
   for(size_t i = 0; i < 1000; i++) {
+    if(i == 0) lowest = costs[i];
     if(costs[i] < lowest) lowest = costs[i];
   }
 
