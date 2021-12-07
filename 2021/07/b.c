@@ -27,7 +27,7 @@ int main(void) {
     tcost = 0;
     for(size_t j = 0; j < 1000; j++) {
       cost = 0;
-      diff = abs(i - crabs[j]);
+      diff = abs((int)(i - crabs[j]));
       for(size_t k = 1; k <= diff; k++) cost += k;
       tcost += cost;
     }
