@@ -17,13 +17,30 @@ line* parse_line(char inputs[15][8]) {
 
 int solve_line(line* line) {
   int total = 0;
+  
   for(size_t i = 0; i < 10; i++) {
-    // solve input
+    int len = strlen(line->inputs[i]);
+    switch(len) {
+      case 2:
+      case 3:
+      case 4:
+      case 7:
+        line->matched[len] = line->inputs[i];
+        break;
+      case 5:
+        break;
+        
+      case 6:
+        break;
+    }
   }
 
   for(size_t i = 0; i < 4; i++) {
-    // map each output to matches and sum value
+    for(size_t j = 0; j < 10; j++) {
+      if(strcmp(line->outputs[i], line->matched[j]) == 0) total += j);
+    }
   }
+  
   return total;
 }
 
