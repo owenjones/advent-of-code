@@ -85,13 +85,15 @@ int solve_line(line* line) {
 
   // find S3 as the only remaining letter
 
-  // work through each lit segment in each of the output values, and add
-  // that segment's value to the total
-  int total = 0;
+  // work through each lit segment in each of the output values, add
+  // that segment's value to the output total, then convert to get digit
+  int total = 0, output;
   for(size_t i = 0; i < 4; i++) {
+    output = 0;
     for(size_t j = 0; j < strlen(line->outputs[i]); j++) {
-      total += values[letter_to_index(line->outputs[i][j])];
+      output += values[letter_to_index(line->outputs[i][j])];
     }
+    total += get_value(output);
   }
   return total;
 }
