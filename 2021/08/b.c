@@ -59,11 +59,21 @@ int solve_line(line* line) {
   int values[10];
   for(size_t i = 0; i < 10; i++) {
     switch(frequencies[i]) {
-      case 4: values[i] = 16;
-      case 6: values[i] = 32;
-      case 8: values[i] = 1;
-      case 9: values[i] = 2;
-      default: values[i] = 0;
+      case 4:
+        values[i] = 16;
+        break;
+      case 6:
+        values[i] = 32;
+        break;
+      case 8:
+        values[i] = 1;
+        break;
+      case 9:
+        values[i] = 2;
+        break;
+      default:
+        values[i] = 0;
+        break;
     }
   }
 
