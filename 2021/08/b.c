@@ -1,6 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+/*
+Segment definition:
+
+ — S0 —
+|      |
+S5    S1
+|      |
+ — S6 —
+|      |
+S4    S2
+|      |
+ — S3 —
+ 
+Binary representation is little endian.
+*/
 
 typedef struct {
   char inputs[10][8];
@@ -10,13 +27,13 @@ typedef struct {
 
 line* parse_line(char inputs[15][8]) {
   line* line = calloc(1, sizeof(line));
-  memcpy(line->inputs, inputs, sizeof(char)*10);
-  memcpy(line->outputs, &inputs[11], sizeof(char)*4);
+  memcpy(line->inputs, inputs, sizeof(char)*10*8);
+  memcpy(line->outputs, &inputs[11], sizeof(char)*4*8);
   return line;
 }
 
 int letter_to_index(char letter) {
-  // convert segment letters into an indexable value (a=0, b=1...)
+  // convert segment letters into index value (a=0, b=1...)
   return letter - 97;
 }
 
@@ -38,26 +55,23 @@ int get_value(int segmentv) {
     case 111: return 9;
     case 125: return 6;
     case 127: return 8;
+    default: return -1;
   }
 }
 
-void sort(char inputs[10][8]) {
-
-}
-
 int solve_line(line* line) {
-  // calculate how often we see each segment letter
-  int frequencies[10];
-  for(size_t i = 0; i < 10; i++) frequencies[i] = 0;
+  // calculate frequency of each segment letter
+  int frequencies[7];
+  for(size_t i = 0; i < 7; i++) frequencies[i] = 0;
   for(size_t i = 0; i < 10; i++) {
     for(size_t j = 0; j < strlen(line->inputs[i]); j++) {
       frequencies[letter_to_index(line->inputs[i][j])]++;
     }
   }
 
-  // map frequencies to segments {S0,S2,S4,S5} (the easy ones...)
-  int values[10];
-  for(size_t i = 0; i < 10; i++) {
+  // map frequencies to segments {S2,S4,S5} (the easy ones...)
+  int values[7];
+  for(size_t i = 0; i < 7; i++) {
     switch(frequencies[i]) {
       case 4:
         values[i] = 16;
@@ -65,11 +79,8 @@ int solve_line(line* line) {
       case 6:
         values[i] = 32;
         break;
-      case 8:
-        values[i] = 1;
-        break;
       case 9:
-        values[i] = 2;
+        values[i] = 4;
         break;
       default:
         values[i] = 0;
@@ -77,24 +88,58 @@ int solve_line(line* line) {
     }
   }
 
-  sort(line->inputs);
+  // find S2 from 1 (input length 2)
+  for(size_t i = 0; i < 10; i++) {
+    if(strlen(line->inputs[i]) == 2) {
+      char x = line->inputs[i][0];
+      char y = line->inputs[i][1];
+      if(values[letter_to_index(x)] == 0) {
+        values[letter_to_index(x)] = 2;
+      } else {
+        values[letter_to_index(y)] = 2;
+      }
+    }
+  }
 
-  // find S1 from 1 (input length 2)
+  // find S0 from 7 (input length 3)
+  for(size_t i = 0; i < 10; i++) {
+    if(strlen(line->inputs[i]) == 3) {
+      for(size_t j = 0; j < 3; j++) {
+        if(values[letter_to_index(line->inputs[i][j])] == 0) {
+          values[letter_to_index(line->inputs[i][j])] = 1;
+        }
+      }
+    }
+  }
 
   // find S6 from 4 (input length 4)
+  for(size_t i = 0; i < 10; i++) {
+    if(strlen(line->inputs[i]) == 4) {
+      for(size_t j = 0; j < 4; j++) {
+        if(values[letter_to_index(line->inputs[i][j])] == 0) {
+          values[letter_to_index(line->inputs[i][j])] = 64;
+        }
+      }
+    }
+  }
 
   // find S3 as the only remaining letter
+  for(size_t i = 0; i < 7; i++) 
+  values[i] = (values[i] == 0) ? 8 : values[i];
 
-  // work through each lit segment in each of the output values, add
+  // work through each lit segment in each of the output strings, add
   // that segment's value to the output total, then convert to get digit
-  int total = 0, output;
+  // multiply these by powers of 10 to get final output value, and sum all together
+  int total = 0, output, segv;
   for(size_t i = 0; i < 4; i++) {
     output = 0;
     for(size_t j = 0; j < strlen(line->outputs[i]); j++) {
       output += values[letter_to_index(line->outputs[i][j])];
     }
-    total += get_value(output);
+    
+    total += pow(10, (3 - i)) * get_value(output);
   }
+  
   return total;
 }
 
@@ -121,6 +166,6 @@ int main(void) {
 
   fclose(fptr);
 
-  printf("Total: %i\n", total); // answer:
+  printf("Total: %i\n", total); // answer: 1070957
   return 0;
 }
