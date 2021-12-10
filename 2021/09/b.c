@@ -10,12 +10,12 @@ int is_min(int* heightmap, int x, int y) {
   int cell = heightmap[ind(x, y)];
 
   // for each adjacent cell test if the value is greater (or cell is on an edge)
-  int lv = (x == 0 || heightmap[ind(x - 1, y)] > cell);
-  int rv = (x == 99 || heightmap[ind(x + 1, y)] > cell);
-  int uv = (y == 0 || heightmap[ind(x, y - 1)] > cell);
-  int dv = (y == 99 || heightmap[ind(x, y + 1)] > cell);
+  int l = (x == 0 || heightmap[ind(x - 1, y)] > cell);
+  int r = (x == 99 || heightmap[ind(x + 1, y)] > cell);
+  int u = (y == 0 || heightmap[ind(x, y - 1)] > cell);
+  int d = (y == 99 || heightmap[ind(x, y + 1)] > cell);
 
-  return (lv && rv && uv && dv);
+  return (l && r && u && d);
 }
 
 int get_risk(int* heightmap, int x, int y) {
