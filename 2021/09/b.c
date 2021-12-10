@@ -24,13 +24,23 @@ int get_risk(int* heightmap, int x, int y) {
 
 int walk(int* heightmap, int* covered, int x, int y) {
   covered[ind(x, y)] = 1; // mark that we've visited the current cell
+
   int total = 1; // include current cell in count
   int l = x - 1, r = x + 1, u = y - 1, d = y + 1; // identify all adjacent cells
+
   // start walking in all valid directions...
-  if(l >= 0 && covered[ind(l, y)] == 0 && heightmap[ind(l, y)] != 9) total += walk(heightmap, covered, l, y);
-  if(r < 100 && covered[ind(r, y)] == 0 && heightmap[ind(r, y)] != 9) total += walk(heightmap, covered, r, y);
-  if(u >= 0 && covered[ind(x, u)] == 0 && heightmap[ind(x, u)] != 9) total += walk(heightmap, covered, x, u);
-  if(d < 100 && covered[ind(x, d)] == 0 && heightmap[ind(x, d)] != 9) total += walk(heightmap, covered, x, d);
+  if(l >= 0 && covered[ind(l, y)] == 0 && heightmap[ind(l, y)] != 9)
+  total += walk(heightmap, covered, l, y);
+
+  if(r < 100 && covered[ind(r, y)] == 0 && heightmap[ind(r, y)] != 9)
+  total += walk(heightmap, covered, r, y);
+
+  if(u >= 0 && covered[ind(x, u)] == 0 && heightmap[ind(x, u)] != 9)
+  total += walk(heightmap, covered, x, u);
+
+  if(d < 100 && covered[ind(x, d)] == 0 && heightmap[ind(x, d)] != 9)
+  total += walk(heightmap, covered, x, d);
+  
   return total;
 }
 
