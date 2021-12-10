@@ -21,7 +21,6 @@ Binary representation is little endian.
 
 typedef struct {
   char inputs[10][8];
-  int matched[10];
   char outputs[4][8];
 } line;
 
@@ -35,11 +34,6 @@ line* parse_line(char inputs[15][8]) {
 int letter_to_index(char letter) {
   // convert segment letters into index value (a=0, b=1...)
   return letter - 97;
-}
-
-char index_to_letter(int index) {
-  // convert indexes back into segment letters
-  return index + 97;
 }
 
 int get_value(int segmentv) {
