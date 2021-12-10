@@ -6,6 +6,22 @@ int ind(int x, int y) {
   return (100*y) + x;
 }
 
+int is_min(int* heightmap, int x, int y) {
+  int cell = heightmap[ind(x, y)];
+
+  // for each adjacent cell test if the value is greater (or cell is on an edge)
+  int lv = (x == 0 || heightmap[ind(x - 1, y)] > cell);
+  int rv = (x == 99 || heightmap[ind(x + 1, y)] > cell);
+  int uv = (y == 0 || heightmap[ind(x, y - 1)] > cell);
+  int dv = (y == 99 || heightmap[ind(x, y + 1)] > cell);
+
+  return (lv && rv && uv && dv);
+}
+
+int get_risk(int* heightmap, int x, int y) {
+  return 1 + heightmap[ind(x, y)];
+}
+
 int main(void) {
   char file[] = "input.txt";
   FILE* fptr;
@@ -23,18 +39,10 @@ int main(void) {
   int risk = 0;
   for(int y = 0; y < 100; y++) {
     for(int x = 0; x < 100; x++) {
-      int cell = heightmap[ind(x, y)];
-      
-      // for each adjacent cell test if the value is greater (or cell is on an edge)
-      int lv = (x == 0 || heightmap[ind(x - 1, y)] > cell);
-      int rv = (x == 99 || heightmap[ind(x + 1, y)] > cell);
-      int uv = (y == 0 || heightmap[ind(x, y - 1)] > cell);
-      int dv = (y == 99 || heightmap[ind(x, y + 1)] > cell);
-      
-      if(lv && rv && uv && dv) risk += 1 + cell;
+      if(is_min(heightmap, x, y)) risk += get_risk(heightmap, x, y);
     }
   }
-  
+
   printf("Risk level: %i\n", risk); // 423
   return 0;
 }
