@@ -15,7 +15,7 @@ S5    S1
 S4    S2
 |      |
  — S3 —
- 
+
 Binary representation is little endian.
 */
 
@@ -24,11 +24,9 @@ typedef struct {
   char outputs[4][8];
 } line;
 
-line* parse_line(char inputs[15][8]) {
-  line* line = calloc(1, sizeof(line));
+void parse_line(line* line, char inputs[15][8]) {
   memcpy(line->inputs, inputs, sizeof(char)*10*8);
   memcpy(line->outputs, &inputs[11], sizeof(char)*4*8);
-  return line;
 }
 
 int letter_to_index(char letter) {
@@ -121,7 +119,7 @@ int solve_line(line* line) {
   }
 
   // find S3 as the only remaining letter
-  for(size_t i = 0; i < 7; i++) 
+  for(size_t i = 0; i < 7; i++)
   values[i] = (values[i] == 0) ? 8 : values[i];
 
   // work through each lit segment in each of the output strings, add
@@ -133,10 +131,10 @@ int solve_line(line* line) {
     for(size_t j = 0; j < strlen(line->outputs[i]); j++) {
       output += values[letter_to_index(line->outputs[i][j])];
     }
-    
+
     total += pow(10, (3 - i)) * get_value(output);
   }
-  
+
   return total;
 }
 
@@ -150,18 +148,19 @@ int main(void) {
   }
 
   int total = 0;
-  line* line;
+  line* line = calloc(1, sizeof(char)*15*8);
   char inputs[15][8];
   for(size_t i = 0; i < 200; i++) {
     for(size_t j = 0; j < 15; j++) {
       fscanf(fptr, "%s", inputs[j]);
     }
 
-    line = parse_line(inputs);
+    parse_line(line, inputs);
     total += solve_line(line);
   }
 
   fclose(fptr);
+  free(line);
 
   printf("Total: %i\n", total); // answer: 1070957
   return 0;
