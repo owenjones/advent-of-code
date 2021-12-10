@@ -92,6 +92,7 @@ int solve_line(line* line) {
       } else {
         values[letter_to_index(y)] = 2;
       }
+      break;
     }
   }
 
@@ -103,6 +104,7 @@ int solve_line(line* line) {
           values[letter_to_index(line->inputs[i][j])] = 1;
         }
       }
+      break;
     }
   }
 
@@ -114,6 +116,7 @@ int solve_line(line* line) {
           values[letter_to_index(line->inputs[i][j])] = 64;
         }
       }
+      break;
     }
   }
 
