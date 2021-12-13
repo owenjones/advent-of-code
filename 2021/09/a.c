@@ -43,6 +43,7 @@ int main(void) {
     }
   }
 
+  free(heightmap);
   printf("Risk level: %i\n", risk); // 423
   return 0;
 }
