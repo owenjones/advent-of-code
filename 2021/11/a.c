@@ -11,7 +11,7 @@ void dispgrid(uint8_t* g) {
 }
 
 int main(void) {
-  char file[] = "test_input.txt";
+  char file[] = "input.txt";
   FILE* fptr;
 
   if((fptr = fopen(file, "r")) == NULL) {
@@ -33,9 +33,7 @@ int main(void) {
   uint32_t flashes = 0;
   uint8_t* flashed = (uint8_t*) calloc(100, sizeof(uint8_t));
 
-  dispgrid(grid);
-
-  for(size_t s = 0; s < 2; s++) {
+  for(size_t s = 0; s < 100; s++) {
     for(size_t i = 0; i < 100; i++) grid[i]++;
 
     size_t i = 0;
@@ -45,8 +43,8 @@ int main(void) {
         flashes++;
         flashed[i] = 1;
 
-        size_t x = i % 10;
-        size_t y = i / 10;
+        int x = i % 10;
+        int y = i / 10;
 
         // work around adjacent cells clockwise from 12 o'clock.
         if(y - 1 >= 0) grid[i - 10]++;
@@ -65,13 +63,10 @@ int main(void) {
       }
     }
 
-    dispgrid(flashed);
-
     for(size_t i = 0; i < 100; i++) {
       grid[i] = flashed[i] ? 0 : grid[i];
       flashed[i] = 0;
     }
-    dispgrid(grid);
   }
 
   printf("Total number of flashes: %i\n", flashes);
