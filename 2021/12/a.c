@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+enum size{Big, Small};
+
+typedef struct cave {
+  char id[6];
+  enum size size;
+} cave_t;
+
 int main(void) {
   char file[] = "input.txt";
   FILE* fptr;
@@ -11,10 +18,9 @@ int main(void) {
     exit(1);
   }
 
-  char in[6];
-  char out[6];
+  char in[6], out[6];
   while(fscanf(fptr, "%s-%s", &in, &out) > 0) {
-    
+
   }
 
   fclose(fptr);
