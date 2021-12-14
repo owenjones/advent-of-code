@@ -19,7 +19,7 @@ int main(void) {
     exit(1);
   }
 
-  uint8_t* grid = (uint8_t*) calloc(100, sizeof(uint8_t));
+  uint8_t* grid = (uint8_t*) calloc(104, sizeof(uint8_t));
   size_t i = 0;
   while(fscanf(fptr, "%1i", &grid[i]) > 0) i++;
   fclose(fptr);
@@ -77,6 +77,9 @@ int main(void) {
     }
   }
 
-  printf("No flash sync...\n");
+  free(grid);
+  free(flashed);
+
+  printf("No flash sync...\n"); // 440
   return 1;
 }
