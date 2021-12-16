@@ -40,6 +40,7 @@ void cave_size(cave_t* cave) {
 
 cave_t* get_cave(cave_t** caves, char* id) {
   int h = hash(id);
+
   if(caves[h] == 0) {
     cave_t* cave = (cave_t*) calloc(1, sizeof(cave_t));
     strncpy(cave->id, id, strlen(id));
@@ -78,15 +79,43 @@ void load_caves(char* file, cave_t** caves) {
 }
 
 int walk_caves(cave_t** caves) {
-  // walk the cave - find start node (use hash func), then iteratively
-  // access each node in paths array and walk from there
-  // - how to track small caves in this to prevent re-visiting?
-  // ^ check on the visit, or generate all paths and parse at the end to remove
   cave_t* start = get_cave(caves, "start");
   cave_t* end = get_cave(caves, "end");
 
-  int paths = 0;
-  
+  int paths = 0, depth = 0;
+  int* taken = (int*) calloc(234, sizeof(int));
+  int* dir = (int*) calloc(10, sizeof(int));
+  cave_t *current = start, *next, *last;
+
+  while(depth >= 0) {
+    printf("Currently in cave <%s>\n", current->id);
+    next = current->paths[dir[depth]];
+
+    if(next == end) {
+      // check if next step takes us to the end
+      paths++;
+      dir[depth]++;
+    } else if(next->size == Small && taken[next->hash] == 1) {
+      // check if next step takes us into a small cave we've already visited
+      dir[depth]++;
+    } else if(dir[depth] < current->npaths) {
+      if(next->size == Small) taken[next->hash] = 1;
+      last = current;
+      current = next;
+      depth++;
+    } else {
+      depth--;
+      current = last;
+    }
+
+    if(depth == 0) {
+      free(taken);
+      taken = (int*) calloc(234, sizeof(int));
+    }
+  }
+
+  printf("Starting point has %i possible routes\n", start->npaths);
+
   return paths;
 }
 
@@ -100,10 +129,9 @@ void free_caves(cave_t** caves) {
 
 int main(void) {
   cave_t **caves = (cave_t**) calloc(234, sizeof(cave_t*));
-  load_caves("input.txt", caves);
+  load_caves("test_input.txt", caves);
   int paths = walk_caves(caves);
   free_caves(caves);
-
   printf("Paths through the system: %i\n", paths);
   return 0;
 }
