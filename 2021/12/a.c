@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum size{Big, Small, Exit};
+enum size{Big, Small, Special};
 
 typedef struct cave {
   char id[6];
@@ -29,12 +29,12 @@ int hash(char* id) {
 }
 
 void cave_size(cave_t* cave) {
-  if(cave->hash <= 50) {
+  if(cave->hash <= 50) { // 50==ZZ
     cave->size = Big;
-  } else if(cave->hash <= 114) {
+  } else if(cave->hash <= 114) { // 114==zz
     cave->size = Small;
   } else {
-    cave->size = Exit; // start/end nodes
+    cave->size = Special; // start/end nodes
   }
 }
 
@@ -51,16 +51,7 @@ cave_t* get_cave(cave_t** caves, char* id) {
   return caves[h];
 }
 
-void free_caves(cave_t** caves) {
-  for(size_t i = 0; i < 234; i++) {
-    if(caves[i] != 0) free(caves[i]);
-  }
-
-  free(caves);
-}
-
-int main(void) {
-  char file[] = "input.txt";
+void load_caves(char* file, cave_t** caves) {
   FILE* fptr;
 
   if((fptr = fopen(file, "r")) == NULL) {
@@ -68,13 +59,12 @@ int main(void) {
     exit(1);
   }
 
-  cave_t **caves = (cave_t**) calloc(234, sizeof(cave_t*));
   char* in = (char*) calloc(10, sizeof(char));
   while(fscanf(fptr, "%s", in) > 0) {
     char *left = (char*) calloc(6, sizeof(char));
     char *right = (char*) calloc(6, sizeof(char));
     split(in, left, right);
-    
+
     cave_t* l = get_cave(caves, left);
     cave_t* r = get_cave(caves, right);
     l->paths[l->npaths++] = r;
@@ -85,19 +75,35 @@ int main(void) {
   }
   free(in);
   fclose(fptr);
+}
 
-  cave_t* start = get_cave(caves, "start");
-  cave_t* end = get_cave(caves, "end");
-
+int walk_caves(cave_t** caves) {
   // walk the cave - find start node (use hash func), then iteratively
   // access each node in paths array and walk from there
   // - how to track small caves in this to prevent re-visiting?
   // ^ check on the visit, or generate all paths and parse at the end to remove
-
+  cave_t* start = get_cave(caves, "start");
+  cave_t* end = get_cave(caves, "end");
 
   int paths = 0;
-  printf("Paths through the system: %i\n", paths);
+  
+  return paths;
+}
 
+void free_caves(cave_t** caves) {
+  for(size_t i = 0; i < 234; i++) {
+    if(caves[i] != 0) free(caves[i]);
+  }
+
+  free(caves);
+}
+
+int main(void) {
+  cave_t **caves = (cave_t**) calloc(234, sizeof(cave_t*));
+  load_caves("input.txt", caves);
+  int paths = walk_caves(caves);
   free_caves(caves);
+
+  printf("Paths through the system: %i\n", paths);
   return 0;
 }
