@@ -59,6 +59,11 @@ int have_visited(cave_t** path, int depth, cave_t* cave) {
   return 0;
 }
 
+void print_path(cave_t** path, int depth) {
+  for(size_t i = 0; i <= depth; i++) printf("%s,", path[i]->id);
+  printf("end\n");
+}
+
 void load_caves(char* file, cave_t** caves) {
   FILE* fptr;
 
@@ -96,25 +101,32 @@ int walk_caves(cave_t** caves) {
   path[0] = start;
 
   while(depth >= 0) {
-    printf("Currently in cave <%s>\n", path[depth]->id);
+    // printf("Currently in cave <%s>\n", path[depth]->id);
 
-    next = path[depth]->paths[direction[depth]];
-
-    if(next == end) {
-      // check if next step takes us to the end
-      printf("reached end\n");
-      paths++;
-      direction[depth]++;
-    } else if(next->size == Small && have_visited(path, depth, next)) {
-      // check if next step takes us into a small cave we've already visited
-      direction[depth]++;
-      printf("reached a small cave we've already visited\n")
-    } else if(direction[depth] < path[depth]->npaths) {
-      depth++;
-      path[depth] = next;
-    } else {
+    if(direction[depth] > (path[depth]->npaths - 1)) {
       direction[depth] = 0;
+      path[depth] = NULL;
       depth--;
+    } else {
+      next = path[depth]->paths[direction[depth]];
+
+      if(next == end) {
+        // check if next step takes us to the end
+        // printf("reached end\n");
+        print_path(path, depth);
+        paths++;
+        direction[depth]++;
+      } else if(next->size == Small && have_visited(path, depth, next)) {
+        // check if next step takes us into a small cave we've already visited
+        direction[depth]++;
+        // printf("reached a small cave we've already visited (%s)\n", next->id);
+      } else if(next == start) {
+        direction[depth]++;
+      } else {
+        direction[depth]++;
+        depth++;
+        path[depth] = next;
+      }
     }
   }
 
