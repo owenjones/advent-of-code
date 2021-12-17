@@ -52,6 +52,13 @@ cave_t* get_cave(cave_t** caves, char* id) {
   return caves[h];
 }
 
+int have_visited(cave_t** path, int depth, cave_t* cave) {
+  for(size_t i = 0; i < depth; i++) {
+    if(path[i] == cave) return 1;
+  }
+  return 0;
+}
+
 void load_caves(char* file, cave_t** caves) {
   FILE* fptr;
 
@@ -83,57 +90,32 @@ int walk_caves(cave_t** caves) {
   cave_t* end = get_cave(caves, "end");
 
   int paths = 0, depth = 0;
-  int* taken = (int*) calloc(234, sizeof(int));
-  int* dir = (int*) calloc(10, sizeof(int));
-  cave_t *current = start, *next, *last;
+  cave_t** path = (cave_t**) calloc(10, sizeof(cave_t));
+  int* direction = (int*) calloc(10, sizeof(int));
+  cave_t* next;
+  path[0] = start;
 
   while(depth >= 0) {
-    printf("Currently in cave <%s>\n", current->id);
-    
-    taken[current->hash] = 1;
-    
-    if(dir[depth] > current->npaths) {
-      printf("exhausted all paths from here\n");
-      depth--;
-      current = last;
-      
-      if(depth == 0) {
-        // back at start so reset
-        free(taken);
-        taken = (int*) calloc(234, sizeof(int));
-      } else {
-        dir[depth] = 0;
-      }
-      
-      break;
-    }
-    
-    next = current->paths[dir[depth]];
+    printf("Currently in cave <%s>\n", path[depth]->id);
+
+    next = path[depth]->paths[direction[depth]];
 
     if(next == end) {
       // check if next step takes us to the end
       printf("reached end\n");
       paths++;
-      dir[depth]++;
-      break;
-    }
-    
-    if(next->size == Small && taken[next->hash] == 1) {
+      direction[depth]++;
+    } else if(next->size == Small && have_visited(path, depth, next)) {
       // check if next step takes us into a small cave we've already visited
-      printf("skipping small cave\n");
-      dir[depth]++;
-      break;
+      direction[depth]++;
+      printf("reached a small cave we've already visited\n")
+    } else if(direction[depth] < path[depth]->npaths) {
+      depth++;
+      path[depth] = next;
+    } else {
+      direction[depth] = 0;
+      depth--;
     }
-    
-    if(next == last) {
-      printf("can't go back to last cave\n");
-      dir[depth]++;
-      break;
-    }
-    
-    last = current;
-    current = next;
-    depth++;
   }
 
   return paths;
