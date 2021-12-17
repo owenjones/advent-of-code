@@ -89,32 +89,52 @@ int walk_caves(cave_t** caves) {
 
   while(depth >= 0) {
     printf("Currently in cave <%s>\n", current->id);
+    
+    taken[current->hash] = 1;
+    
+    if(dir[depth] > current->npaths) {
+      printf("exhausted all paths from here\n");
+      depth--;
+      current = last;
+      
+      if(depth == 0) {
+        // back at start so reset
+        free(taken);
+        taken = (int*) calloc(234, sizeof(int));
+      } else {
+        dir[depth] = 0;
+      }
+      
+      break;
+    }
+    
     next = current->paths[dir[depth]];
 
     if(next == end) {
       // check if next step takes us to the end
+      printf("reached end\n");
       paths++;
       dir[depth]++;
-    } else if(next->size == Small && taken[next->hash] == 1) {
+      break;
+    }
+    
+    if(next->size == Small && taken[next->hash] == 1) {
       // check if next step takes us into a small cave we've already visited
+      printf("skipping small cave\n");
       dir[depth]++;
-    } else if(dir[depth] < current->npaths) {
-      if(next->size == Small) taken[next->hash] = 1;
-      last = current;
-      current = next;
-      depth++;
-    } else {
-      depth--;
-      current = last;
+      break;
     }
-
-    if(depth == 0) {
-      free(taken);
-      taken = (int*) calloc(234, sizeof(int));
+    
+    if(next == last) {
+      printf("can't go back to last cave\n");
+      dir[depth]++;
+      break;
     }
+    
+    last = current;
+    current = next;
+    depth++;
   }
-
-  printf("Starting point has %i possible routes\n", start->npaths);
 
   return paths;
 }
