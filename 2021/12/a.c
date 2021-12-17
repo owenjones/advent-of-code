@@ -101,29 +101,21 @@ int walk_caves(cave_t** caves) {
   path[0] = start;
 
   while(depth >= 0) {
-    // printf("Currently in cave <%s>\n", path[depth]->id);
-
     if(direction[depth] > (path[depth]->npaths - 1)) {
       direction[depth] = 0;
       path[depth] = NULL;
       depth--;
+      direction[depth]++;
     } else {
       next = path[depth]->paths[direction[depth]];
 
       if(next == end) {
-        // check if next step takes us to the end
-        // printf("reached end\n");
         print_path(path, depth);
         paths++;
         direction[depth]++;
-      } else if(next->size == Small && have_visited(path, depth, next)) {
-        // check if next step takes us into a small cave we've already visited
-        direction[depth]++;
-        // printf("reached a small cave we've already visited (%s)\n", next->id);
-      } else if(next == start) {
+      } else if((next->size == Small && have_visited(path, depth, next)) || (next == start)) {
         direction[depth]++;
       } else {
-        direction[depth]++;
         depth++;
         path[depth] = next;
       }
@@ -143,9 +135,9 @@ void free_caves(cave_t** caves) {
 
 int main(void) {
   cave_t **caves = (cave_t**) calloc(234, sizeof(cave_t*));
-  load_caves("test_input.txt", caves);
+  load_caves("input.txt", caves);
   int paths = walk_caves(caves);
   free_caves(caves);
-  printf("Paths through the system: %i\n", paths);
+  printf("\nTotal paths through the system: %i\n", paths); // 3495
   return 0;
 }
