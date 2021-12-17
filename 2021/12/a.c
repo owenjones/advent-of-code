@@ -122,6 +122,9 @@ int walk_caves(cave_t** caves) {
     }
   }
 
+  free(path);
+  free(direction);
+
   return paths;
 }
 
