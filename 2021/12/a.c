@@ -95,8 +95,8 @@ int walk_caves(cave_t** caves) {
   cave_t* end = get_cave(caves, "end");
 
   int paths = 0, depth = 0;
-  cave_t** path = (cave_t**) calloc(10, sizeof(cave_t));
-  int* direction = (int*) calloc(10, sizeof(int));
+  cave_t** path = (cave_t**) calloc(15, sizeof(cave_t));
+  int* direction = (int*) calloc(15, sizeof(int));
   cave_t* next;
   path[0] = start;
 
