@@ -12,12 +12,73 @@ typedef struct cave {
   int npaths;
 } cave_t;
 
-typedef struct save {
-  int hash;
+typedef struct state {
   int depth;
+  cave_t** paths;
+  int* direction;
+  int saved;
+  int sdepth;
   int triggered;
-  int tdepth;
-} save_t;
+} state_t;
+
+state_t* init_state(cave_t* start) {
+  state_t* state = (state_t*) calloc(1, sizeof(state_t));
+  state->depth = 0;
+  state->paths = (cave_t**) calloc(50, sizeof(cave_t*));
+  state->paths[0] = start;
+  state->direction = (int*) calloc(50, sizeof(int));
+  state->saved = 0;
+  state->sdepth = 0;
+  state->triggered = 0;
+  return state;
+}
+
+cave_t* current_cave(state_t* state) {
+  return state->paths[state->depth];
+}
+
+cave_t* next_cave(state_t* state) {
+  return current_cave(state)->paths[state->direction[state->depth]];
+}
+
+void take_path(state_t* state) {
+  state->paths[(state->depth + 1)] = next_cave(state);
+  state->depth++;
+}
+
+void skip_path(state_t* state) {
+  state->direction[state->depth]++;
+}
+
+int is_valid_path(state_t* state) {
+  return state->direction[state->depth] < state->paths[state->depth]->npaths;
+}
+
+void backtrack(state_t* state) {
+  printf("Backtracking... ");
+
+  if(state->depth < 0) {
+    printf("we shouldn't be this deep?\n");
+  } else {
+    state->direction[state->depth] = 0;
+
+    if(current_cave(state)->hash == state->saved && state->triggered == state->depth) {
+      printf("and untriggering this small cave\n");
+      state->triggered = 0;
+    } else if(current_cave(state)->hash == state->saved && state->sdepth == state->depth) {
+      printf("and unsaving this small cave\n");
+      state->saved = 0;
+      state->sdepth = 0;
+    }
+    else {
+      printf("and taking a step backwards\n");
+      state->depth--;
+      state->direction[state->depth]++;
+      if(!is_valid_path(state)) backtrack(state);
+      // if(state->depth == 0) state->direction[state->depth] = 0;
+    }
+  }
+}
 
 void split(char* in, char* left, char* right) {
   for(size_t i = 0; i < strlen(in); i++) {
@@ -35,17 +96,6 @@ int hash(char* id) {
   return h;
 }
 
-
-void cave_size(cave_t* cave) {
-  if(cave->hash <= 50) { // 50==ZZ
-    cave->size = Big;
-  } else if(cave->hash <= 114) { // 114==zz
-    cave->size = Small;
-  } else {
-    cave->size = Special; // start/end nodes
-  }
-}
-
 cave_t* get_cave(cave_t** caves, char* id) {
   int h = hash(id);
 
@@ -53,7 +103,15 @@ cave_t* get_cave(cave_t** caves, char* id) {
     cave_t* cave = (cave_t*) calloc(1, sizeof(cave_t));
     strncpy(cave->id, id, strlen(id));
     cave->hash = h;
-    cave_size(cave);
+
+    if(cave->hash <= 50) { // 50==ZZ
+      cave->size = Big;
+    } else if(cave->hash <= 114) { // 114==zz
+      cave->size = Small;
+    } else {
+      cave->size = Special; // start/end nodes
+    }
+
     caves[h] = cave;
   }
 
@@ -67,8 +125,8 @@ int have_visited(cave_t** path, int depth, cave_t* cave) {
   return 0;
 }
 
-void print_path(cave_t** path, int depth) {
-  for(size_t i = 0; i <= depth; i++) printf("%s,", path[i]->id);
+void print_path(state_t* state) {
+  for(size_t i = 0; i <= state->depth; i++) printf("%s,", state->paths[i]->id);
   printf("end\n\n");
 }
 
@@ -99,85 +157,68 @@ void load_caves(char* file, cave_t** caves) {
 }
 
 int walk_caves(cave_t** caves) {
+  int paths = 0;
   cave_t* start = get_cave(caves, "start");
   cave_t* end = get_cave(caves, "end");
+  cave_t *current = NULL, *next = NULL;
+  state_t* state = init_state(start);
 
-  int paths = 0, depth = 0;
-  cave_t** path = (cave_t**) calloc(50, sizeof(cave_t));
-  int* direction = (int*) calloc(50, sizeof(int));
-  cave_t* next;
-  save_t* save = (save_t*) calloc(1, sizeof(save_t));
-  
-  save->hash = 0;
-  path[0] = start;
+  while(state->depth >= 0) {
+    if(!is_valid_path(state)) backtrack(state);
+    if(state->depth < 0) return paths;
 
-  while(depth >= 0) {
-    printf("In cave <%s> (depth=%i)\n", path[depth]->id, depth);
-    
-    if(direction[depth] > (path[depth]->npaths - 1)) {
-      direction[depth] = 0;
-      
-      if(save->hash && save->depth == depth && save->hash == path[depth]->hash) {
-        printf("we're back to the small cave we're allowed to visit first\n");
-        save->hash = 0;
-      } else if(save->hash && save->hash == path[depth]->hash && save->triggered && save->tdepth == depth) {
-        save->triggered = 0;
-      } else {
-        printf("no more valid paths forward, lets go back one\n");
-        path[depth] = NULL;
-        depth--;
-        if(depth >= 0) direction[depth]++;
-        // if(depth == 0) save->hash = 0;
+    current = current_cave(state);
+    next = next_cave(state);
+
+    printf("In cave <%s>, next cave is <%s> (path %i): ", current->id, next->id, state->direction[state->depth]);
+
+    if(next == NULL) {
+      printf("ERROR - next cave is a null pointer\n");
+      exit(1);
+    }
+
+    if(next == end) {
+      printf("we've reached the end\n");
+      paths++;
+      printf("%4i - ", paths);
+      print_path(state);
+      skip_path(state);
+    }
+    else if(next == start) {
+      printf("this would take us back to the start\n");
+      skip_path(state);
+    }
+    else if(next->size == Small) {
+      printf("this is a small cave - ");
+      if(!state->saved) {
+        printf("saved for a re-visit\n");
+        state->saved = next->hash;
+        state->sdepth = state->depth;
+        take_path(state);
       }
-      
-    } else {
-      next = path[depth]->paths[direction[depth]];
-
-      if(next == end) {
-        printf("we've reached the end\n");
-        paths++;
-        printf("%4i - ", paths);
-        print_path(path, depth);
-        direction[depth]++;
-      } else if(next->size == Small) {
-        printf("we've reached a small cave <%s>\n", next->id);
-        if(!save->hash) {
-          printf("this is the first small cave we've visited\n");
-          save->hash = next->hash;
-          save->depth = depth;
-          depth++;
-          path[depth] = next;
-        } else {
-          printf("this is not the first small cave we've visited ");
-          if(save->hash == next->hash && save->triggered == 0) {
-            printf("but we can visit this one again\n");
-            save->triggered = 1;
-            save->tdepth = depth;
-            depth++;
-            path[depth] = next;
-          } else if(!have_visited(path, depth, next)) {
-            depth++;
-            path[depth] = next;
-            printf("but we haven't visited this cave yet\n");
-          } else {
-            printf("and we can't take it again, so we can't take this path\n");
-            direction[depth]++;
-          }
-        }
-      } else if(next == start) {
-        direction[depth]++;
-        printf("this path would take us back to the beginning\n");
-      } else {
-        printf("lets go into this cave <%s>\n", next->id);
-        depth++;
-        path[depth] = next;
+      else if(state->saved == next->hash && !state->triggered) {
+        printf("our single allowed re-visit\n");
+        state->triggered = state->depth;
+        take_path(state);
+      }
+      else if(!have_visited(state->paths, state->depth, next)) {
+        printf("we haven't visited it yet\n");
+        take_path(state);
+      }
+      else {
+        printf("we can't go this way\n");
+        skip_path(state);
       }
     }
+    else {
+      printf("let's take this path\n");
+      take_path(state);
+    }
+
+    if(state->depth > 10) exit(1);
   }
 
-  free(direction);
-  free(path);
-
+  free(state);
   return paths;
 }
 
