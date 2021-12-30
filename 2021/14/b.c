@@ -19,7 +19,7 @@ int hash_letter(char letter) {
 }
 
 int hash_pair(char pair[2]) {
-  // convert letter pair XX into hash value
+  // convert letter pair into hash value
   return (((pair[0] - 65) * 10) << 2) + (pair[1] - 65);
 }
 
@@ -32,7 +32,7 @@ int main(void) {
     exit(1);
   }
 
-  char* template = (char*) calloc(21, sizeof(char));
+  char* template = calloc(21, sizeof(char));
   fscanf(fptr, "%s\n\n", template);
 
   pair_t **pairs = calloc(1000, sizeof(pair_t*));
@@ -45,8 +45,7 @@ int main(void) {
   int h;
   while(fscanf(fptr, "%2c -> %1c\n", pair, insert) > 0) {
     h = hash_pair(pair);
-    // printf("%s = %i\n", pair, h);
-    
+
     p = calloc(1, sizeof(pair_t));
     p->left = hash_letter(pair[0]);
     p->right = hash_letter(pair[1]);
