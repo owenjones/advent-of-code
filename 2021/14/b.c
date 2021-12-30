@@ -8,11 +8,6 @@ typedef struct pair {
   int right;
 } pair_t;
 
-typedef struct rule {
-  int left;
-  int right;
-} rule_t;
-
 int hash_letter(char letter) {
   // convert single letter into hash value
   return (letter - 65);
@@ -36,13 +31,11 @@ int main(void) {
   fscanf(fptr, "%s\n\n", template);
 
   pair_t **pairs = calloc(6426, sizeof(pair_t*));
-  rule_t **rules = calloc(6426, sizeof(rule_t*));
+  pair_t **rules = calloc(6426, sizeof(pair_t*));
   
-  pair_t *p;
-  rule_t *r;
-  
-  char pair[3], insert[2], left[3], right[3];
   int h;
+  pair_t *p, *r;
+  char pair[3], insert[2], left[3], right[3];
   while(fscanf(fptr, "%2c -> %1c\n", pair, insert) > 0) {
     h = hash_pair(pair);
 
@@ -57,7 +50,7 @@ int main(void) {
     right[0] = *insert;
     right[1] = pair[1];
 
-    r = calloc(1, sizeof(rule_t));
+    r = calloc(1, sizeof(pair_t));
     r->left = hash_pair(left);
     r->right = hash_pair(right);
     rules[h] = r;
@@ -79,7 +72,7 @@ int main(void) {
     tcounts = calloc(6426, sizeof(uint64_t));
     
     // For each step - take count of pair and add pairs the character
-    // insertion would generate
+    // insertion would generate if we were folding normally
     for(size_t i = 0; i < 6426; i++) {
       if(rules[i] != NULL) {
         tcounts[rules[i]->left] += counts[i];
@@ -87,21 +80,28 @@ int main(void) {
       }
     }
     
+    free(counts);
     counts = tcounts;
   }
   
+  // Count the frequency of each letter in the pairs
   uint64_t *letters = calloc(25, sizeof(uint64_t));
   for(size_t i = 0; i < 6426; i++) {
     if(pairs[i] != NULL) {
       letters[pairs[i]->left] += counts[i];
       letters[pairs[i]->right] += counts[i];
     }
+    
+    free(pairs[i]);
+    free(rules[i]);
   }
+  free(counts);
 
   // Need to add on first & last letters of template as these only
-  // get covered by one pair (all other letters have a left and right)
+  // get covered by one pair (all other letters appear in both left and right of pairs)
   letters[hash_letter(template[0])]++;
   letters[hash_letter(template[(strlen(template) - 1)])]++;
+  free(template);
 
   // Sort counts largest to smallest
   size_t i = 0;
@@ -117,10 +117,12 @@ int main(void) {
     }
   }
 
-  // Find last non-zero count, and subtract from highest count
+  // Find last non-zero count, and subtract from highest count - need to halve
+  // amount (as letters appear twice - in left of one pair, and right of another)
   size_t x = 0;
   while(letters[x] > 0) x++;
   uint64_t answer = (letters[0] - letters[(x-1)]) / 2; // 4110215602456
+  free(letters);
   
   printf("Frequency of most common element minus frequency of least common: %llu\n", answer);
   return 0;
