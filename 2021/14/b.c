@@ -20,7 +20,7 @@ int hash_letter(char letter) {
 
 int hash_pair(char pair[2]) {
   // convert letter pair into hash value
-  return (((pair[0] - 65) * 10) << 2) + (pair[1] - 65);
+  return ((pair[0] - 65) << 8) + (pair[1] - 65);
 }
 
 int main(void) {
@@ -35,8 +35,8 @@ int main(void) {
   char* template = calloc(21, sizeof(char));
   fscanf(fptr, "%s\n\n", template);
 
-  pair_t **pairs = calloc(1000, sizeof(pair_t*));
-  rule_t **rules = calloc(1000, sizeof(rule_t*));
+  pair_t **pairs = calloc(6426, sizeof(pair_t*));
+  rule_t **rules = calloc(6426, sizeof(rule_t*));
   
   pair_t *p;
   rule_t *r;
@@ -65,7 +65,7 @@ int main(void) {
   
   fclose(fptr);
     
-  uint64_t *counts = calloc(1000, sizeof(uint64_t));
+  uint64_t *counts = calloc(6426, sizeof(uint64_t));
   uint64_t *tcounts;
   
   // Make initial count of all pairs in template
@@ -76,11 +76,11 @@ int main(void) {
   }
   
   for(size_t s = 0; s < 40; s++) {
-    tcounts = calloc(1000, sizeof(uint64_t));
+    tcounts = calloc(6426, sizeof(uint64_t));
     
     // For each step - take count of pair and add pairs the character
     // insertion would generate
-    for(size_t i = 0; i < 999; i++) {
+    for(size_t i = 0; i < 6426; i++) {
       if(rules[i] != NULL) {
         tcounts[rules[i]->left] += counts[i];
         tcounts[rules[i]->right] += counts[i];
@@ -91,7 +91,7 @@ int main(void) {
   }
   
   uint64_t *letters = calloc(25, sizeof(uint64_t));
-  for(size_t i = 0; i < 999; i++) {
+  for(size_t i = 0; i < 6426; i++) {
     if(pairs[i] != NULL) {
       letters[pairs[i]->left] += counts[i];
       letters[pairs[i]->right] += counts[i];
