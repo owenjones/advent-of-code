@@ -1,40 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
+typedef struct pair {
+  int left;
+  int right;
+} pair_t;
 
 typedef struct rule {
-  char left;
-  char right;
-  char element;
+  int left;
+  int right;
 } rule_t;
 
-char* fold(char* template, rule_t** rules, int nrules) {
-  char* new = (char*) calloc(strlen(template) * 2, sizeof(char));
-  char* insert;
-  
-  new[0] = template[0];
-  
-  for(size_t i = 0; i < strlen(template); i++) {
-    insert = (char*) calloc(3, sizeof(char));
+int hash_letter(char letter) {
+  // convert single letter into hash value
+  return (letter - 65);
+}
 
-    for(size_t r = 0; r < nrules; r++) {
-      if(template[i] == rules[r]->left && template[i+1] == rules[r]->right) {
-        sprintf(insert, "%c%c", rules[r]->element, rules[r]->right);
-        strcat(new, insert);
-        break;
-      }
-    }
-    
-    if(!insert) {
-      sprintf(insert, "%c", template[i+1]);
-      strcat(new, insert);
-    }
-    
-    free(insert);
-  }
-  
-  free(template);
-  return new;
+int hash_pair(char pair[2]) {
+  // convert letter pair XX into hash value
+  return (((pair[0] - 65) * 10) << 2) + (pair[1] - 65);
 }
 
 int main(void) {
@@ -46,49 +32,97 @@ int main(void) {
     exit(1);
   }
 
-  char* template = (char*) calloc(20, sizeof(char));
-  fscanf(fptr, "%s\n", template);
+  char* template = (char*) calloc(21, sizeof(char));
+  fscanf(fptr, "%s\n\n", template);
+
+  pair_t **pairs = calloc(1000, sizeof(pair_t*));
+  rule_t **rules = calloc(1000, sizeof(rule_t*));
   
-  rule_t **rules = (rule_t**) calloc(100, sizeof(rule_t*));
-  char left, right, element;
-  int nrules = 0;
-  while(fscanf(fptr, "%1c%1c -> %1c\n", &left, &right, &element) > 0) {
-    rule_t *rule = (rule_t*) calloc(1, sizeof(rule_t));
-    rule->left = left;
-    rule->right = right;
-    rule->element = element;
-    rules[nrules++] = rule;
-  }
+  pair_t *p;
+  rule_t *r;
+  
+  char pair[3], insert[2], left[3], right[3];
+  int h;
+  while(fscanf(fptr, "%2c -> %1c\n", pair, insert) > 0) {
+    h = hash_pair(pair);
+    // printf("%s = %i\n", pair, h);
+    
+    p = calloc(1, sizeof(pair_t));
+    p->left = hash_letter(pair[0]);
+    p->right = hash_letter(pair[1]);
+    pairs[h] = p;
+    
+    left[0] = pair[0];
+    left[1] = *insert;
+    
+    right[0] = *insert;
+    right[1] = pair[1];
 
+    r = calloc(1, sizeof(rule_t));
+    r->left = hash_pair(left);
+    r->right = hash_pair(right);
+    rules[h] = r;
+  }
+  
   fclose(fptr);
-
-  for(size_t i = 0; i < 40; i++) {
-    printf("%zu...\n", i);
-    template = fold(template, rules, nrules);
-  }
-
-  int* counts = (int*) calloc(26, sizeof(int));
+    
+  uint64_t *counts = calloc(1000, sizeof(uint64_t));
+  uint64_t *tcounts;
+  
+  // Make initial count of all pairs in template
   for(size_t i = 0; i < strlen(template); i++) {
-    counts[(template[i] - 65)]++;
+    pair[0] = template[i];
+    pair[1] = template[i+1];
+    counts[hash_pair(pair)]++;
+  }
+  
+  for(size_t s = 0; s < 40; s++) {
+    tcounts = calloc(1000, sizeof(uint64_t));
+    
+    // For each step - take count of pair and add pairs the character
+    // insertion would generate
+    for(size_t i = 0; i < 999; i++) {
+      if(rules[i] != NULL) {
+        tcounts[rules[i]->left] += counts[i];
+        tcounts[rules[i]->right] += counts[i];
+      }
+    }
+    
+    counts = tcounts;
+  }
+  
+  uint64_t *letters = calloc(25, sizeof(uint64_t));
+  for(size_t i = 0; i < 999; i++) {
+    if(pairs[i] != NULL) {
+      letters[pairs[i]->left] += counts[i];
+      letters[pairs[i]->right] += counts[i];
+    }
   }
 
+  // Need to add on first & last letters of template as these only
+  // get covered by one pair (all other letters have a left and right)
+  letters[hash_letter(template[0])]++;
+  letters[hash_letter(template[(strlen(template) - 1)])]++;
+
+  // Sort counts largest to smallest
   size_t i = 0;
-  int temp;
+  uint64_t temp;
   while(i < 25) {
-    if(counts[i] < counts[i+1]) {
-      temp = counts[i];
-      counts[i] = counts[i+1];
-      counts[i+1] = temp;
+    if(letters[i] < letters[i+1]) {
+      temp = letters[i];
+      letters[i] = letters[i+1];
+      letters[i+1] = temp;
       i = 0;
     } else {
       i++;
     }
   }
 
-  i = 0;
-  while(counts[i] > 0) i++;
+  // Find last non-zero count, and subtract from highest count
+  size_t x = 0;
+  while(letters[x] > 0) x++;
+  uint64_t answer = (letters[0] - letters[(x-1)]) / 2; // 4110215602456
   
-  int answer = counts[0] - counts[i-1]; // 3143
-  printf("Frequency of most common element minus frequency of least common: %i\n", answer);
+  printf("Frequency of most common element minus frequency of least common: %llu\n", answer);
   return 0;
 }
