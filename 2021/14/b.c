@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
-#include <wchar.h>
 
 typedef struct pair {
   int left;
