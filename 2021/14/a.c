@@ -9,13 +9,13 @@ typedef struct rule {
 } rule_t;
 
 char* fold(char* template, rule_t** rules, int nrules) {
-  char* new = (char*) calloc(strlen(template) * 2, sizeof(char));
+  char* new = calloc(strlen(template) * 2, sizeof(char));
   char* insert;
-  
+
   new[0] = template[0];
-  
+
   for(size_t i = 0; i < strlen(template); i++) {
-    insert = (char*) calloc(3, sizeof(char));
+    insert = calloc(3, sizeof(char));
 
     for(size_t r = 0; r < nrules; r++) {
       if(template[i] == rules[r]->left && template[i+1] == rules[r]->right) {
@@ -24,15 +24,15 @@ char* fold(char* template, rule_t** rules, int nrules) {
         break;
       }
     }
-    
+
     if(!insert) {
       sprintf(insert, "%c", template[i+1]);
       strcat(new, insert);
     }
-    
+
     free(insert);
   }
-  
+
   free(template);
   return new;
 }
@@ -46,14 +46,14 @@ int main(void) {
     exit(1);
   }
 
-  char* template = (char*) calloc(20, sizeof(char));
+  char* template = calloc(21, sizeof(char));
   fscanf(fptr, "%s\n", template);
-  
-  rule_t **rules = (rule_t**) calloc(100, sizeof(rule_t*));
+
+  rule_t **rules = calloc(100, sizeof(rule_t*));
   char left, right, element;
   int nrules = 0;
   while(fscanf(fptr, "%1c%1c -> %1c\n", &left, &right, &element) > 0) {
-    rule_t *rule = (rule_t*) calloc(1, sizeof(rule_t));
+    rule_t *rule = calloc(1, sizeof(rule_t));
     rule->left = left;
     rule->right = right;
     rule->element = element;
@@ -66,10 +66,15 @@ int main(void) {
     template = fold(template, rules, nrules);
   }
 
-  int* counts = (int*) calloc(26, sizeof(int));
+  for(size_t i = 0; i < nrules; i++) free(rules[i]);
+  free(rules);
+
+  int* counts = calloc(26, sizeof(int));
   for(size_t i = 0; i < strlen(template); i++) {
     counts[(template[i] - 65)]++;
   }
+
+  free(template);
 
   size_t i = 0;
   int temp;
@@ -86,8 +91,11 @@ int main(void) {
 
   i = 0;
   while(counts[i] > 0) i++;
-  
+
   int answer = counts[0] - counts[i-1]; // 3143
   printf("Frequency of most common element minus frequency of least common: %i\n", answer);
+
+  free(counts);
+
   return 0;
 }

@@ -59,7 +59,7 @@ int is_close(char input) {
 uint64_t test_line(char input[100]) {
   char symbols[100];
   int index = 0;
-  
+
   for(size_t i = 0; i < strlen(input); i++) {
     if(is_open(input[i])) {
       symbols[index++] = input[i];
@@ -72,7 +72,7 @@ uint64_t test_line(char input[100]) {
       }
     }
   }
-  
+
   uint64_t s = 0;
   for(size_t i = index ; i > 0; i--) {
     s *= 5;
@@ -114,11 +114,11 @@ int main(void) {
     score = test_line(line);
     if(score > 0) scores[ind++] = score;
   }
-  
+
   fclose(fptr);
-  
+
   sort(scores, ind);
   score = scores[(ind / 2)];
-  printf("Middle score (of %i scores): %llu\n", ind, score); // 2360030859
+  printf("Middle score (of %i scores): %" PRIu64 "\n", ind, score); // 2360030859
   return 0;
 }

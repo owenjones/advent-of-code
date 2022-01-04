@@ -79,9 +79,9 @@ int is_valid_path(state_t* state) {
 void backtrack(state_t* state) {
   state->direction[state->depth] = 0;
   state->depth--;
-  
+
   if(state->depth < 0) return;
-  
+
   if(next_cave(state)->hash == state->saved) {
     if(state->saved_depth == state->depth && !state->triggered) {
       state->saved = 0;
@@ -91,7 +91,7 @@ void backtrack(state_t* state) {
       state->triggered = 0;
     }
   }
-  
+
   state->path[state->depth+1] = NULL;
   state->direction[state->depth]++;
 }
@@ -175,13 +175,12 @@ void load_caves(char* file, cave_t** caves) {
 int walk_caves(cave_t** caves) {
   cave_t* start = get_cave(caves, "start");
   cave_t* end = get_cave(caves, "end");
-  cave_t *current = NULL, *next = NULL;
+  cave_t *next = NULL;
   state_t* state = init_state(start);
 
   while(state->depth >= 0) {
     if(!is_valid_path(state)) backtrack(state);
     else {
-      current = current_cave(state);
       next = next_cave(state);
 
       if(next == end) {
@@ -189,7 +188,7 @@ int walk_caves(cave_t** caves) {
           print_path(state);
           store_valid_path(state);
         }
-        
+
         skip_path(state);
       }
       else if(next == start) {
@@ -201,7 +200,7 @@ int walk_caves(cave_t** caves) {
             state->saved = next->hash;
             state->saved_depth = state->depth;
           }
-      
+
           take_path(state);
         }
         else if(state->saved && state->saved == next->hash && !state->triggered) {
@@ -216,12 +215,17 @@ int walk_caves(cave_t** caves) {
       else {
         take_path(state);
       }
-      
+
     }
   }
 
   int paths = state->paths;
+
+  for(size_t i = 0; i < paths; i++) free(state->valid_paths[i]);
+  free(state->path);
+  free(state->direction);
   free(state);
+
   return paths;
 }
 
@@ -235,7 +239,7 @@ void free_caves(cave_t** caves) {
 
 int main(void) {
   cave_t **caves = (cave_t**) calloc(234, sizeof(cave_t*));
-  load_caves("input.txt", caves);
+  load_caves("test_input_a.txt", caves);
   int paths = walk_caves(caves);
   free_caves(caves);
   printf("\nTotal paths through the system: %i\n", paths); // 94849

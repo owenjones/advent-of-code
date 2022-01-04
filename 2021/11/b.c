@@ -19,9 +19,9 @@ int main(void) {
     exit(1);
   }
 
-  uint8_t* grid = (uint8_t*) calloc(104, sizeof(uint8_t));
+  uint8_t* grid = calloc(104, sizeof(uint8_t));
   size_t i = 0;
-  while(fscanf(fptr, "%1i", &grid[i]) > 0) i++;
+  while(fscanf(fptr, "%1hhi", &grid[i]) > 0) i++;
   fclose(fptr);
 
   // for 100 steps:
@@ -31,7 +31,7 @@ int main(void) {
   // * once we've made it to end of grid, reset all flashed to 0 and move to next step
 
   uint32_t flashes = 0;
-  uint8_t* flashed = (uint8_t*) calloc(100, sizeof(uint8_t));
+  uint8_t* flashed = calloc(100, sizeof(uint8_t));
   size_t s;
 
   for(s = 0; s < 1000; s++) {
@@ -73,6 +73,8 @@ int main(void) {
 
     if(sum == 100) {
       printf("Flashed on step: %zu\n", (s+1));
+      free(grid);
+      free(flashed);
       return 0;
     }
   }

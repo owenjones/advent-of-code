@@ -21,7 +21,7 @@ int main(void) {
 
   uint8_t* grid = (uint8_t*) calloc(104, sizeof(uint8_t));
   size_t i = 0;
-  while(fscanf(fptr, "%1i", &grid[i]) > 0) i++;
+  while(fscanf(fptr, "%1hhi", &grid[i]) > 0) i++;
   fclose(fptr);
 
   // for 100 steps:
