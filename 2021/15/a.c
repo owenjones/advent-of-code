@@ -122,11 +122,12 @@ int main(void) {
   cells[0]->cost = 0; // hack to stop start cost being included in total cost
   heap_insert(frontier, cells[0]);
 
-  cell_t *c, *target = cells[hash((DIM - 1), (DIM - 1))];
+  cell_t *c = NULL, *target = cells[hash((DIM - 1), (DIM - 1))];
   int n[4], dist;
 
   while(c != target) {
-    c = heap_min(frontier);
+    c = heap_pop(frontier);
+    
     for(size_t i = 0; i < frontier->size; i++) {
       if(distance(c, frontier->cells[i]) < (DIM / 10)) {
         neighbours(c, n);
@@ -134,6 +135,9 @@ int main(void) {
           if(n[j] > 0) {
             cost = frontier->cells[i]->cost + cells[n[j]]->cost;
             dist = distance(cells[n[j]], target);
+
+            cells[n[j]]->cost = cost;
+            heap_insert(frontier, cells[n[j]]);
 
             printf("(%i, %i) => %i/%i\n", cells[n[j]]->x, cells[n[j]]->y, cost, dist);
           }
