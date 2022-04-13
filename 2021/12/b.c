@@ -239,7 +239,7 @@ void free_caves(cave_t** caves) {
 
 int main(void) {
   cave_t **caves = (cave_t**) calloc(234, sizeof(cave_t*));
-  load_caves("test_input_a.txt", caves);
+  load_caves("input.txt", caves);
   int paths = walk_caves(caves);
   free_caves(caves);
   printf("\nTotal paths through the system: %i\n", paths); // 94849
