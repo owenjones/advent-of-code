@@ -52,6 +52,6 @@ int main(void) {
 
   fclose(fptr);
 
-  printf("Total of priority items: %d\n", total); // 8515
+  printf("Total of priority items: %d\n", total); // 2434
   return 0;
 }
