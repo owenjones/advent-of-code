@@ -14,14 +14,12 @@ int main(void) {
   int a, b, c, d;
   int* upper = NULL;
   int* lower = NULL;
-  int* overlap = NULL;
   int i;
   int lines = 0;
   
   while(fscanf(fptr, "%d-%d,%d-%d", &a, &b, &c, &d) > 0) {
     upper = calloc(100, sizeof(int));
     lower = calloc(100, sizeof(int));
-    overlap = calloc(100, sizeof(int));
     
     for(i = a; i <= b; i++) {
       upper[i]++;
@@ -37,10 +35,13 @@ int main(void) {
         break;
       }
     }
+    
+    free(upper);
+    free(lower);
   }
 
   fclose(fptr);
 
-  printf("Total lines: %d\n", lines);
+  printf("Total lines: %d\n", lines); // 849
   return 0;
 }

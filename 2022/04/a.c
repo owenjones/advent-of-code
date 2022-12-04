@@ -40,10 +40,14 @@ int main(void) {
     }
     
     if(x || y) lines++;
+    
+    free(upper);
+    free(lower);
+    free(overlap);
   }
 
   fclose(fptr);
 
-  printf("Total lines: %d\n", lines);
+  printf("Total lines: %d\n", lines); // 487
   return 0;
 }
