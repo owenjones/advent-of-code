@@ -7,7 +7,7 @@ typedef struct crate {
   struct crate* next;
 } crate_t;
 
-void init_stacks(crate_t**);
+crate_t** init_stacks();
 void fill_stacks(crate_t**, FILE*);
 void print_stacks(crate_t**);
 void free_stacks(crate_t**);

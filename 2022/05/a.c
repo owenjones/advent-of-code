@@ -10,20 +10,20 @@ int main(void) {
     exit(1);
   }
 
-  crate_t* stacks[STACKS];
-  init_stacks(stacks);
+  crate_t** stacks = init_stacks();
   fill_stacks(stacks, fptr);
-  
+
   int n, from, to;
   while(fscanf(fptr, "move %i from %i to %i\n", &n, &from, &to) > 0) {
     print_stacks(stacks);
     move_crates_individually(stacks, n, from, to);
   }
   fclose(fptr);
-  
+
   print_stacks(stacks);
   get_top_crates(stacks); // GRTSWNJHH
   free_stacks(stacks);
-  
+  free(stacks);
+
   return 0;
 }
