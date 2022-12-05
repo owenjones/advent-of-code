@@ -19,7 +19,7 @@ void fill_stacks(crate_t** stacks, FILE* fptr) {
     
     for(size_t i = 0; i < STACKS; i++) {
       char c = line[(i*4) + 1];
-      if((int) c > 64 && (int) c < 91) {
+      if(c >= 'A' && c <= 'Z') {
         crate_t* n = calloc(1, sizeof(crate_t));
         n->id = c;
         n->next = NULL;
