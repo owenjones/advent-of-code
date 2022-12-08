@@ -32,8 +32,8 @@ int find_best_candidate(node_t* root, uint32_t size) {
 
   // sort array of candidates smallest => largest
   uint32_t temp = 0;
-  for(size_t i = 0; i < candidates->n; i++) {
-    for(size_t j = 0; j < (candidates->n - i); j++) {
+  for(size_t i = 0; i < (candidates->n - 1); i++) {
+    for(size_t j = 0; j < (candidates->n - 1 - i); j++) {
       if(candidates->sizes[j] > candidates->sizes[j+1]) {
         temp = candidates->sizes[j];
         candidates->sizes[j] = candidates->sizes[j+1];
@@ -42,8 +42,7 @@ int find_best_candidate(node_t* root, uint32_t size) {
     }
   }
 
-  // sizes[0] == 0 and I cba to work out why so just skip it
-  int s = candidates->sizes[1];
+  int s = candidates->sizes[0];
   free(candidates->sizes);
   free(candidates);
   return s;
