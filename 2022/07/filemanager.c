@@ -47,8 +47,8 @@ void build_tree(FILE* fptr, node_t* root) {
   char* name = calloc(128, sizeof(char));
   uint32_t size;
 
-  char* input = calloc(128, sizeof(char));
-  size_t bufsize;
+  char* input = NULL;
+  size_t bufsize = 0;
   while(getline(&input, &bufsize, fptr) != -1) {
     // skip entering root directory as we've already made it
     if(strcmp(input, "$ cd /\n") == 0) continue;
