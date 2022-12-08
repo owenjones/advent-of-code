@@ -6,13 +6,13 @@
 
 void add_child(node_t* parent, node_t* child) {
   if(parent == NULL) return;
-  parent->children[parent->nchildren] = child;
-  parent->nchildren++;
+  parent->child[parent->children] = child;
+  parent->children++;
 }
 
 int find_child(node_t* node, char* id) {
-  for(size_t i = 0; i < node->nchildren; i++) {
-    if(strcmp(id, node->children[i]->id) == 0) return i;
+  for(size_t i = 0; i < node->children; i++) {
+    if(strcmp(id, node->child[i]->id) == 0) return i;
   }
   return -1;
 }
@@ -34,8 +34,8 @@ node_t* create_node(char* id, enum type type, uint32_t size, node_t* parent) {
   node->type = type;
   node->size = size;
   node->parent = parent;
-  node->children = calloc(128, sizeof(node_t*));
-  node->nchildren = 0;
+  node->child = calloc(128, sizeof(node_t*));
+  node->children = 0;
 
   add_child(parent, node);
   if(type == file) update_sizes(node);
@@ -46,7 +46,7 @@ void build_tree(FILE* fptr, node_t* root) {
   node_t* current = root;
   char* name = calloc(128, sizeof(char));
   uint32_t size;
-  
+
   char* input = calloc(128, sizeof(char));
   size_t bufsize;
   while(getline(&input, &bufsize, fptr) != -1) {
@@ -59,7 +59,7 @@ void build_tree(FILE* fptr, node_t* root) {
         current = current->parent;
       } else {
         // move down the tree to node identified by directory name
-        current = current->children[find_child(current, name)];
+        current = current->child[find_child(current, name)];
       }
     } else if(sscanf(input, "dir %s", name) > 0) {
       // create a new directory node
@@ -74,9 +74,9 @@ void build_tree(FILE* fptr, node_t* root) {
 }
 
 void free_nodes(node_t* node) {
-  for(size_t i = 0; i < node->nchildren; i++) {
-    free_nodes(node->children[i]);
+  for(size_t i = 0; i < node->children; i++) {
+    free_nodes(node->child[i]);
   }
-  free(node->children);
+  free(node->child);
   free(node);
 }

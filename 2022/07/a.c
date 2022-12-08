@@ -6,8 +6,8 @@
 
 uint32_t find_sum_of_nodes(node_t* node, uint32_t max) {
   uint32_t size = 0;
-  for(size_t i = 0; i < node->nchildren; i++) {
-    node_t* child = node->children[i];
+  for(size_t i = 0; i < node->children; i++) {
+    node_t* child = node->child[i];
     if(child->type == directory) {
       if(child->size <= max) size += child->size;
       size += find_sum_of_nodes(child, max);
@@ -29,7 +29,7 @@ int main(void) {
 
   uint32_t total = find_sum_of_nodes(root, 100000);
   printf("Total size of directories = %u\n", total); // 1086293
-  
+
   free_nodes(root);
   return 0;
 }

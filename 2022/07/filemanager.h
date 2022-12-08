@@ -5,8 +5,8 @@ typedef struct node {
   enum type type;
   uint32_t size;
   struct node* parent;
-  int nchildren;
-  struct node** children;
+  int children;
+  struct node** child;
 } node_t;
 
 void add_child(node_t*, node_t*);
