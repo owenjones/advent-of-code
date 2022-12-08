@@ -3,7 +3,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-enum command { cd, ls };
 enum type { directory, file };
 
 typedef struct node {
