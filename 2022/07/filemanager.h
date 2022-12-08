@@ -13,5 +13,5 @@ void add_child(node_t*, node_t*);
 int find_child(node_t*, char*);
 void update_sizes(node_t*);
 node_t* create_node(char*, enum type, uint32_t, node_t*);
-void build_tree(FILE*, node_t*);
+node_t* build_tree_from_file(char*);
 void free_nodes(node_t*);

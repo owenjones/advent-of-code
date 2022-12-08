@@ -49,16 +49,7 @@ int find_best_candidate(node_t* root, uint32_t size) {
 }
 
 int main(void) {
-  FILE* fptr;
-  if((fptr = fopen("input.txt", "r")) == NULL) {
-    printf("Error opening file\n");
-    exit(1);
-  }
-
-  node_t* root = create_node("/", directory, 0, NULL);
-  build_tree(fptr, root);
-  fclose(fptr);
-
+  node_t* root = build_tree_from_file("input.txt");
   uint32_t required = 30000000 - (70000000 - root->size);
   uint32_t del = find_best_candidate(root, required);
   printf("Size of directory to delete = %u\n", del); // 366028
