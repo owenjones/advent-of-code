@@ -12,7 +12,7 @@ int main(void) {
   }
 
   size_t elf = 0;
-  int* calories = calloc(250, sizeof(int));
+  int* calories = calloc(512, sizeof(int));
 
   char* line = NULL;
   size_t len = 0;
@@ -24,7 +24,7 @@ int main(void) {
       calories[elf] += atoi(line);
     }
   }
-
+  free(line);
   fclose(fptr);
 
   int temp = 0;
