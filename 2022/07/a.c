@@ -110,7 +110,7 @@ int main(void) {
   free(input);
 
   uint32_t total = walk_tree(root);
-  printf("Total size of directories = %u\n", total);
+  printf("Total size of directories = %u\n", total); // 1086293
   
   return 0;
 }

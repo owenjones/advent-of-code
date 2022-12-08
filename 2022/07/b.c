@@ -138,7 +138,7 @@ int main(void) {
 
   uint32_t required = 30000000 - (70000000 - root->size);
   uint32_t del = find_candidate(root, required);
-  printf("Size of directory to delete = %u\n", del);
+  printf("Size of directory to delete = %u\n", del); // 366028
   
   return 0;
 }
