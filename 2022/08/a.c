@@ -59,8 +59,7 @@ int count_visible(grid_t* grid) {
 int main(void) {
   grid_t* grid = grid_from_file("input.txt");
   int visible = count_visible(grid);
-  free_grid(grid);
-
   printf("Number of visible trees: %d\n", visible); // 1688
+  free_grid(grid);
   return 0;
 }

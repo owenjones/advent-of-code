@@ -4,6 +4,8 @@
 #include "grid.h"
 
 int calculate_scenic_score(grid_t* grid, int x, int y) {
+  if(is_edge(grid, x, y)) return 0;
+
   int height = grid->values[c2ind(grid, x, y)];
   int up = 1, down = 1, left = 1, right = 1;
 
@@ -37,11 +39,7 @@ int calculate_scenic_score(grid_t* grid, int x, int y) {
 void get_scenic_scores(grid_t* grid, int* scores) {
   for(int y = 0; y < grid->dim; y++) {
     for(int x = 0; x < grid->dim; x++) {
-      if(is_edge(grid, x, y)) {
-        scores[c2ind(grid, x, y)] = 0;
-      } else {
-        scores[c2ind(grid, x, y)] = calculate_scenic_score(grid, x, y);
-      }
+      scores[c2ind(grid, x, y)] = calculate_scenic_score(grid, x, y);
     }
   }
 }
@@ -62,13 +60,10 @@ void sort_scores(int* scores, int dim) {
 int main(void) {
   grid_t* grid = grid_from_file("input.txt");
   int* scores = calloc((grid->dim * grid->dim), sizeof(int));
-
   get_scenic_scores(grid, scores);
   sort_scores(scores, grid->dim);
-  int best = scores[0];
+  printf("Best scenic score: %d\n", scores[0]); // 410400
   free(scores);
   free_grid(grid);
-
-  printf("Best scenic score: %d\n", best); // 410400
   return 0;
 }
