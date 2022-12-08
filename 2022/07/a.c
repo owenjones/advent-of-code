@@ -4,13 +4,13 @@
 #include <inttypes.h>
 #include "filemanager.h"
 
-int find_nodes(node_t* node) {
-  int size = 0;
+uint32_t find_sum_of_nodes(node_t* node, uint32_t max) {
+  uint32_t size = 0;
   for(size_t i = 0; i < node->nchildren; i++) {
     node_t* child = node->children[i];
     if(child->type == directory) {
-      if(child->size <= 100000) size += child->size;
-      size += find_nodes(child);
+      if(child->size <= max) size += child->size;
+      size += find_sum_of_nodes(child, max);
     }
   }
   return size;
@@ -27,7 +27,7 @@ int main(void) {
   build_tree(fptr, root);
   fclose(fptr);
 
-  uint32_t total = find_nodes(root);
+  uint32_t total = find_sum_of_nodes(root, 100000);
   printf("Total size of directories = %u\n", total); // 1086293
   
   free_nodes(root);
