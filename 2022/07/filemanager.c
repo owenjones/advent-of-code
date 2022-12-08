@@ -73,7 +73,10 @@ void build_tree(FILE* fptr, node_t* root) {
   free(input);
 }
 
-void free_nodes(node_t* root) {
-  
-  free(root);
+void free_nodes(node_t* node) {
+  for(size_t i = 0; i < node->nchildren; i++) {
+    free_nodes(node->children[i]);
+  }
+  free(node->children);
+  free(node);
 }

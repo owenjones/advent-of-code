@@ -4,6 +4,11 @@
 #include <inttypes.h>
 #include "filemanager.h"
 
+typedef struct candidates {
+  uint8_t n;
+  uint32_t* sizes;
+} cand_t;
+
 void walk_tree(node_t* node, uint32_t size, cand_t* candidates) {
   for(size_t i = 0; i < node->nchildren; i++) {
     node_t* child = node->children[i];
@@ -35,7 +40,11 @@ int find_candidate(node_t* root, uint32_t size) {
   }
   
   // sizes[0] == 0 and I cba to work out why so just skip it
-  return candidates->sizes[1];
+  int s = candidates->sizes[1];
+  
+  free(candidates->sizes);
+  free(candidates);
+  return s;
 }
 
 int main(void) {
@@ -54,6 +63,5 @@ int main(void) {
   printf("Size of directory to delete = %u\n", del); // 366028
   
   free_nodes(root);
-  
   return 0;
 }

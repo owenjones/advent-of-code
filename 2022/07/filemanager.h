@@ -9,11 +9,6 @@ typedef struct node {
   struct node** children;
 } node_t;
 
-typedef struct candidates {
-  uint8_t n;
-  uint32_t* sizes;
-} cand_t;
-
 void add_child(node_t*, node_t*);
 int find_child(node_t*, char*);
 void update_sizes(node_t*);

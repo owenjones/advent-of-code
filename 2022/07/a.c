@@ -31,6 +31,5 @@ int main(void) {
   printf("Total size of directories = %u\n", total); // 1086293
   
   free_nodes(root);
-  
   return 0;
 }
