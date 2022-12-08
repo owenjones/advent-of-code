@@ -9,25 +9,28 @@ typedef struct candidates {
   uint32_t* sizes;
 } cand_t;
 
-void walk_tree(node_t* node, uint32_t size, cand_t* candidates) {
+void extract_candidates(cand_t* candidates, uint32_t size, node_t* node) {
+  // recursively walk tree and extract any directory sizes which are >=
+  // the required size, add these to the array of candidates
   for(size_t i = 0; i < node->nchildren; i++) {
     node_t* child = node->children[i];
     if(child->type == directory) {
       if(child->size >= size) {
-        candidates->sizes[candidates->n] = child->size;
-        candidates->n++;
+        candidates->sizes[candidates->n++] = child->size;
       }
-      walk_tree(child, size, candidates);
+      extract_candidates(candidates, size, child);
     }
   }
 }
 
-int find_candidate(node_t* root, uint32_t size) {
+int find_best_candidate(node_t* root, uint32_t size) {
   cand_t* candidates = calloc(1, sizeof(cand_t));
   candidates->n = 0;
   candidates->sizes = calloc(256, sizeof(uint32_t));
-  walk_tree(root, size, candidates);
+  
+  extract_candidates(candidates, size, root);
 
+  // sort array of candidates smallest => largest
   uint32_t temp = 0;
   for(size_t i = 0; i < candidates->n; i++) {
     for(size_t j = 0; j < (candidates->n - i); j++) {
@@ -41,7 +44,6 @@ int find_candidate(node_t* root, uint32_t size) {
   
   // sizes[0] == 0 and I cba to work out why so just skip it
   int s = candidates->sizes[1];
-  
   free(candidates->sizes);
   free(candidates);
   return s;
@@ -59,7 +61,7 @@ int main(void) {
   fclose(fptr);
 
   uint32_t required = 30000000 - (70000000 - root->size);
-  uint32_t del = find_candidate(root, required);
+  uint32_t del = find_best_candidate(root, required);
   printf("Size of directory to delete = %u\n", del); // 366028
   
   free_nodes(root);
