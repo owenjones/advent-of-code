@@ -17,7 +17,7 @@ int main(void) {
     printf("Error opening file\n");
     exit(1);
   }
-  
+
   int total = 0;
   char* input = calloc(100, sizeof(char));
   int len, split, value;
@@ -28,16 +28,16 @@ int main(void) {
   while(fscanf(fptr, "%s", input) > 0) {
     matched = calloc(52, sizeof(int));
     len = strlen(input);
-    
+
     for(i = 0; i < len; i++) {
       value = letter_value(input[i]);
-      
+
       if(matched[(value - 1)] == 0) {
         matched[(value -1)] = 1;
         common[(value - 1)] += 1;
       }
     }
-    
+
     gcount++;
     if(gcount == 3) {
       for(i = 0; i < 52; i++) {
@@ -47,8 +47,10 @@ int main(void) {
       common = calloc(52, sizeof(int));
       gcount = 0;
     }
+    free(matched);
   }
   free(input);
+  free(common);
 
   fclose(fptr);
 
