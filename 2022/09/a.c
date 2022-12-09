@@ -118,6 +118,9 @@ int main(void) {
   }
 
   fclose(fptr);
+  free(head);
+  free(tail);
+  free(squares);
 
   printf("Squares visited: %d\n", count_visited(squares)); // 6522
   

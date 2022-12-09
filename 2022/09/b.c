@@ -63,6 +63,15 @@ int count_visited(int* list) {
   return total;
 }
 
+void free_knots(coord_t* start) {
+  coord_t *ptr = start, *temp;
+  while(ptr != NULL) {
+    temp = ptr->child;
+    free(ptr);
+    ptr = temp;
+  }
+}
+
 int main(void) {
   FILE* fptr;
   if((fptr = fopen("input.txt", "r")) == NULL) {
@@ -127,8 +136,9 @@ int main(void) {
       }
     }
   }
-
   fclose(fptr);
+  free_knots(head);
+  free(squares);
 
   printf("Squares visited: %d\n", count_visited(squares)); // 2717
   
