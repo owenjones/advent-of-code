@@ -79,7 +79,7 @@ int main(void) {
     exit(1);
   }
 
-  // grid, origin in bottom left
+  // grid, origin right in the middle (500, 500)
   int* squares = calloc((DIM * DIM), sizeof(int));
 
   // head of rope, starts at the origin
