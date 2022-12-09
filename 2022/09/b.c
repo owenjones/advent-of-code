@@ -6,15 +6,17 @@
 #define DIM 1000
 
 typedef struct coord {
+  int id;
   int x;
   int y;
+  struct coord* child;
 } coord_t;
 
 int c2ind(int x, int y) {
   return (y * DIM) + x;
 }
 
-void set_direction(char direction, int* x, int* y) {
+void set_initial_direction(char direction, int* x, int* y) {
   // set (x,y) vector depending on input direction
   switch(direction) {
     case 'U':
@@ -39,26 +41,20 @@ void set_direction(char direction, int* x, int* y) {
   }
 }
 
+void set_direction(coord_t* head, coord_t* tail, int* x, int* y) {
+  // vector between head & tail - move 1 in that x&y
+  *x = floor((tail->x - head->x) / 2);
+  *y = floor((tail->y - head->y) / 2);
+}
+
 int is_neighbour(coord_t* a, coord_t* b) {
   int x = (abs(b->x - a->x) <= 1);
   int y = (abs(b->y - a->y) <= 1);
   return x && y;
 }
 
-int manhattan_distance(coord_t* a, coord_t* b) {
-  int x = abs(b->x - a->x);
-  int y = abs(b->y - a->y);
-  return x + y;
-}
-
 void mark_visited(int* list, int x, int y) {
   list[c2ind(x, y)] = 1;
-}
-
-void set_diagonal_direction(coord_t* head, coord_t* tail, int* x, int* y) {
-  // vector between head & tail - move 1 in that x&y
-  *x = copysign(1, (head->x - tail->x));
-  *y = copysign(1, (head->y - tail->y));
 }
 
 int count_visited(int* list) {
@@ -79,47 +75,62 @@ int main(void) {
 
   // head of rope, starts at the origin
   coord_t* head = calloc(1, sizeof(coord_t));
+  head->id = 'H';
   head->x = 500;
   head->y = 500;
+  head->child = NULL;
   
-  // tail of rope, also starts at the origin
-  coord_t* tail = calloc(1, sizeof(coord_t));
-  tail->x = 500;
-  tail->y = 500;
+  // add 9 additional knots beneath head (all on the origin)
+  coord_t* parent = head;
+  coord_t* child;
+  for(size_t i = 0; i < 9; i++) {
+    child = calloc(1, sizeof(coord_t));
+    child->id = (i + 1);
+    child->x = 500;
+    child->y = 500;
+    child->child = NULL;
+    
+    parent->child = child;
+    parent = child;
+  }
+  
+  // pre-mark origin as we don't move in to it
   mark_visited(squares, 500, 500);
 
   char direction;
-  int steps, distance, x, y;
+  int steps, x, y;
   size_t i;
+  coord_t *current, *next;
   
   while(fscanf(fptr, "%c %d\n", &direction, &steps) > 0) {
-
     for(i = 0; i < steps; i++) {
       // move head 1 step in direction
-      set_direction(direction, &x, &y);
+      set_initial_direction(direction, &x, &y);
       head->x += x;
       head->y += y;
       
-      // don't need to move tail unless it's not adjacant/underneath the head
-      if(is_neighbour(head, tail)) {
-        continue;
-      }
-      
-      if(manhattan_distance(head, tail) > 2) {
-        // head is diagonal from tail, need to move tail a step diagonally
-        set_diagonal_direction(head, tail, &x, &y);
-      }
+      current = head;
+      next = head->child;
+      while(next != NULL) {
+        if(is_neighbour(current, next)) break;
         
-      tail->x += x;
-      tail->y += y;
-      
-      mark_visited(squares, tail->x, tail->y);
+        set_direction(current, next, &x, &y);
+        next->x = current->x + x;
+        next->y = current->y + y;
+
+        if(next->child == NULL) {
+          mark_visited(squares, next->x, next->y);
+        }
+
+        current = next;
+        next = next->child;
+      }
     }
   }
 
   fclose(fptr);
 
-  printf("Squares visited: %d\n", count_visited(squares)); // 6522
+  printf("Squares visited: %d\n", count_visited(squares)); // 2717
   
   return 0;
 }
