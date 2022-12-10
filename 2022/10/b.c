@@ -35,11 +35,11 @@ int main(void) {
   for(size_t i = 0; i < 240; i++) {
     v = value_after[i];
     
-    if(p == (v - 1) || p == v || p == (v + 1)) printf("# ");
-    else printf(". ");
+    if(p == (v - 1) || p == v || p == (v + 1)) printf("* ");
+    else printf("  ");
     
     p++;
-    if(((i + 1) % 40) == 0) {
+    if((p % 40) == 0) {
       p = 0;
       printf("\n");
     }
