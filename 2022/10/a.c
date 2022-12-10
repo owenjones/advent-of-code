@@ -30,6 +30,7 @@ int main(void) {
     }
   }
   fclose(fptr);
+  free(input);
 
   int total = 0, v;
   for(size_t i = 20; i <= 220; i += 40) {
