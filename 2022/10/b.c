@@ -31,11 +31,19 @@ int main(void) {
   }
   fclose(fptr);
 
-  int total = 0;
-  for(size_t i = 20; i <= 220; i += 40) {
-    total += (i * value_after[i-1]);
-  }
+  int v, p = 0;
+  for(size_t i = 0; i < 240; i++) {
+    v = value_after[i];
+    
+    if(p == (v - 1) || p == v || p == (v + 1)) printf("# ");
+    else printf(". ");
+    
+    p++;
+    if(((i + 1) % 40) == 0) {
+      p = 0;
+      printf("\n");
+    }
+  } // EKRHEPUZ
 
-  printf("Total: %d\n", total); // 14560
   return 0;
 }
