@@ -31,9 +31,10 @@ int main(void) {
   }
   fclose(fptr);
 
-  int total = 0;
+  int total = 0, v;
   for(size_t i = 20; i <= 220; i += 40) {
-    total += (i * value_after[i-1]);
+    v = value_after[(i - 1)]; // i - 1 as we want value *during* not value after
+    total += (i * v);
   }
 
   printf("Total: %d\n", total); // 14560
