@@ -56,7 +56,7 @@ void extract_monkeys(char* file, monkey_t** monkeys, int* nmonkey) {
   
   monkey_t* monkey;
   int v;
-  char* split;
+  char *split, *tok;
   char opcode;
   int opvalue;
 
@@ -70,12 +70,12 @@ void extract_monkeys(char* file, monkey_t** monkeys, int* nmonkey) {
       (*nmonkey)++;
     } else if((split = strstr(input, "items: ")) != NULL) {
       split += 7; // skip "items: " in string
-      input = strtok(split, " ");
-      while(input != NULL) {
-        char item[3] = { input[0], input[1], '\0' }; // hacky way to extract number..
+      tok = strtok(split, " ");
+      while(tok != NULL) {
+        char item[3] = { tok[0], tok[1], '\0' }; // hacky way to extract number..
         v = atoi(item);
         append(monkey->items, v);
-        input = strtok(NULL, " ");
+        tok = strtok(NULL, " ");
       }
     } else if(sscanf(input, " Operation: new = old %c %d", &opcode, &opvalue) == 2) {
       monkey->opcode = opcode;
@@ -94,6 +94,7 @@ void extract_monkeys(char* file, monkey_t** monkeys, int* nmonkey) {
   fclose(fptr);
   free(input);
   free(split);
+  free(tok);
 }
 
 int calculate_worry(int old, char opcode, int opvalue) {
@@ -121,6 +122,15 @@ int do_monkey_test(int item, int div) {
   return ((item % div) == 0);
 }
 
+void free_monkeys(monkey_t** monkey, int monkeys) {
+  for(size_t m = 0; m < monkeys; m++) {
+    free(monkey[m]->items->item);
+    free(monkey[m]->items);
+    free(monkey[m]);
+  }
+  free(monkey);
+}
+
 int main(void) {
   int monkeys = 0;
   monkey_t** monkey = calloc(10, sizeof(monkey_t*));
@@ -128,27 +138,18 @@ int main(void) {
   
   int* inspected = calloc(monkeys, sizeof(int));
   
-  int count, test;
+  int count;
   int item, worry;
   for(size_t r = 0; r < 20; r++) {
     for(size_t m = 0; m < monkeys; m++) {
       count = monkey[m]->items->count;
-      //printf("Monkey %zu (has %d items)\n", m, count);
       for(size_t i = 0; i < count; i++) {
         item = pop_first(monkey[m]->items);
-        //printf(" Monkey inspects an item with a worry level of %d.\n", item);
         if(item > 0) {
           worry = calculate_worry(item, monkey[m]->opcode, monkey[m]->opvalue);
-          //printf("  Worry level is %c by %d, then / by 3 to %d\n", monkey[m]->opcode, monkey[m]->opvalue, worry);
-          
-          test = do_monkey_test(worry, monkey[m]->test);
-          if(test) {
-            // printf("  Current worry level is divisible by %d\n", monkey[m]->test);
-            // printf("  Item with worry level %d is thrown to monkey %d\n", worry, monkey[m]->true);
+          if(do_monkey_test(worry, monkey[m]->test)) {
             append(monkey[monkey[m]->true]->items, worry);
           } else {
-            // printf("  Current worry level is not divisible by %d\n", monkey[m]->test);
-            // printf("  Item with worry level %d is thrown to monkey %d\n", worry, monkey[m]->false);
             append(monkey[monkey[m]->false]->items, worry);
           }
           inspected[m]++;
@@ -156,9 +157,10 @@ int main(void) {
           continue;
         }
       }
-    // printf("\n");
     }
   }
+  
+  free_monkeys(monkey, monkeys);
   
   for(size_t m = 0; m < monkeys; m++) {
     printf("Monkey %zu had %d interactions\n", m, inspected[m]);
@@ -178,6 +180,8 @@ int main(void) {
   
   int monkey_business = inspected[0] * inspected[1];
   printf("Monkey business = %d\n", monkey_business); // 151312
+  
+  free(inspected);
   
   return 0;
 }
