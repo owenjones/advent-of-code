@@ -97,6 +97,15 @@ void extract_monkeys(char* file, monkey_t** monkeys, int* nmonkey) {
   free(tok);
 }
 
+int calculate_lcm(monkey_t** monkey, int monkeys) {
+  int lcm = 1;
+  for(size_t i = 0; i < monkeys; i++) {
+    // monkey test divisors are all prime, so LCM is product of them all
+    lcm *= monkey[i]->test;
+  }
+  return lcm;
+}
+
 uint64_t calculate_worry(uint64_t old, char opcode, int opvalue, int lcm) {
   uint64_t new;
   int input = (opvalue > 0) ? opvalue : old;
@@ -104,21 +113,15 @@ uint64_t calculate_worry(uint64_t old, char opcode, int opvalue, int lcm) {
     case '+':
       new = old + input;
       break;
-    case '-': // don't think comes up
-      new = old - input;
-      break;
     case '*':
       new = old * input;
-      break;
-    case '/': // don't think comes up
-      new = old / input;
       break;
   }
   
   return new % lcm;
 }
 
-int do_monkey_test(uint64_t item, int div) {
+int passes_monkey_test(uint64_t item, int div) {
   return ((item % div) == 0);
 }
 
@@ -131,47 +134,33 @@ void free_monkeys(monkey_t** monkey, int monkeys) {
   free(monkey);
 }
 
-int main(void) {
-  int monkeys = 0;
-  monkey_t** monkey = calloc(10, sizeof(monkey_t*));
-  extract_monkeys("input.txt", monkey, &monkeys);
-  
-  int lcm = 1;
-  for(size_t i = 0; i < monkeys; i++) {
-    // monkey test divisors are all prime, so LCM is product of them all
-    lcm *= monkey[i]->test;
-  }
-  
+uint64_t monkey_business(monkey_t** monkey, int monkeys, int rounds) {
+  int lcm = calculate_lcm(monkey, monkeys);
   uint64_t* inspected = calloc(monkeys, sizeof(int));
   
   int count;
   uint64_t item, worry;
-  for(size_t r = 0; r < 10000; r++) {
+  
+  for(size_t r = 0; r < rounds; r++) {
     for(size_t m = 0; m < monkeys; m++) {
       count = monkey[m]->items->count;
       for(size_t i = 0; i < count; i++) {
         item = pop_first(monkey[m]->items);
-        if(item > 0) {
-          worry = calculate_worry(item, monkey[m]->opcode, monkey[m]->opvalue, lcm);
-          if(do_monkey_test(worry, monkey[m]->test)) {
-            append(monkey[monkey[m]->true]->items, worry);
-          } else {
-            append(monkey[monkey[m]->false]->items, worry);
-          }
-          inspected[m]++;
+        worry = calculate_worry(item, monkey[m]->opcode, monkey[m]->opvalue, lcm);
+        if(passes_monkey_test(worry, monkey[m]->test)) {
+          append(monkey[monkey[m]->true]->items, worry);
         } else {
-          continue;
+          append(monkey[monkey[m]->false]->items, worry);
         }
+        inspected[m]++;
       }
     }
   }
   
-  free_monkeys(monkey, monkeys);
-  
-  for(size_t m = 0; m < monkeys; m++) {
-    printf("Monkey %zu had %llu interactions\n", m, inspected[m]);
-  }
-  printf("\n");
+  // for(size_t m = 0; m < monkeys; m++) {
+  //   printf("Monkey %zu had %llu interactions\n", m, inspected[m]);
+  // }
+  // printf("\n");
   
   // Sort descending
   for(size_t i = 0; i < (monkeys - 1); i++) {
@@ -184,10 +173,19 @@ int main(void) {
     }
   }
   
-  uint64_t monkey_business = inspected[0] * inspected[1];
-  printf("Monkey business = %llu\n", monkey_business); // 51382025916
-  
+  uint64_t business = inspected[0] * inspected[1];
   free(inspected);
+  return business;
+}
+
+int main(void) {
+  int monkeys = 0;
+  monkey_t** monkey = calloc(10, sizeof(monkey_t*));
+  extract_monkeys("input.txt", monkey, &monkeys);
   
+  uint64_t business = monkey_business(monkey, monkeys, 10000);
+  printf("Monkey business = %llu\n", business); // 51382025916
+  
+  free_monkeys(monkey, monkeys);
   return 0;
 }
