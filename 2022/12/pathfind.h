@@ -51,3 +51,4 @@ int lower_exists_in(list_t*, node_t*);
 
 // Actual pathfinding...
 int steps_to_end(map_t*);
+int find_hiking_trail(map_t*);

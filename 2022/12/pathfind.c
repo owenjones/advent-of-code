@@ -84,7 +84,7 @@ void free_point(point_t* point) {
   free(point);
 }
 
-int can_climb(map_t* map, point_t* a, point_t* b) {
+int can_climb_up(map_t* map, point_t* a, point_t* b) {
   // can we move from point a to point b?
   int ha = height_at(map, a->x, a->y);
   int hb = height_at(map, b->x, b->y);
@@ -239,7 +239,7 @@ int steps_to_end(map_t* map) {
         continue;
       } else if(!is_valid(map, next->point->x, next->point->y)) {
         free_node(next);
-      } else if(!can_climb(map, current->point, next->point)) {
+      } else if(!can_climb_up(map, current->point, next->point)) {
         free_node(next);
       } else if(!lower_exists_in(open, next) && !lower_exists_in(closed, next)) {
         append_node(open, next);
@@ -255,4 +255,65 @@ int steps_to_end(map_t* map) {
   free_list(closed);
 
   return steps;
+}
+
+int find_hiking_trail(map_t* map) {
+  // input: map
+  // output: number of steps of shortest route
+  
+  int end[41];
+  for(size_t z = 0; z < 41; z++) {
+    list_t* open = new_list();
+    list_t* closed = new_list();
+
+    node_t* start = new_node_at(0, z);
+    set_node_heuristics(start, NULL, map->end);
+    append_node(open, start);
+
+    int n = open->n, steps = 0;
+    node_t *current, *next;
+    size_t i;
+    while(n > 0 && !steps) {
+      current = remove_node_at(open, find_lowest_node(open));
+
+      for(i = 0; i < 4; i++) {
+        next = step_from(current, i);
+        set_node_heuristics(next, current, map->end);
+        
+        if(is_same(next->point, map->end)) {
+          // we have reached the end!
+          steps = next->g;
+          free_node(next);
+          continue;
+        } else if(!is_valid(map, next->point->x, next->point->y)) {
+          free_node(next);
+        } else if(!can_climb_up(map, current->point, next->point)) {
+          free_node(next);
+        } else if(!lower_exists_in(open, next) && !lower_exists_in(closed, next)) {
+          append_node(open, next);
+        } else {
+          free_node(next);
+        }
+      }
+      append_node(closed, current);
+      n = open->n;
+    }
+
+    free_list(open);
+    free_list(closed);
+    
+    end[z] = steps;
+  }
+  
+  for(size_t i = 0; i < 40; i++) {
+    for(size_t j = 0; j < (40 - i); j++) {
+      if(end[j] > end[(j + 1)]) {
+        int temp = end[j];
+        end[j] = end[(j + 1)];
+        end[(j + 1)] = temp;
+      }
+    }
+  }
+  
+  return end[0];
 }
