@@ -164,6 +164,7 @@ list_t* new_list() {
 }
 
 void free_list(list_t* list) {
+  for(size_t n = 0; n < list->n; n++) free_node(list->nodes[n]);
   free(list->nodes);
   free(list);
 }
@@ -258,11 +259,13 @@ int steps_to_end(map_t* map) {
 }
 
 int find_hiking_trail(map_t* map) {
-  // input: map
-  // output: number of steps of shortest route
+  // Warning, very hacky approach...
+  // Essentially, in my input all possible start points (an a next to a b)
+  // occur at x=0, so for 41 lines of map input I just tried starting at the
+  // far left of each of them. Does this work for all puzzle inputs? Who knows...
   
-  int end[41];
-  for(size_t z = 0; z < 41; z++) {
+  int end[map->h];
+  for(size_t z = 0; z < map->h; z++) {
     list_t* open = new_list();
     list_t* closed = new_list();
 
@@ -295,18 +298,19 @@ int find_hiking_trail(map_t* map) {
           free_node(next);
         }
       }
+      
       append_node(closed, current);
       n = open->n;
     }
 
-    free_list(open);
-    free_list(closed);
+    //free_list(open);
+    //free_list(closed);
     
     end[z] = steps;
   }
   
-  for(size_t i = 0; i < 40; i++) {
-    for(size_t j = 0; j < (40 - i); j++) {
+  for(size_t i = 0; i < (map->h - 1); i++) {
+    for(size_t j = 0; j < (map->h - 1 - i); j++) {
       if(end[j] > end[(j + 1)]) {
         int temp = end[j];
         end[j] = end[(j + 1)];
