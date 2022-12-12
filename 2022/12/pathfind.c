@@ -159,7 +159,7 @@ void set_node_heuristics(node_t* node, node_t* parent, point_t* end) {
 list_t* new_list() {
   // return an empty node list
   list_t* list = calloc(1, sizeof(list_t));
-  list->nodes = calloc(1000, sizeof(node_t*));
+  list->nodes = calloc(10000, sizeof(node_t*));
   return list;
 }
 
@@ -212,10 +212,8 @@ int lower_exists_in(list_t* list, node_t* node) {
   return 0;
 }
 
-// The actual pathfinding
+// The actual pathfinding (sketchy implementation of A* algorithm)
 int steps_to_end(map_t* map) {
-  // input: map
-  // output: number of steps of shortest route
   list_t* open = new_list();
   list_t* closed = new_list();
 
@@ -223,10 +221,10 @@ int steps_to_end(map_t* map) {
   set_node_heuristics(start, NULL, map->end);
   append_node(open, start);
 
-  int n = open->n, steps = 0;
+  int steps = 0;
   node_t *current, *next;
   size_t i;
-  while(n > 0 && !steps) {
+  while(open->n > 0 && !steps) {
     current = remove_node_at(open, find_lowest_node(open));
 
     for(i = 0; i < 4; i++) {
@@ -234,10 +232,8 @@ int steps_to_end(map_t* map) {
       set_node_heuristics(next, current, map->end);
       
       if(is_same(next->point, map->end)) {
-        // we have reached the end!
         steps = next->g;
         free_node(next);
-        continue;
       } else if(!is_valid(map, next->point->x, next->point->y)) {
         free_node(next);
       } else if(!can_climb_up(map, current->point, next->point)) {
@@ -249,7 +245,6 @@ int steps_to_end(map_t* map) {
       }
     }
     append_node(closed, current);
-    n = open->n;
   }
 
   free_list(open);
@@ -273,10 +268,10 @@ int find_hiking_trail(map_t* map) {
     set_node_heuristics(start, NULL, map->end);
     append_node(open, start);
 
-    int n = open->n, steps = 0;
+    int steps = 0;
     node_t *current, *next;
     size_t i;
-    while(n > 0 && !steps) {
+    while(open->n > 0 && !steps) {
       current = remove_node_at(open, find_lowest_node(open));
 
       for(i = 0; i < 4; i++) {
@@ -287,7 +282,6 @@ int find_hiking_trail(map_t* map) {
           // we have reached the end!
           steps = next->g;
           free_node(next);
-          continue;
         } else if(!is_valid(map, next->point->x, next->point->y)) {
           free_node(next);
         } else if(!can_climb_up(map, current->point, next->point)) {
@@ -300,11 +294,10 @@ int find_hiking_trail(map_t* map) {
       }
       
       append_node(closed, current);
-      n = open->n;
     }
 
-    //free_list(open);
-    //free_list(closed);
+    free_list(open);
+    free_list(closed);
     
     end[z] = steps;
   }
