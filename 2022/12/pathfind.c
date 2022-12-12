@@ -176,8 +176,10 @@ int steps_to_end(map_t* map) {
   append_node(open, start);
 
   int n = open->n;
+
+  int steps = 0;
   node_t* current;
-  while(n > 0) {
+  while(n > 0 && !steps) {
     current = get_head_node(open);
 
     // generate points in cardinal directions
