@@ -20,25 +20,23 @@ typedef struct nodelist {
 } list_t;
 
 // Map
-map_t* new_map();
 map_t* load_map(char*);
 void free_map(map_t*);
-int is_valid(map_t*, int, int);
-int height_at(map_t*, int, int);
 
 // Points
 point_t* new_point();
 point_t* new_point_at(int, int);
-void free_point(point_t*);
-int can_climb(map_t*, point_t*, point_t*);
+int can_climb_up(map_t*, point_t*, point_t*);
 int manhattan_distance(point_t*, point_t*);
+int is_same(point_t*, point_t*);
+int is_valid(map_t*, point_t*);
+int height_at(map_t*, point_t*);
 
 // Nodes
-node_t* new_node();
 node_t* new_node_at(int, int);
 void free_node(node_t*);
 node_t* step_from(node_t*, int);
-void set_node_heuristics(node_t*, node_t*, point_t*);
+void update_node_heuristics(node_t*, node_t*, point_t*);
 
 // Lists
 list_t* new_list();

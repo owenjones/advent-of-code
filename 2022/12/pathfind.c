@@ -3,16 +3,6 @@
 #include <string.h>
 #include "pathfind.h"
 
-map_t* new_map() {
-  map_t* map = calloc(1, sizeof(map_t));
-  map->h = 0;
-  map->w = 0;
-  map->heights = calloc(10000, sizeof(int)); // guess height x width <= 10000
-  map->start = NULL;
-  map->end = NULL;
-  return map;
-}
-
 map_t* load_map(char* file) {
   FILE* fptr;
   if((fptr = fopen(file, "r")) == NULL) {
@@ -20,14 +10,21 @@ map_t* load_map(char* file) {
     exit(1);
   }
 
-  map_t* map = new_map();
+  map_t* map = calloc(1, sizeof(map_t));
+  map->h = 0;
+  map->w = 0;
+  map->heights = calloc(10000, sizeof(int)); // guess height x width <= 10000
+  map->start = NULL;
+  map->end = NULL;
 
   char* input = NULL;
   size_t bufsize = 0;
   int height;
   while(getline(&input, &bufsize, fptr) != -1) {
     if(map->w == 0) map->w = (strlen(input) - 1); // extract width from length of first line
-    // origin in top-left, extend down and right in x & y from here (because that's how we read file)
+    
+    // origin in top-left, extend down and right in x & y from here
+    // (because that's how we read file in)
     for(size_t x = 0; x < map->w; x++) {
       height = (int) input[x];
       if(height == 83) {
@@ -60,14 +57,6 @@ void free_map(map_t* map) {
   free(map);
 }
 
-int is_valid(map_t* map, int x, int y) {
-  return (x >= 0) && (x < map->w) && (y >= 0) && (y < map->h);
-}
-
-int height_at(map_t* map, int x, int y) {
-  return map->heights[(y * map->w) + x];
-}
-
 // Points
 point_t* new_point() {
   return calloc(1, sizeof(point_t));
@@ -80,14 +69,10 @@ point_t* new_point_at(int x, int y) {
   return point;
 }
 
-void free_point(point_t* point) {
-  free(point);
-}
-
 int can_climb_up(map_t* map, point_t* a, point_t* b) {
   // can we move from point a to point b?
-  int ha = height_at(map, a->x, a->y);
-  int hb = height_at(map, b->x, b->y);
+  int ha = height_at(map, a);
+  int hb = height_at(map, b);
 
   // can go down any height difference(?) but can only go up difference of 1
   return (hb <= ha) || ((ha + 1) == hb);
@@ -104,13 +89,15 @@ int is_same(point_t* a, point_t* b) {
   return (a->x == b->x) && (a->y == b->y);
 }
 
-// Nodes
-node_t* new_node() {
-  node_t* node = calloc(1, sizeof(node_t));
-  node->point = new_point();
-  return node;
+int is_valid(map_t* map, point_t* p) {
+  return (p->x >= 0) && (p->x < map->w) && (p->y >= 0) && (p->y < map->h);
 }
 
+int height_at(map_t* map, point_t* p) {
+  return map->heights[(p->y * map->w) + p->x];
+}
+
+// Nodes
 node_t* new_node_at(int x, int y) {
   node_t* node = calloc(1, sizeof(node_t));
   node->point = new_point_at(x, y);
@@ -149,7 +136,7 @@ node_t* step_from(node_t* current, int direction) {
   return new_node_at(x, y);
 }
 
-void set_node_heuristics(node_t* node, node_t* parent, point_t* end) {
+void update_node_heuristics(node_t* node, node_t* parent, point_t* end) {
   node->g = (parent != NULL) ? (parent->g + 1) : 0;
   node->h = manhattan_distance(node->point, end);
   node->f = node->g + node->h;
@@ -218,7 +205,7 @@ int steps_to_end(map_t* map) {
   list_t* closed = new_list();
 
   node_t* start = new_node_at(map->start->x, map->start->y);
-  set_node_heuristics(start, NULL, map->end);
+  update_node_heuristics(start, NULL, map->end);
   append_node(open, start);
 
   int steps = 0;
@@ -229,12 +216,12 @@ int steps_to_end(map_t* map) {
 
     for(i = 0; i < 4; i++) {
       next = step_from(current, i);
-      set_node_heuristics(next, current, map->end);
+      update_node_heuristics(next, current, map->end);
       
       if(is_same(next->point, map->end)) {
         steps = next->g;
         free_node(next);
-      } else if(!is_valid(map, next->point->x, next->point->y)) {
+      } else if(!is_valid(map, next->point)) {
         free_node(next);
       } else if(!can_climb_up(map, current->point, next->point)) {
         free_node(next);
@@ -265,7 +252,7 @@ int find_hiking_trail(map_t* map) {
     list_t* closed = new_list();
 
     node_t* start = new_node_at(0, z);
-    set_node_heuristics(start, NULL, map->end);
+    update_node_heuristics(start, NULL, map->end);
     append_node(open, start);
 
     int steps = 0;
@@ -276,13 +263,13 @@ int find_hiking_trail(map_t* map) {
 
       for(i = 0; i < 4; i++) {
         next = step_from(current, i);
-        set_node_heuristics(next, current, map->end);
+        update_node_heuristics(next, current, map->end);
         
         if(is_same(next->point, map->end)) {
           // we have reached the end!
           steps = next->g;
           free_node(next);
-        } else if(!is_valid(map, next->point->x, next->point->y)) {
+        } else if(!is_valid(map, next->point)) {
           free_node(next);
         } else if(!can_climb_up(map, current->point, next->point)) {
           free_node(next);

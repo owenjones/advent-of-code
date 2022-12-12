@@ -7,6 +7,6 @@ int main(void) {
   map_t* map = load_map("input.txt");
   int steps = find_hiking_trail(map);
   free_map(map);
-  printf("Number of steps in hiking trail = %d\n", steps); // 439
+  printf("Number of steps in shortest hiking trail = %d\n", steps); // 439
   return 0;
 }
