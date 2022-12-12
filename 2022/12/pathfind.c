@@ -4,15 +4,12 @@
 #include "pathfind.h"
 
 map_t* new_map() {
-  point_t* start = new_point();
-  point_t* end = new_point();
-
   map_t* map = calloc(1, sizeof(map_t));
   map->h = 0;
   map->w = 0;
   map->heights = calloc(10000, sizeof(int)); // guess height x width <= 10000
-  map->start = start;
-  map->end = end;
+  map->start = NULL;
+  map->end = NULL;
   return map;
 }
 
@@ -35,23 +32,23 @@ map_t* load_map(char* file) {
       height = (int) input[x];
       if(height == 83) {
         // S - start point
-        map->start->x = x;
-        map->start->y = map->h;
+        point_t* start = new_point_at(x, map->h);
+        map->start = start;
         height = 97; // height of S is a;
       }
 
       if(height == 69) {
         // E - end point
-        map->end->x = x;
-        map->end->y = map->h;
+        point_t* end = new_point_at(x, map->h);
+        map->end = end;
         height = 122; // height of E is z;
       }
 
-      map->heights[(map->h * map->w) + x] = (height - 96);
+      map->heights[(map->h * map->w) + x] = (height - 97);
     }
     map->h++;
   }
-
+  free(input);
   fclose(fptr);
   return map;
 }
@@ -93,7 +90,7 @@ int can_climb(map_t* map, point_t* a, point_t* b) {
   int hb = height_at(map, b->x, b->y);
 
   // can go down any height difference(?) but can only go up difference of 1
-  return(hb < ha) || ((ha + 1) == hb);
+  return (hb <= ha) || ((ha + 1) == hb);
 }
 
 int manhattan_distance(point_t* a, point_t* b) {
@@ -103,7 +100,7 @@ int manhattan_distance(point_t* a, point_t* b) {
   return dx + dy;
 }
 
-int is_end(point_t* a, point_t* b) {
+int is_same(point_t* a, point_t* b) {
   return (a->x == b->x) && (a->y == b->y);
 }
 
@@ -120,11 +117,42 @@ node_t* new_node_at(int x, int y) {
   return node;
 }
 
+void free_node(node_t* node) {
+  free(node->point);
+  free(node);
+}
+
+node_t* step_from(node_t* current, int direction) {
+  int x, y;
+  switch(direction) {
+    case 0: // up / north
+      x = current->point->x;
+      y = (current->point->y - 1);
+      break;
+    
+    case 1: // right / east
+      x = (current->point->x + 1);
+      y = current->point->y;
+      break;
+      
+    case 2: // down / south
+      x = current->point->x;
+      y = (current->point->y + 1);
+      break;
+      
+    case 3: // left / west
+      x = (current->point->x - 1);
+      y = current->point->y;
+      break;
+  }
+  
+  return new_node_at(x, y);
+}
+
 void set_node_heuristics(node_t* node, node_t* parent, point_t* end) {
+  node->g = (parent != NULL) ? (parent->g + 1) : 0;
   node->h = manhattan_distance(node->point, end);
-  node->g = (parent != NULL) ? parent->g + 1 : 0;
   node->f = node->g + node->h;
-  printf("Node heuristics: h=%d, g=%d, f=%d\n", node->h, node->g, node->f);
 }
 
 // Lists
@@ -142,26 +170,45 @@ void free_list(list_t* list) {
 
 node_t* get_head_node(list_t* list) {
   // take first element off the list
-  node_t* h = list->nodes[0];
-  for(size_t n = 0; n < (list->n - 1); n++) {
+  return remove_node_at(list, 0);
+}
+
+node_t* remove_node_at(list_t* list, int i) {
+  // remove node at position i from the list and return it
+  node_t* h = list->nodes[i];
+  for(size_t n = i; n < (list->n - 1); n++) {
     list->nodes[n] = list->nodes[(n + 1)];
   }
   list->n--;
   return h;
 }
 
-void remove_node_at(int i) {
-  // remove node at position i from the list
-  list->nodes[i] = 0;
-  for(size_t n = 0; n < (list->n - 1); n++) {
-    list->nodes[n] = list->nodes[(n + 1)];
-  }
-  list->n--;
-}
-
 void append_node(list_t* list, node_t* node) {
   // append new element to end of the list
   list->nodes[list->n++] = node;
+}
+
+int find_lowest_node(list_t* list) {
+  int lowest = list->nodes[0]->f;
+  int ind = 0;
+  
+  for(size_t i = 0; i < list->n; i++) {
+    if(list->nodes[i]->f < lowest){
+      lowest = list->nodes[i]->f;
+      ind = i;
+    }
+  }
+  
+  return ind;
+}
+
+int lower_exists_in(list_t* list, node_t* node) {
+  for(size_t i = 0; i < list->n; i++) {
+    if(is_same(list->nodes[i]->point, node->point)) {
+      if(list->nodes[i]->f <= node->f) return 1;
+    }
+  }
+  return 0;
 }
 
 // The actual pathfinding
@@ -175,23 +222,37 @@ int steps_to_end(map_t* map) {
   set_node_heuristics(start, NULL, map->end);
   append_node(open, start);
 
-  int n = open->n;
-
-  int steps = 0;
-  node_t* current;
+  int n = open->n, steps = 0;
+  node_t *current, *next;
+  size_t i;
   while(n > 0 && !steps) {
-    current = get_head_node(open);
+    current = remove_node_at(open, find_lowest_node(open));
 
-    // generate points in cardinal directions
-    // - check if point is the end -> return here?
-    // - check if point is valid (in bounds)
-    // - check we can climb to this new point
-    //
-
+    for(i = 0; i < 4; i++) {
+      next = step_from(current, i);
+      set_node_heuristics(next, current, map->end);
+      
+      if(is_same(next->point, map->end)) {
+        // we have reached the end!
+        steps = next->g;
+        free_node(next);
+        continue;
+      } else if(!is_valid(map, next->point->x, next->point->y)) {
+        free_node(next);
+      } else if(!can_climb(map, current->point, next->point)) {
+        free_node(next);
+      } else if(!lower_exists_in(open, next) && !lower_exists_in(closed, next)) {
+        append_node(open, next);
+      } else {
+        free_node(next);
+      }
+    }
+    append_node(closed, current);
     n = open->n;
   }
 
   free_list(open);
   free_list(closed);
-  return 0;
+
+  return steps;
 }
