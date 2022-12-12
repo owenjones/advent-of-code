@@ -42,6 +42,7 @@ void free_node(node_t*);
 list_t* new_list();
 void free_list(list_t*);
 node_t* get_head_node(list_t*);
+void remove_node_at(int);
 void append_node(list_t*, node_t*);
 
 // Actual pathfinding...

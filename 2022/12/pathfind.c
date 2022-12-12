@@ -140,7 +140,7 @@ void free_list(list_t* list) {
   free(list);
 }
 
-node_t* head_node(list_t* list) {
+node_t* get_head_node(list_t* list) {
   // take first element off the list
   node_t* h = list->nodes[0];
   for(size_t n = 0; n < (list->n - 1); n++) {
@@ -148,6 +148,15 @@ node_t* head_node(list_t* list) {
   }
   list->n--;
   return h;
+}
+
+void remove_node_at(int i) {
+  // remove node at position i from the list
+  list->nodes[i] = 0;
+  for(size_t n = 0; n < (list->n - 1); n++) {
+    list->nodes[n] = list->nodes[(n + 1)];
+  }
+  list->n--;
 }
 
 void append_node(list_t* list, node_t* node) {
@@ -172,10 +181,10 @@ int steps_to_end(map_t* map) {
     current = get_head_node(open);
 
     // generate points in cardinal directions
-    // - check if point is the end
+    // - check if point is the end -> return here?
     // - check if point is valid (in bounds)
     // - check we can climb to this new point
-    // 
+    //
 
     n = open->n;
   }
