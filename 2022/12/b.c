@@ -64,7 +64,6 @@ int find_hiking_trail(map_t* map) {
   return end[0];
 }
 
-
 int main(void) {
   map_t* map = load_map("input.txt");
   int steps = find_hiking_trail(map);
