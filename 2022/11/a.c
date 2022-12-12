@@ -10,7 +10,7 @@ typedef struct l {
 } list_t;
 
 list_t* list() {
-  list_t* l = calloc(1, sizeof("list_t"));
+  list_t* l = calloc(1, sizeof(list_t));
   l->count = 0;
   l->item = calloc(32, sizeof(int));
   return l;
@@ -19,12 +19,12 @@ list_t* list() {
 int pop_first(list_t* list) {
   if(list->count > 0) {
     int item = list->item[0];
-    
+
     for(size_t i = 0; i < (list->count - 1); i++) {
       list->item[i] = list->item[i+1];
     }
     list->count--;
-    
+
     return item;
   } else {
     return -1;
@@ -47,13 +47,13 @@ typedef struct monkey {
 
 void extract_monkeys(char* file, monkey_t** monkeys, int* nmonkey) {
   // horrible hacky way to extract monkey data from input file into usable structs
-  
+
   FILE* fptr;
   if((fptr = fopen(file, "r")) == NULL) {
     printf("Error opening file\n");
     exit(1);
   }
-  
+
   monkey_t* monkey;
   int v;
   char *split, *tok;
@@ -114,7 +114,7 @@ int calculate_worry(int old, char opcode, int opvalue) {
       new = old / input;
       break;
   }
-  
+
   return floor(new / 3);
 }
 
@@ -135,9 +135,9 @@ int main(void) {
   int monkeys = 0;
   monkey_t** monkey = calloc(10, sizeof(monkey_t*));
   extract_monkeys("input.txt", monkey, &monkeys);
-  
+
   int* inspected = calloc(monkeys, sizeof(int));
-  
+
   int count;
   int item, worry;
   for(size_t r = 0; r < 20; r++) {
@@ -159,14 +159,14 @@ int main(void) {
       }
     }
   }
-  
+
   free_monkeys(monkey, monkeys);
-  
+
   for(size_t m = 0; m < monkeys; m++) {
     printf("Monkey %zu had %d interactions\n", m, inspected[m]);
   }
   printf("\n");
-  
+
   // Sort descending
   for(size_t i = 0; i < (monkeys - 1); i++) {
     for(size_t j = 0; j < (monkeys - i - 1); j++) {
@@ -177,11 +177,11 @@ int main(void) {
       }
     }
   }
-  
+
   int monkey_business = inspected[0] * inspected[1];
   printf("Monkey business = %d\n", monkey_business); // 151312
-  
+
   free(inspected);
-  
+
   return 0;
 }

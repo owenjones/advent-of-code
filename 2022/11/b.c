@@ -19,12 +19,12 @@ list_t* list() {
 uint64_t pop_first(list_t* list) {
   if(list->count > 0) {
     uint64_t item = list->item[0];
-    
+
     for(size_t i = 0; i < (list->count - 1); i++) {
       list->item[i] = list->item[i+1];
     }
     list->count--;
-    
+
     return item;
   } else {
     return 0;
@@ -47,13 +47,13 @@ typedef struct monkey {
 
 void extract_monkeys(char* file, monkey_t** monkeys, int* nmonkey) {
   // horrible hacky way to extract monkey data from input file into usable structs
-  
+
   FILE* fptr;
   if((fptr = fopen(file, "r")) == NULL) {
     printf("Error opening file\n");
     exit(1);
   }
-  
+
   monkey_t* monkey;
   int v;
   char *split, *tok;
@@ -117,7 +117,7 @@ uint64_t calculate_worry(uint64_t old, char opcode, int opvalue, int lcm) {
       new = old * input;
       break;
   }
-  
+
   return new % lcm;
 }
 
@@ -136,11 +136,11 @@ void free_monkeys(monkey_t** monkey, int monkeys) {
 
 uint64_t monkey_business(monkey_t** monkey, int monkeys, int rounds) {
   int lcm = calculate_lcm(monkey, monkeys);
-  uint64_t* inspected = calloc(monkeys, sizeof(int));
-  
+  uint64_t* inspected = calloc(monkeys, sizeof(uint64_t));
+
   int count;
   uint64_t item, worry;
-  
+
   for(size_t r = 0; r < rounds; r++) {
     for(size_t m = 0; m < monkeys; m++) {
       count = monkey[m]->items->count;
@@ -156,12 +156,12 @@ uint64_t monkey_business(monkey_t** monkey, int monkeys, int rounds) {
       }
     }
   }
-  
+
   // for(size_t m = 0; m < monkeys; m++) {
   //   printf("Monkey %zu had %llu interactions\n", m, inspected[m]);
   // }
   // printf("\n");
-  
+
   // Sort descending
   for(size_t i = 0; i < (monkeys - 1); i++) {
     for(size_t j = 0; j < (monkeys - i - 1); j++) {
@@ -172,7 +172,7 @@ uint64_t monkey_business(monkey_t** monkey, int monkeys, int rounds) {
       }
     }
   }
-  
+
   uint64_t business = inspected[0] * inspected[1];
   free(inspected);
   return business;
@@ -182,10 +182,10 @@ int main(void) {
   int monkeys = 0;
   monkey_t** monkey = calloc(10, sizeof(monkey_t*));
   extract_monkeys("input.txt", monkey, &monkeys);
-  
+
   uint64_t business = monkey_business(monkey, monkeys, 10000);
   printf("Monkey business = %llu\n", business); // 51382025916
-  
+
   free_monkeys(monkey, monkeys);
   return 0;
 }
