@@ -46,7 +46,3 @@ node_t* remove_node_at(list_t*, int);
 void append_node(list_t*, node_t*);
 int find_lowest_node(list_t*);
 int lower_exists_in(list_t*, node_t*);
-
-// Actual pathfinding...
-int steps_to_end(map_t*);
-int find_hiking_trail(map_t*);
