@@ -41,7 +41,7 @@ int main(void) {
   free_map(small);
 
   int risk = calculate_risk(map);
-  printf("Total risk: %d\n", risk);
+  printf("Total risk: %d\n", risk); // 2825
   free_map(map);
   return 0;
 }
