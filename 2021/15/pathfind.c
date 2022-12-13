@@ -26,7 +26,7 @@ map_t* load_map(char* file) {
   int height;
   while(getline(&input, &bufsize, fptr) != -1) {
     if(map->w == 0) map->w = (strlen(input) - 1); // extract width from length of first line
-    
+
     // origin in top-left, extend down and right in x & y from here
     // (because that's how we read file in)
     for(size_t x = 0; x < map->w; x++) {
@@ -105,23 +105,23 @@ node_t* step_from(node_t* current, int direction) {
       x = current->point->x;
       y = (current->point->y - 1);
       break;
-    
+
     case 1: // right / east
       x = (current->point->x + 1);
       y = current->point->y;
       break;
-      
+
     case 2: // down / south
       x = current->point->x;
       y = (current->point->y + 1);
       break;
-      
+
     case 3: // left / west
       x = (current->point->x - 1);
       y = current->point->y;
       break;
   }
-  
+
   return new_node_at(x, y);
 }
 
@@ -168,14 +168,14 @@ void append_node(list_t* list, node_t* node) {
 int find_lowest_node(list_t* list) {
   int lowest = list->nodes[0]->f;
   int ind = 0;
-  
+
   for(size_t i = 0; i < list->n; i++) {
     if(list->nodes[i]->f < lowest){
       lowest = list->nodes[i]->f;
       ind = i;
     }
   }
-  
+
   return ind;
 }
 
@@ -204,22 +204,34 @@ int calculate_risk(map_t* map) {
   while(open->n > 0 && !risk) {
     current = remove_node_at(open, find_lowest_node(open));
     // printf("(%d, %d)\n", current->point->x, current->point->y);
-    
+
     for(i = 0; i < 4; i++) {
       next = step_from(current, i);
+
+      if(!is_valid(map, next->point)) {
+        // can't calculate heuristics on an invalid point
+        free_node(next);
+        continue;
+      }
+
       update_node_heuristics(map, next, current);
 
       if(is_same(next->point, map->end)) {
+        // we've reached the end!
         risk = next->g;
         free_node(next);
-      } else if(!is_valid(map, next->point)) {
-        free_node(next);
-      } else if(!lower_exists_in(open, next) && !lower_exists_in(closed, next)) {
+        break;
+      }
+
+      if(!lower_exists_in(open, next) && !lower_exists_in(closed, next)) {
+        // either we haven't been to this point before, or we have and have
+        // gotten here with a lower cost
         append_node(open, next);
       } else {
         free_node(next);
       }
     }
+
     append_node(closed, current);
   }
 
