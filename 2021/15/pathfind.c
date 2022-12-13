@@ -135,7 +135,7 @@ void update_node_heuristics(map_t* map, node_t* node, node_t* parent) {
 list_t* new_list() {
   // return an empty node list
   list_t* list = calloc(1, sizeof(list_t));
-  list->nodes = calloc(10000, sizeof(node_t*));
+  list->nodes = calloc(250000, sizeof(node_t*));
   return list;
 }
 
@@ -203,10 +203,12 @@ int calculate_risk(map_t* map) {
   size_t i;
   while(open->n > 0 && !risk) {
     current = remove_node_at(open, find_lowest_node(open));
+    // printf("(%d, %d)\n", current->point->x, current->point->y);
+    
     for(i = 0; i < 4; i++) {
       next = step_from(current, i);
       update_node_heuristics(map, next, current);
-      
+
       if(is_same(next->point, map->end)) {
         risk = next->g;
         free_node(next);
