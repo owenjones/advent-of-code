@@ -12,13 +12,7 @@ map_t* expand_map(map_t* old) {
     for(size_t x = 0; x < old->w; x++) {
       int h = old->heights[(y * old->w) + x];
       
-      for(size_t i = 0; i < 5; i++) {
-        int n = (h + i) % 9;
-        n = (n == 0) ? 9 : n;
-        
-        map->heights[(y * map->w) + (i * old->w) + x] = n;
-        //map->heights[() + x] = n;
-      }
+      
     }
   }
   
@@ -35,7 +29,6 @@ int main(void) {
       printf("%d", map->heights[(y * map->w) + x]);
     }
     printf("\n");
-    //exit(1);
   }
   
   // int risk = calculate_risk(map);
