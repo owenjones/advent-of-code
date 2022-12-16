@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <inttypes.h>
 
 #define YLINE 2000000
 // #define YLINE 20
