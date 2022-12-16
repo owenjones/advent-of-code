@@ -11,12 +11,11 @@ point_t* point_at(uint32_t x, uint32_t y) {
   return p;
 }
 
-int distance(point_t* a, point_t* b) {
-  int dx = abs(b->x - a->x);
-  int dy = abs(b->y - a->y);
+int distance(uint32_t ax, uint32_t ay, uint32_t bx, uint32_t by) {
+  int dx = abs((int) (bx - ax));
+  int dy = abs((int) (by - ay));
   return dx + dy;
 }
-
 
 list_t* list() {
   // return an empty node list
@@ -51,14 +50,20 @@ void append(list_t* list, point_t* point) {
   list->point[list->len++] = point;
 }
 
-grid_t* grid(int offset) {
+grid_t* grid(uint64_t dim, uint32_t offset) {
   grid_t* g = calloc(1, sizeof(grid_t));
   g->offset = offset;
-  g->dim = (2 * offset);
-  g->values = calloc((g->dim * g->dim), sizeof(int));
+  g->dim = dim;
+  g->values = calloc((dim * dim), sizeof(uint8_t));
   return g;
 }
 
 uint32_t c2ind(grid_t* grid, uint32_t x, uint32_t y) {
   return (y * grid->dim) + x;
+}
+
+void mark_point(grid_t* map, uint32_t x, uint32_t y) {
+  if(x >= 0 && x < map->dim && y >= 0 && y < map->dim) {
+    map->values[c2ind(map, x, y)] = 1;
+  }
 }
