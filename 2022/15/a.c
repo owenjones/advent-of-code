@@ -67,7 +67,6 @@ int main(void) {
       i--;
     }
   }
- 
 
   int total = 0;
   for(size_t i = 0; i < r; i++) {
