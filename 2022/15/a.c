@@ -1,4 +1,15 @@
-#include "beacons.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <inttypes.h>
+
+#define YLINE 2000000
+// #define YLINE 20
+
+struct range {
+  int min, max;
+};
 
 int main(void) {
   FILE* fptr;
@@ -7,58 +18,65 @@ int main(void) {
     exit(1);
   }
 
-  list_t* sensors = list();
-  list_t* beacons = list();
+  struct range ranges[25];
+  int beacons_x[25], b = 0, r = 0;
 
-  grid_t* map = grid(8000000, 2000000);
-
-  int sx, sy, bx, by;
-  while(fscanf(fptr, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d\n", &sx, &sy, &bx, &by) == 4) {
-    append(sensors, point_at(sx + map->offset, sy + map->offset));
-    append(beacons, point_at(bx + map->offset, by + map->offset));
+  int ax, ay, bx, by, d, e, f;
+  while(fscanf(fptr, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d\n", &ax, &ay, &bx, &by) == 4) {
+    d = abs(ax - bx) + abs(ay - by);
+    
+    if(((ay - d) <= YLINE) && ((ay + d) >= YLINE)) {
+      e = abs(ay - YLINE);
+      f = d - e;
+      
+      struct range range;
+      range.min = ax - f;
+      range.max = ax + f;
+      ranges[r++] = range;
+    }
   }
   fclose(fptr);
 
-  // printf("%d sensor readings\n", sensors->len);
+  if(r == 0) {
+    printf("Error - no points on the line\n");
+    exit(1);
+  }
 
-  int d, f;
-  size_t m, n;
-  for(size_t i = 0; i < sensors->len; i++) {
-    d = distance(sensors->point[i]->x, sensors->point[i]->y, beacons->point[i]->x, beacons->point[i]->y);
-
-    // printf("Sensor %zu (%d, %d) => (%d, %d) [%d]\n", (i + 1), sensors->point[i]->x, sensors->point[i]->y, beacons->point[i]->x, beacons->point[i]->y, d);
-
-    sx = (sensors->point[i]->x - d);
-    sy = (sensors->point[i]->y - d);
-    bx = (sensors->point[i]->x + d);
-    by = (sensors->point[i]->y + d);
-    
-    for(n = sy; n <= by; n++) {
-      for(m = sx; m <= bx; m++) {
-        // printf("n=%zu, m=%zu\n", n, m);
-        f = distance(sensors->point[i]->x, sensors->point[i]->y, m, n); 
-        if(f <= d) {
-          mark_point(map, m, n);
-        }
+  // sort ranges by min value (ascending)
+  for(size_t i = 0; i < (r - 1); i++) {
+    for(size_t j = 0; j < (r - i - 1); j++) {
+      if(ranges[j].min > ranges[j+1].min) {
+        struct range temp = ranges[j];
+        ranges[j] = ranges[j+1];
+        ranges[j+1] = temp;
       }
     }
   }
-  free_list(sensors);
-  free_list(beacons);
 
-  // for(size_t j = 0; j < map->dim; j++) {
-  //   for(size_t i = 0; i < map->dim; i++) {
-  //     char c = (map->values[c2ind(map, i, j)] == 1) ? '#' : '.';
-  //     printf("%c", c);
-  //   }
-  //   printf("\n");
-  // }
+  // merge overlapping ranges
+  for(size_t i = 0; i < (r - 1); i++) {
+    if(ranges[i].max > ranges[i+1].min && ranges[i].max < ranges[i+1].max) {
+      ranges[i].max = ranges[i+1].max;
+      for(size_t j = (i + 1); j < (r - 1); j++) {
+        ranges[j] = ranges[j+1];
+      }
+      r--;
+      i--;
+    } else if(ranges[i].min <= ranges[i+1].min && ranges[i].max >= ranges[i+1].max) {
+      for(size_t j = (i + 1); j < (r - 1); j++) {
+        ranges[j] = ranges[j+1];
+      }
+      r--;
+      i--;
+    }
+  }
+ 
 
   int total = 0;
-  for(size_t i = 0; i < map->dim; i++) {
-    total += map->values[c2ind(map, (i + map->offset), (2000000 + map->offset))];
+  for(size_t i = 0; i < r; i++) {
+    total += abs(ranges[i].max - ranges[i].min);
   }
 
-  printf("Total covered positions: %d\n", total);
+  printf("Total covered positions: %d\n", total); // 4951427
   return 0;
 }
