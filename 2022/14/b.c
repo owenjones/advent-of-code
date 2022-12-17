@@ -30,7 +30,7 @@ int main(void) {
     }
   }
   
-  int p, x, minx, maxx, y, miny, maxy, floor = 0;
+  int p, x, minx, maxx, y, miny, maxy, f = 0;
   int points[50][2];
   char pair[50][10];
   char *string = NULL;
@@ -70,16 +70,16 @@ int main(void) {
         }
       }
       
-      floor = (floor > maxy) ? floor : maxy;
+      f = (f > maxy) ? f : maxy;
     }
   }
   fclose(fptr);
   free(input);
   free(string);
   
-  floor += 2;
+  f += 2;
   for(i = 0; i < X; i++) {
-    grid[i][floor] = 1;
+    grid[i][f] = 1;
   }
 
   int units = 0;
@@ -109,10 +109,7 @@ int main(void) {
       break;
     }
     
-    if(x == 500 && y == 0) {
-      // printf("at the top\n");
-      break;
-    }
+    if(x == 500 && y == 0) break;
   }
 
   printf("Units of sand to fill structure: %d\n", units); // 24377
