@@ -16,9 +16,7 @@ int main(void) {
   }
 
   struct range ranges[25];
-  int beacons_x[25], b = 0, r = 0;
-
-  int ax, ay, bx, by, d, e, f;
+  int ax, ay, bx, by, d, e, f, r = 0;
   while(fscanf(fptr, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d\n", &ax, &ay, &bx, &by) == 4) {
     d = abs(ax - bx) + abs(ay - by);
     
