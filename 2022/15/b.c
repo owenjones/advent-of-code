@@ -82,7 +82,7 @@ int main(void) {
   
   uint64_t x, y;
   find_the_beacon(sensors, s, &x, &y);
-  uint64_t frequency = (uint64_t) (x * MAXCOORD) + y;
+  uint64_t frequency = (x * MAXCOORD) + y;
   printf("Frequency of distress beacon: %llu\n", frequency); // 13029714573243
   return 0;
 }
