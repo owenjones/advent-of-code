@@ -32,9 +32,9 @@ int main(void) {
     exit(1);
   }
 
-  int filled[100][100][100];
-  int visited[100][100][100];
-  size_t x, y, z;
+  int x, y, z;
+  uint8_t filled[100][100][100];
+  uint8_t visited[100][100][100];
   for(x = 0; x < 100; x++) {
     for(y = 0; y < 100; y++) {
       for(z = 0; z < 100; z++) {
@@ -46,17 +46,17 @@ int main(void) {
   
   int minx = 100, maxx = 0, miny = 100, maxy = 0, minz = 100, maxz = 0;
   int i, j, k;
-  while(fscanf(fptr, "%d,%d,%d\n", &i, &j, &k) == 3) {
-    i += 5; j += 5; k += 5; // to move points away from 0
+  while(fscanf(fptr, "%d,%d,%d\n", &x, &y, &z) == 3) {
+    x += 5; y += 5; z += 5; // to move points away from 0
 
-    filled[i][j][k] = 1;
+    filled[x][y][z] = 1;
     
-    minx = (i < minx) ? i : minx;
-    maxx = (i > maxx) ? i : maxx;
-    miny = (j < miny) ? j : miny;
-    maxy = (j > maxy) ? j : maxy;
-    minz = (k < minz) ? k : minz;
-    maxz = (k > maxz) ? k : maxz;
+    minx = (x < minx) ? x : minx;
+    maxx = (x > maxx) ? x : maxx;
+    miny = (y < miny) ? y : miny;
+    maxy = (y > maxy) ? y : maxy;
+    minz = (z < minz) ? z : minz;
+    maxz = (z > maxz) ? z : maxz;
   }
   fclose(fptr);
   
@@ -115,19 +115,26 @@ int main(void) {
       
       if(filled[n->x][n->y][n->z]) {
         faces++;
+        free(n);
       } else if(!visited[n->x][n->y][n->z] 
-        && n->x >= minx - 1
-        && n->x <= maxx + 1
-        && n->y >= miny - 1
-        && n->y <= maxy + 1
-        && n->z >= minz - 1
-        && n->z <= maxz + 1) {
+        && n->x >= minx
+        && n->x <= maxx
+        && n->y >= miny
+        && n->y <= maxy
+        && n->z >= minz 
+        && n->z <= maxz) {
         visited[n->x][n->y][n->z] = 1;
         append(queue, n);
+      } else {
+        free(n);
       }
     }
+    free(p);
   }
-    
+  
+  free(queue->points);
+  free(queue);
+  
   printf("Faces: %d\n", faces); // 2018
   return 0;
 }
