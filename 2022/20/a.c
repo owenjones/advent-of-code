@@ -76,7 +76,7 @@ int main(void) {
   for(i = 0; i < x; i++) {
     if(indexes[i]->value == 0) {
       ptr = indexes[i];
-      // break;
+      break;
     }
   }
 
