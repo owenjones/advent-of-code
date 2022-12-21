@@ -38,14 +38,10 @@ monkey_t* make_or_get_monkey(monkey_t** monkies, char id[4]) {
 
 int64_t do_operation(char op, int64_t a, int64_t b) {
   switch(op) {
-    case '+':
-      return a + b;
-    case '-':
-      return a - b;
-    case '*':
-      return a * b;
-    case '/':
-      return a / b;
+    case '+': return a + b;
+    case '-': return a - b;
+    case '*': return a * b;
+    case '/': return a / b;
   }
   return 0;
 }
@@ -64,6 +60,7 @@ void yell(monkey_t* monkey) {
       }
     }
   monkey->listening = 0;
+  free(monkey->listeners);
   }
 }
 
@@ -113,13 +110,8 @@ int main(void) {
         monkey->operation.left = left;
         monkey->operation.right = right;
         
-        if(!left->yelled) {
-          add_listener(left, monkey);
-        }
-        
-        if(!right->yelled) {
-          add_listener(right, monkey);
-        }
+        if(!left->yelled) add_listener(left, monkey);
+        if(!right->yelled) add_listener(right, monkey);
       }
       
     }
@@ -130,10 +122,7 @@ int main(void) {
   printf("Value of root monkey = %lld\n", root); // 331319379445180
 
   for(size_t m = 0; m < 421075226; m++) {
-    if(monkies[m] != NULL) {
-      free(monkies[m]->listeners);
-      free(monkies[m]);
-    }
+    if(monkies[m] != NULL) free(monkies[m]);
   }
 
   return 0;
