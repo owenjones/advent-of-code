@@ -54,13 +54,21 @@ void yell(monkey_t* monkey) {
   monkey->yelled = 1;
   if(monkey->listening > 0) {
     for(size_t m = 0; m < monkey->listening; m++) {
-      if(monkey->listeners[m]->operation.left->yelled && monkey->listeners[m]->operation.right->yelled) {
-        monkey->listeners[m]->value = do_operation(monkey->listeners[m]->operation.op, monkey->listeners[m]->operation.left->value, monkey->listeners[m]->operation.right->value);
+      if(monkey->listeners[m]->operation.left->yelled 
+        && monkey->listeners[m]->operation.right->yelled) {
+          
+        monkey->listeners[m]->value = do_operation(
+          monkey->listeners[m]->operation.op,
+          monkey->listeners[m]->operation.left->value,
+          monkey->listeners[m]->operation.right->value
+        );
+        
         yell(monkey->listeners[m]);
       }
     }
-  monkey->listening = 0;
-  free(monkey->listeners);
+    
+    monkey->listening = 0;
+    free(monkey->listeners);
   }
 }
 
