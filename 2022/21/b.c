@@ -23,11 +23,15 @@ uint32_t monkey_hash(char id[4]) {
   return ((id[0] - 97) << 24) + ((id[1] - 97) << 16) + ((id[2] - 97) << 8) + (id[3] - 97);
 }
 
+monkey_t* get_monkey(monkey_t** monkies, char id[4]) {
+  return monkies[monkey_hash(id)];
+}
+
 monkey_t* make_or_get_monkey(monkey_t** monkies, char id[4]) {
-  uint32_t hash = monkey_hash(id);
-  monkey_t* monkey = monkies[hash];
+  monkey_t* monkey = get_monkey(monkies, id);
   
   if(monkey == NULL) {
+    uint32_t hash = monkey_hash(id);
     monkey = calloc(1, sizeof(monkey_t));
     monkey->type = UNKNOWN_MONKEY;
     monkey->value = 0;
@@ -39,6 +43,58 @@ monkey_t* make_or_get_monkey(monkey_t** monkies, char id[4]) {
   }
   
   return monkey;
+}
+
+monkey_t** extract_monkies(char* file) {
+  FILE* fptr;
+  if((fptr = fopen(file, "r")) == NULL) {
+    printf("Error opening file\n");
+    exit(1);
+  }
+
+  monkey_t** monkies = calloc(421075226, sizeof(monkey_t*));
+
+  char id[4], left_id[4], right_id[4], operation;
+  int64_t value;
+  monkey_t* monkey;
+
+  char* input = NULL;
+  size_t bufsize = 0;
+  while(getline(&input, &bufsize, fptr) != -1) {
+    if(sscanf(input, "%4c: %lld\n", id, &value) == 2) {
+      monkey = make_or_get_monkey(monkies, id);
+      if(strcmp(id, "humn") == 0) {
+        monkey->type = NOT_A_MONKEY;
+        monkey->branch_contains_human = 1;
+      } else {
+        monkey->type = VALUE_MONKEY;
+        monkey->value = value;
+      }
+    } else if(sscanf(input, "%4c: %4c %1c %4c\n", id, left_id, &operation, right_id) == 4) {
+      monkey = make_or_get_monkey(monkies, id);
+      monkey->left = make_or_get_monkey(monkies, left_id);
+      monkey->right = make_or_get_monkey(monkies, right_id);
+      
+      if(strcmp(id, "root") == 0) {
+        monkey->type = ROOT_MONKEY;
+        monkey->operation = '=';
+      } else {
+        monkey->type = OPERATION_MONKEY;
+        monkey->operation = operation;
+      }
+    }
+  }
+  fclose(fptr);
+  free(input);
+  
+  return monkies;
+}
+
+void free_monkies(monkey_t** monkies) {
+  for(size_t m = 0; m < 421075226; m++) {
+    if(monkies[m] != NULL) free(monkies[m]);
+  }
+  free(monkies);
 }
 
 int64_t do_operation(char op, int64_t a, int64_t b) {
@@ -84,20 +140,14 @@ uint8_t unmask_humans(monkey_t* monkey) {
       return 0;
       
     case OPERATION_MONKEY:
-      contains = (unmask_humans(monkey->left) || unmask_humans(monkey->right));
-      monkey->branch_contains_human = contains;
-      return contains;
-      
     case ROOT_MONKEY:
       contains = (unmask_humans(monkey->left) || unmask_humans(monkey->right));
       monkey->branch_contains_human = contains;
       return contains;
-      
+
     case NOT_A_MONKEY:
       return 1;
-      
   }
-  
 }
 
 int64_t solve_branch(monkey_t* monkey) {
@@ -131,108 +181,39 @@ int64_t solve_branch(monkey_t* monkey) {
   }
 }
 
-void find_human_value(monkey_t* monkey, int64_t target) {
+void find_human_value(monkey_t* monkey, int64_t input) {
   if(monkey->type == NOT_A_MONKEY) {
-    monkey->value = target;
+    monkey->value = input;
     return;
   }
   
-  int64_t left, right, solution;
+  uint8_t in_left = monkey->left->branch_contains_human;
+  monkey_t* branch = (in_left) ? monkey->right : monkey->left;
+  int64_t solution = solve_branch(branch);
   
-  if(monkey->left->branch_contains_human) {
-    right = solve_branch(monkey->right);
+  if(monkey->type != ROOT_MONKEY) {
     solution = do_invert_operation(
       monkey->operation,
-      target,
-      right,
-      1
+      input,
+      solution,
+      in_left
     );
-    
-    find_human_value(monkey->left, solution);
-    
-  } else if(monkey->right->branch_contains_human) {
-    left = solve_branch(monkey->left);
-    solution = do_invert_operation(
-      monkey->operation,
-      target,
-      left,
-      0
-    );
-    
-    find_human_value(monkey->right, solution);
   }
   
-}
-
-void start_search(monkey_t* root) {
-  if(root->left->branch_contains_human) {
-    int64_t solution = solve_branch(root->right);
-    printf("Human is in left branch, right branch solution is %lld\n", solution);
-    find_human_value(root->left, solution);
-  } else if(root->right->branch_contains_human) {
-    int64_t solution = solve_branch(root->left);
-    printf("Human is in right branch, left branch solution is %lld\n", solution);
-    find_human_value(root->right, solution);
-  }
+  branch = (in_left) ? monkey->left : monkey->right;
+  find_human_value(branch, solution);
 }
 
 int main(void) {
-  FILE* fptr;
-  if((fptr = fopen("input.txt", "r")) == NULL) {
-    printf("Error opening file\n");
-    exit(1);
-  }
-
-  monkey_t** monkies = calloc(421075226, sizeof(monkey_t*));
-
-  char id[4], left_id[4], right_id[4], operation;
-  int64_t value;
-  monkey_t *monkey, *left, *right;
-
-  char* input = NULL;
-  size_t bufsize = 0;
-  while(getline(&input, &bufsize, fptr) != -1) {
-    if(sscanf(input, "%4c: %lld\n", id, &value) == 2) {
-      if(strcmp(id, "humn") == 0) {
-        monkey = make_or_get_monkey(monkies, id);
-        monkey->type = NOT_A_MONKEY;
-        monkey->branch_contains_human = 1;
-      } else {
-        monkey = make_or_get_monkey(monkies, id);
-        monkey->type = VALUE_MONKEY;
-        monkey->value = value;
-      }
-      
-    } else if(sscanf(input, "%4c: %4c %1c %4c\n", id, left_id, &operation, right_id) == 4) {
-      monkey = make_or_get_monkey(monkies, id);
-      left = make_or_get_monkey(monkies, left_id);
-      right = make_or_get_monkey(monkies, right_id);
-      
-      if(strcmp(id, "root") == 0) {
-        monkey->type = ROOT_MONKEY;
-        monkey->operation = '=';
-      } else {
-        monkey->type = OPERATION_MONKEY;
-        monkey->operation = operation;
-      }
-      
-      monkey->left = left;
-      monkey->right = right;
-    }
-  }
-  fclose(fptr);
-  free(input);
-
-  monkey_t* root = make_or_get_monkey(monkies, "root");
+  monkey_t** monkies = extract_monkies("input.txt");
+  monkey_t* root = get_monkey(monkies, "root");
   unmask_humans(root);
-  start_search(root);
+  find_human_value(root, 0);
 
-  int64_t shout = make_or_get_monkey(monkies, "humn")->value;
-  printf("Number human has to shout = %lld\n", shout); 
+  int64_t shout = get_monkey(monkies, "humn")->value;
+  printf("Number human has to shout = %lld\n", shout);
+  // 3715799488132
 
-  for(size_t m = 0; m < 421075226; m++) {
-    if(monkies[m] != NULL) free(monkies[m]);
-  }
-
+  free_monkies(monkies);
   return 0;
 }
