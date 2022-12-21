@@ -125,6 +125,7 @@ int main(void) {
     }
   }
   fclose(fptr);
+  free(input);
 
   int64_t root = make_or_get_monkey(monkies, "root")->value;
   printf("Value of root monkey = %lld\n", root); // 331319379445180
