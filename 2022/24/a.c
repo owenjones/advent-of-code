@@ -200,8 +200,6 @@ int main(void) {
   grid_t* grids[10000];
   list_t* search = new_list();
   
-  int32_t t = 0;
-  
   node_t* start = new_node(0, -1, 0);
   append_node(search, start);
   
