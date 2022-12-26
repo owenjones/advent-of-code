@@ -206,13 +206,11 @@ int main(void) {
 
   grid_t* grids[10000];
   list_t* search = new_list();
-  
-  int32_t t = 0;
-  
+
   node_t* start = new_node(0, -1, 0);
   append_node(search, start);
   
-  uint32_t end = 0, count = search->n;
+  uint32_t end = 0;
   node_t* current;
   grid_t* grid;
   int8_t x, y;
@@ -220,7 +218,7 @@ int main(void) {
   uint8_t route = 0; // 0 = there, 1 = back, 2 = there (again..)
   int8_t targetx = (GRIDX - 1), targety = GRIDY;
   
-  while(count > 0 && !end) {
+  while(search->n > 0 && !end) {
     current = get_head_node(search);
     grid = grid_at_time(grids, blizzards, (current->time + 1));
     
@@ -275,11 +273,11 @@ int main(void) {
         }
       }
     }
-    count = search->n;
+    free(current);
   }
   
   free_list(search);
-  for(size_t x = 0; x <= (i + 1); x++) free(grids[x]);
+  for(size_t x = 0; x <= (end + 1); x++) free(grids[x]);
   for(size_t x = 0; x < blizzards->count; x++) free(blizzards->blizzard[x]);
   free(blizzards->blizzard);
   free(blizzards);
