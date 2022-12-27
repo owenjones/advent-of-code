@@ -7,7 +7,6 @@
 typedef struct elf {
   uint32_t now[2];
   uint32_t next[2];
-  uint8_t propose_move;
 } elf_t;
 
 typedef struct elves {
@@ -49,14 +48,6 @@ uint32_t count_empty(elves_t* elves) {
   return total;
 }
 
-void clear_elf_flags(elves_t* elves) {
-  for(size_t e = 0; e < elves->count; e++) {
-    elves->elf[e]->propose_move = 0;
-    elves->elf[e]->next[0] = 0;
-    elves->elf[e]->next[1] = 0;
-  }
-}
-
 int main(void) {
   FILE* fptr;
   if((fptr = fopen("input.txt", "r")) == NULL) {
@@ -94,7 +85,6 @@ int main(void) {
     // reset mid-round holders
     clear_grid(grid);
     clear_grid(moves);
-    clear_elf_flags(elves);
     
     // fill grid with current elf positions
     for(size_t e = 0; e < elves->count; e++) {
@@ -102,56 +92,16 @@ int main(void) {
     }
     
     for(size_t e = 0; e < elves->count; e++) {
-      // check 8 compass directions for a neighbouring elf and propose moving if
-      // we find one
-      for(size_t i = 0; i < 8; i++) {
-        switch(i) {
-          case 0: 
-            if(grid[elves->elf[e]->now[0]][elves->elf[e]->now[1] - 1] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 1: 
-            if(grid[elves->elf[e]->now[0] + 1][elves->elf[e]->now[1] - 1] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 2: 
-            if(grid[elves->elf[e]->now[0] + 1][elves->elf[e]->now[1]] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 3: 
-            if(grid[elves->elf[e]->now[0] + 1][elves->elf[e]->now[1] + 1] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 4: 
-            if(grid[elves->elf[e]->now[0]][elves->elf[e]->now[1] + 1] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 5: 
-            if(grid[elves->elf[e]->now[0] - 1][elves->elf[e]->now[1] + 1] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 6: 
-            if(grid[elves->elf[e]->now[0] - 1][elves->elf[e]->now[1]] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-          case 7: 
-            if(grid[elves->elf[e]->now[0] - 1][elves->elf[e]->now[1] - 1] == 1) {
-              elves->elf[e]->propose_move = 1;
-            }
-            break;
-        }
-      }
-      
-      // if this elf proposes moving, work out first possible direction they could
-      // move to and mark it
-      if(elves->elf[e]->propose_move) {
+      if(
+        (grid[elves->elf[e]->now[0]][elves->elf[e]->now[1] - 1] == 1) ||
+        (grid[elves->elf[e]->now[0] + 1][elves->elf[e]->now[1] - 1] == 1) ||
+        (grid[elves->elf[e]->now[0] + 1][elves->elf[e]->now[1]] == 1) ||
+        (grid[elves->elf[e]->now[0] + 1][elves->elf[e]->now[1] + 1] == 1) ||
+        (grid[elves->elf[e]->now[0]][elves->elf[e]->now[1] + 1] == 1) ||
+        (grid[elves->elf[e]->now[0] - 1][elves->elf[e]->now[1] + 1] == 1) ||
+        (grid[elves->elf[e]->now[0] - 1][elves->elf[e]->now[1]] == 1) ||
+        (grid[elves->elf[e]->now[0] - 1][elves->elf[e]->now[1] - 1] == 1)
+      ) {
         for(size_t i = 0; i < 4; i++) {
           m = (i + d) % 4;
           if(m == 0) { // look North
