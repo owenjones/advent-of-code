@@ -15,6 +15,7 @@ typedef struct packet {
   uint8_t value;
   uint8_t children;
   struct packet** child;
+  char input[100];
 } packet_t;
 
 packet_t* make_packet() {
@@ -22,7 +23,7 @@ packet_t* make_packet() {
   packet->type = UNKNOWN_PACKET;
   packet->value = 0;
   packet->children = 0;
-  packet->child = calloc(100, sizeof(packet_t*));
+  packet->child = calloc(500, sizeof(packet_t*));
   return packet;
 }
 
@@ -31,7 +32,7 @@ void add_child_packet(packet_t* parent, packet_t* add) {
 }
 
 packet_t* parse_packet(char* input) {
-  packet_t* packets[100];
+  packet_t* packets[500];
   
   int n = 0;
   size_t s = strlen(input);
@@ -41,6 +42,7 @@ packet_t* parse_packet(char* input) {
       case '[':
         packets[n] = make_packet();
         packets[n]->type = LIST_PACKET;
+        if(n == 0) strcpy(packets[n]->input, input);
         if(n > 0) add_child_packet(packets[n-1], packets[n]);
         n++;
         break;
@@ -61,7 +63,7 @@ packet_t* parse_packet(char* input) {
           }
           extract[(j - i)] = '\0';
           int d = atoi(extract);
-          i = (j - 1);
+          i = j - 1;
           
           packet_t* p = make_packet();
           p->type = INTEGER_PACKET;
@@ -86,7 +88,7 @@ void wrap_in_list(packet_t* packet) {
   add_child_packet(packet, child);
 }
 
-int compare_packets(packet_t* left, packet_t* right) {
+int in_order(packet_t* left, packet_t* right) {
   // 1 = in order, 0 = not in order, -1 = we don't know, continue comparison
   if(left->type == INTEGER_PACKET && right->type == INTEGER_PACKET) {
     if(left->value == right->value) return -1;
@@ -105,7 +107,7 @@ int compare_packets(packet_t* left, packet_t* right) {
         return 0; // right has run out of items
       }      
       else {
-        int result = compare_packets(left->child[i], right->child[i]);
+        int result = in_order(left->child[i], right->child[i]);
         if(result < 0) continue;
         else return result;
       }
@@ -113,10 +115,10 @@ int compare_packets(packet_t* left, packet_t* right) {
     return -1;
   } else if(left->type == INTEGER_PACKET && right->type != INTEGER_PACKET) {
     wrap_in_list(left);
-    return compare_packets(left, right);
+    return in_order(left, right);
   } else if(left->type != INTEGER_PACKET && right->type == INTEGER_PACKET) {
     wrap_in_list(right);
-    return compare_packets(left, right);
+    return in_order(left, right);
   }
   
   printf("Something went wrong with comparison\n");
@@ -131,13 +133,24 @@ void free_packets(packet_t* packet) {
   free(packet);
 }
 
-int in_order(char* l, char* r) {
-  packet_t* left = parse_packet(l);
-  packet_t* right = parse_packet(r);
-  int result = compare_packets(left, right);
-  free_packets(left);
-  free_packets(right);
-  return result;
+void sort_packets(packet_t** packet, size_t packets) {
+  for(size_t i = 0; i < (packets - 1); i++) {
+    for(size_t j = 0; j < (packets - 1 - i); j++) {
+      int order = in_order(packet[j], packet[j+1]);
+      if(order == 0) {
+        packet_t* temp = packet[j];
+        packet[j] = packet[j+1];
+        packet[j+1] = temp;
+      }
+    }
+  }
+}
+
+int find_index(packet_t** packet, size_t packets, char* input) {
+  for(size_t i = 1; i < (packets + 1); i++) {
+    if(strcmp(packet[(i - 1)]->input, input) == 0) return i;
+  }
+  return 0;
 }
 
 int main(void) {
@@ -147,24 +160,30 @@ int main(void) {
     exit(1);
   }
 
-  char *left = NULL, *right = NULL;
-  size_t bufl = 0, bufr = 0;
-  int cl, cr, pair = 1, total = 0;
-  while(1) {
-    cl = getline(&left, &bufl, fptr);
-    cr = getline(&right, &bufr, fptr);
-    if((cl > 0) && (cr > 0)) {
-      if(in_order(left, right) == 1) total += pair;
-      getline(&left, &bufl, fptr); // clear the newline after a pair
-      pair++;
-    } else {
-      break;
-    }
+  packet_t** packet = calloc(1000, sizeof(packet_t*));
+  packet[0] = parse_packet("[[2]]");
+  packet[1] = parse_packet("[[6]]");
+  size_t packets = 2;
+
+  char *input = NULL;
+  size_t bufsize = 0;
+  while(getline(&input, &bufsize, fptr) != -1) {
+    if(strcmp(input, "\n") == 0) continue;
+    packet[packets++] = parse_packet(input);
   }
   fclose(fptr);
-  free(left);
-  free(right);
+  free(input);
 
-  printf("Sum of indices already in order: %d\n", total); // 5806
+  sort_packets(packet, packets);
+  int a = find_index(packet, packets, "[[2]]");
+  int b = find_index(packet, packets, "[[6]]");
+  int total = a * b;
+  
+  for(size_t i = 0; i < packets; i++) {
+    free_packets(packet[i]);
+  }
+  free(packet);
+  
+  printf("Decoder key: %d\n", total); // 23600
   return 0;
 }
