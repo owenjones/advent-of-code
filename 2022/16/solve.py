@@ -53,7 +53,7 @@ def valve_search(
     if current:
         (current_time, current_flow) = current
 
-        if current_time >= max_time:
+        if current_time > max_time:
             return
     else:
         current_time = 0
@@ -85,7 +85,9 @@ def valve_search(
         )
 
 
-def part_a(valves, targets, shortest_paths) -> int:
+def part_a(
+    valves: dict[tuple[int, list[str]]], targets: list[str], shortest_paths: dict[dict]
+) -> int:
     # Work through nodes - cache time & max flow for each leg to speed
     # up calculating additional searches
     cache = dict()
@@ -94,14 +96,42 @@ def part_a(valves, targets, shortest_paths) -> int:
     return max(pressures)
 
 
-def part_b():
+def part_b(
+    valves: dict[tuple[int, list[str]]], targets: list[str], shortest_paths: dict[dict]
+) -> int:
     # partition target node set, find max pressure for each half and sum
     # find max of summed pressures
-    pass
+
+    cache = dict()
+    pressures = list()
+
+    # Pre-cache times and flows
+    valve_search(valves, "AA", None, targets, cache, [], shortest_paths, 26)
+
+    p = itertools.permutations(targets)
+    # assume most efficient method is to evenly split valves between human and elephant
+    s = round(len(targets) / 2)
+
+    # need to massively reduce search space right here!
+
+    for t in p:
+        l = hash(("AA",) + t[:s])
+        r = hash(("AA",) + t[s:])
+
+        dl = cache.get(l, None)
+        dr = cache.get(r, None)
+
+        if not dl or not dr:
+            continue
+
+        pressure = dl[1] + dr[1]
+        pressures.append(pressure)
+
+    return max(pressures)
 
 
 if __name__ == "__main__":
-    input = "input.txt"
+    input = "test_input.txt"
     (valves, targets, shortest_paths) = extract_valves(input)
 
     # Part 1 - 2253
@@ -109,4 +139,5 @@ if __name__ == "__main__":
     print(f"Part 1: Most pressure that can be released = { pressure }")
 
     # Part 2 -
-    # pressure = part_b(valves)
+    pressure = part_b(valves, targets, shortest_paths)
+    print(f"Part 2: Most pressure that can be released = { pressure }")
