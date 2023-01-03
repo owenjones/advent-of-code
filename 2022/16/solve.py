@@ -44,7 +44,6 @@ def valve_search(
     path: tuple,
     targets: list[str],
     cache: dict[tuple],
-    pressures: list[int],
     shortest_paths: dict[dict],
     max_time: int,
 ) -> None:
@@ -81,19 +80,16 @@ def valve_search(
         save.remove("AA")
         cache[hash(new_path)] = (time, flow, save)
 
-        pressures.append(flow)
-        valve_search(
-            valves, node, path, targets, cache, pressures, shortest_paths, max_time
-        )
+        valve_search(valves, node, path, targets, cache, shortest_paths, max_time)
 
 
 def part_a(
     valves: dict[tuple[int, list[str]]], targets: list[str], shortest_paths: dict[dict]
 ) -> int:
     cache = dict()
-    pressures = list()
-    valve_search(valves, "AA", None, targets, cache, pressures, shortest_paths, 30)
-    return max(pressures)
+    valve_search(valves, "AA", None, targets, cache, shortest_paths, 30)
+    cache = sorted(cache.items(), key=lambda x: x[1][1], reverse=True)
+    return cache[0][1][1]
 
 
 def part_b(
@@ -103,7 +99,7 @@ def part_b(
     part_a: int,
 ) -> int:
     cache = dict()
-    valve_search(valves, "AA", None, targets, cache, [], shortest_paths, 26)
+    valve_search(valves, "AA", None, targets, cache, shortest_paths, 26)
     cache = dict(sorted(cache.items(), key=lambda x: x[1][2], reverse=True))
 
     max_flow = 0
@@ -114,11 +110,11 @@ def part_b(
                 continue
 
             flow = outer[1][1] + inner[1][1]
-            if flow < part_a or flow < max_flow:
-                # assume result in part 2 is better than in part 1...
+            if flow <= part_a or flow <= max_flow:
+                # going to assume result in part 2 is better than in part 1...
                 continue
 
-            # check valve(s) don't appear in both sides (can't open a valve twice)
+            # check valves don't appear in both sides (can't open a valve twice)
             if not any(x in outer[1][2] for x in inner[1][2]):
                 max_flow = flow
 
