@@ -1,7 +1,6 @@
 from pathlib import Path
 import re
 import networkx as nx
-import itertools
 
 
 def extract_valves(input: str) -> dict[tuple[int, list[str]]]:
