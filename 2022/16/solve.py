@@ -51,9 +51,9 @@ def valve_search(
     path = path + (root,) if path else (root,)
     current = cache.get(hash(path), None)
     if current:
-        (current_time, current_flow) = current
+        (current_time, current_flow, _) = current
 
-        if current_time > max_time:
+        if current_time >= max_time:
             return
     else:
         current_time = 0
@@ -70,14 +70,16 @@ def valve_search(
         dt = int(shortest_paths[root][node] + 1)
         time = current_time + dt
 
-        if time > max_time:
+        if time >= max_time:
             continue
 
         df = (max_time - time) * valves[node][0]
         flow = current_flow + df
 
         new_path = path + (node,)
-        cache[hash(new_path)] = (time, flow)
+        save = list(new_path)
+        save.remove("AA")
+        cache[hash(new_path)] = (time, flow, save)
 
         pressures.append(flow)
         valve_search(
@@ -88,8 +90,6 @@ def valve_search(
 def part_a(
     valves: dict[tuple[int, list[str]]], targets: list[str], shortest_paths: dict[dict]
 ) -> int:
-    # Work through nodes - cache time & max flow for each leg to speed
-    # up calculating additional searches
     cache = dict()
     pressures = list()
     valve_search(valves, "AA", None, targets, cache, pressures, shortest_paths, 30)
@@ -97,47 +97,42 @@ def part_a(
 
 
 def part_b(
-    valves: dict[tuple[int, list[str]]], targets: list[str], shortest_paths: dict[dict]
+    valves: dict[tuple[int, list[str]]],
+    targets: list[str],
+    shortest_paths: dict[dict],
+    part_a: int,
 ) -> int:
-    # partition target node set, find max pressure for each half and sum
-    # find max of summed pressures
-
     cache = dict()
-    pressures = list()
-
-    # Pre-cache times and flows
     valve_search(valves, "AA", None, targets, cache, [], shortest_paths, 26)
+    cache = dict(sorted(cache.items(), key=lambda x: x[1][2], reverse=True))
 
-    p = itertools.permutations(targets)
-    # assume most efficient method is to evenly split valves between human and elephant
-    s = round(len(targets) / 2)
+    max_flow = 0
 
-    # need to massively reduce search space right here!
+    for outer in cache.items():
+        for inner in cache.items():
+            if outer == inner:
+                continue
 
-    for t in p:
-        l = hash(("AA",) + t[:s])
-        r = hash(("AA",) + t[s:])
+            flow = outer[1][1] + inner[1][1]
+            if flow < part_a or flow < max_flow:
+                # assume result in part 2 is better than in part 1...
+                continue
 
-        dl = cache.get(l, None)
-        dr = cache.get(r, None)
+            # check valve(s) don't appear in both sides (can't open a valve twice)
+            if not any(x in outer[1][2] for x in inner[1][2]):
+                max_flow = flow
 
-        if not dl or not dr:
-            continue
-
-        pressure = dl[1] + dr[1]
-        pressures.append(pressure)
-
-    return max(pressures)
+    return max_flow
 
 
 if __name__ == "__main__":
-    input = "test_input.txt"
+    input = "input.txt"
     (valves, targets, shortest_paths) = extract_valves(input)
 
     # Part 1 - 2253
-    pressure = part_a(valves, targets, shortest_paths)
-    print(f"Part 1: Most pressure that can be released = { pressure }")
+    a = part_a(valves, targets, shortest_paths)
+    print(f"Part 1: Most pressure that can be released = { a }")
 
-    # Part 2 -
-    pressure = part_b(valves, targets, shortest_paths)
-    print(f"Part 2: Most pressure that can be released = { pressure }")
+    # Part 2 - 2838
+    b = part_b(valves, targets, shortest_paths, a)
+    print(f"Part 2: Most pressure that can be released = { b }")
