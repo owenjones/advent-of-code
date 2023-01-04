@@ -54,7 +54,7 @@ uint8_t board_collision(shape_t* shape, int8_t* board, uint32_t y) {
   // take four lines of shape in reverse order and bitwise-and these with four lines of
   // board starting from y (y, y+1, y+2...), bitwise-or the four results together
   // to detect if there's a collision
-  uint8_t collision = (
+  int8_t collision = (
     (shape->line[3] & board[y]) |
     (shape->line[2] & board[(y + 1)]) |
     (shape->line[1] & board[(y + 2)]) |
