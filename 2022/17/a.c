@@ -52,7 +52,7 @@ void make_shapes(shape_t** shapes) {
 
 uint8_t board_collision(shape_t* shape, int8_t* board, uint32_t y) {
   // take four lines of shape in reverse order and bitwise-and these with four lines of
-  // board starting from y (y, y+1, y+1...), bitwise-or the four results together
+  // board starting from y (y, y+1, y+2...), bitwise-or the four results together
   // to detect if there's a collision
   uint8_t collision = (
     (shape->line[3] & board[y]) |
