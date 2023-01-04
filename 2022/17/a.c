@@ -52,8 +52,8 @@ void make_shapes(shape_t** shapes) {
 
 uint8_t board_collision(shape_t* shape, int8_t* board, uint32_t y) {
   // take four lines of shape in reverse order and bitwise-and these with four lines of
-  // board starting from y-1 (y-1, y, y+1...), bitwise-or the four
-  // results together - can drop if result == 0
+  // board starting from y (y, y+1, y+1...), bitwise-or the four results together
+  // to detect if there's a collision
   uint8_t collision = (
     (shape->line[3] & board[y]) |
     (shape->line[2] & board[(y + 1)]) |
@@ -64,8 +64,16 @@ uint8_t board_collision(shape_t* shape, int8_t* board, uint32_t y) {
   return (collision > 0);
 }
 
+void move_shape(shape_t* shape, uint8_t direction) {
+  // assumes we've already checked that the move is valid
+  for(size_t i = 0; i < 4; i++) {
+    if(direction == 0) shape->line[i] <<= 1;
+    else shape->line[i] >>= 1;
+  }
+}
+
 uint8_t can_move_shape(shape_t* shape, uint8_t direction, int8_t* board, uint32_t y) {
-  // test walls
+  // test walls (left most/right most bit is a 1)
   int8_t lines = shape->line[0] | shape->line[1] | shape->line[2] | shape->line[3];
   if(direction == 0) { // <
     if((lines >> 6) == 1) return 0;
@@ -73,30 +81,14 @@ uint8_t can_move_shape(shape_t* shape, uint8_t direction, int8_t* board, uint32_
     if((lines & 00000001) == 1) return 0;
   }
   
-  // test other shapes
+  // test other shapes (clone, make the move, check for collision)
   shape_t* moved = calloc(1, sizeof(shape_t));
   memcpy(moved, shape, sizeof(shape_t));
-  if(direction == 0) { // <
-    moved->line[0] <<= 1;
-    moved->line[1] <<= 1;
-    moved->line[2] <<= 1;
-    moved->line[3] <<= 1;
-  } else if(direction == 1) { // >
-    moved->line[0] >>= 1;
-    moved->line[1] >>= 1;
-    moved->line[2] >>= 1;
-    moved->line[3] >>= 1;
-  }
+  move_shape(moved, direction);
+  uint8_t collision = board_collision(moved, board, y);
+  free(moved);
   
-  return !board_collision(moved, board, y);
-}
-
-void move_shape(shape_t* shape, uint8_t direction) {
-  // assumes we've already checked that the move is valid
-  for(size_t i = 0; i < 4; i++) {
-    if(direction == 0) shape->line[i] <<= 1;
-    else shape->line[i] >>= 1;
-  }
+  return !collision;
 }
 
 uint32_t merge_shape(shape_t* shape, int8_t* board, uint32_t y) {
@@ -171,6 +163,10 @@ int main(void) {
     
     s = (s + 1) % 5;
   }
+  
+  free(board);
+  free(shape);
+  for(size_t i = 0; i < 5; i++) free(shapes[i]);
   
   printf("Total height after 2022 rounds = %i\n", height); // 3191
   return 0;
