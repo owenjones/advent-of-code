@@ -98,7 +98,7 @@ uint32_t merge_shape(shape_t* shape, int8_t* board, uint32_t y) {
 
 int main(void) {
   FILE* fptr;
-  if((fptr = fopen("input.txt", "r")) == NULL) {
+  if((fptr = fopen("test_input.txt", "r")) == NULL) {
     printf("Error opening file\n");
     exit(1);
   }
@@ -124,14 +124,20 @@ int main(void) {
   shape_t* shapes[5];
   make_shapes(shapes);
   shape_t* shape = malloc(sizeof(shape_t));
-  int8_t* board = calloc(10000, sizeof(int8_t)); // ceiling for 2022 shape drops is 8088 (4*2022)
-  uint32_t s = 0, height = 0, i = 0, y, dropped;
+  int8_t* board = calloc(100000, sizeof(int8_t));
+  // int16_t store[100000][2];
+  uint16_t s = 0, i = 0;
+  uint64_t height = 0, y, dropped, full_height = 0;
   
-  for(size_t r = 0; r < 2022; r++) {
+  size_t maxdiff = 0;
+  
+  for(size_t r = 0; r < 2000; r++) {
     memcpy(shape, shapes[s], sizeof(shape_t));
+    s = (s + 1) % 5;
     
     y = height + 3; // start bottom of shape 3 lines above current highest point
-    while(1) {
+    dropped = 0;
+    while(!dropped) {
       if(can_move_shape(shape, instructions[i], board, y)) move_shape(shape, instructions[i]);
       i = (i + 1) % n_instructions;
       
@@ -139,26 +145,29 @@ int main(void) {
       if(y == 0) {
         // edge case: if y == 0 then drop shape right here
         dropped = merge_shape(shape, board, 0);
-        height = (dropped > height) ? dropped : height;
-        break;
       } else if(board_collision(shape, board, (y - 1))) {
         // if it can't, merge shape into board and exit round
         dropped = merge_shape(shape, board, y);
-        height = (dropped > height) ? dropped : height;
-        break;
       } else {
         // if it can - drop it and continue
         y--;
       }
+      
+      if(dropped) {
+        height = (dropped > height) ? dropped : height;
+        
+        
+        break;
+      }
     }
     
-    s = (s + 1) % 5;
+    // after each round
   }
   
   free(board);
   free(shape);
   for(size_t i = 0; i < 5; i++) free(shapes[i]);
   
-  printf("Total height after 2022 rounds = %i\n", height); // 3191
+  printf("Total height after 1 million rocks = %llu\n", height); // 3191
   return 0;
 }
