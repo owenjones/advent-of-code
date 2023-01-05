@@ -75,11 +75,11 @@ int main(void) {
             // lots of maths to work out how much height/how many rocks a cycle adds,
             // then how many cycles will fit in the remaining rocks needed to simulate,
             // then how much height all those cycles will give us
-            uint64_t prior_height = states->state[(states->states - 1 - cycle)]->height;
-            uint64_t prior_rocks = states->state[(states->states - 1 - cycle)]->rocks;
-            uint64_t dh = states->state[(states->states - 1)]->height - prior_height;
-            uint64_t dr = states->state[(states->states - 1)]->rocks - prior_rocks;
-            uint64_t cycles = ((1000000000000 - prior_rocks) / (uint64_t) dr) - 1; // -1 as we simulate a cycle before we detect it
+            uint16_t prior_height = states->state[(states->states - 1 - cycle)]->height;
+            uint16_t prior_rocks = states->state[(states->states - 1 - cycle)]->rocks;
+            uint16_t dh = states->state[(states->states - 1)]->height - prior_height;
+            uint16_t dr = states->state[(states->states - 1)]->rocks - prior_rocks;
+            uint64_t cycles = ((1000000000000 - prior_rocks) / dr) - 1; // -1 as we simulate a cycle before we detect it
             cycle_height = (cycles * dh);
 
             // after running the cycles we're still ~100 rocks short, so we need to
