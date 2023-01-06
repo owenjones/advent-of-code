@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
+#include <limits.h>
 
 typedef struct packet {
   uint8_t version, type, children;
@@ -81,7 +82,7 @@ packet_t* decode_transmission(char* bits, packet_t* parent, int8_t n_subpackets,
       memcpy(&value[(i++ * 4)], &read[1], 4);
       if(read[0] != '1') break;
     }
-    packet->value = (uint8_t) bits2dec(value);
+    packet->value = (uint64_t) bits2dec(value);
     free(value);
   } else {
     consume_bits(bits, 1, read);
@@ -109,12 +110,70 @@ packet_t* decode_transmission(char* bits, packet_t* parent, int8_t n_subpackets,
   return packet;
 }
 
-uint32_t sum_versions(packet_t* packet) {
-  uint32_t total = packet->version;
-  if(packet->children > 0) {
-    for(size_t i = 0; i < packet->children; i++) total += sum_versions(packet->child[i]);
+void calculate_value(packet_t* packet) {
+  uint64_t min = LONG_MAX;
+  uint64_t max = 0;
+  
+  switch(packet->type) {
+    case 0:
+      // sum
+      for(size_t i = 0; i < packet->children; i++) {
+        calculate_value(packet->child[i]);
+        packet->value += packet->child[i]->value;
+      }
+      break;
+      
+    case 1:
+      // product
+      packet->value = 1;
+      for(size_t i = 0; i < packet->children; i++) {
+        calculate_value(packet->child[i]);
+        packet->value *= packet->child[i]->value;
+      }
+      break;
+      
+    case 2:
+      // minimum
+      for(size_t i = 0; i < packet->children; i++) {
+        calculate_value(packet->child[i]);
+        min = (packet->child[i]->value < min) ? packet->child[i]->value : min;
+      }
+      packet->value = min;
+      break;
+      
+    case 3:
+      // maximum
+      for(size_t i = 0; i < packet->children; i++) {
+        calculate_value(packet->child[i]);
+        max = (packet->child[i]->value > max) ? packet->child[i]->value : max;
+      }
+      packet->value = max;
+      break;
+      
+    case 5:
+      // greater than
+      calculate_value(packet->child[0]);
+      calculate_value(packet->child[1]);
+      
+      packet->value = (uint64_t) (packet->child[0]->value > packet->child[1]->value);
+      break;
+      
+    case 6:
+      // less than
+      calculate_value(packet->child[0]);
+      calculate_value(packet->child[1]);
+      
+      packet->value = (uint64_t) (packet->child[0]->value < packet->child[1]->value);
+      break;
+      
+    case 7:
+      // equal to
+      calculate_value(packet->child[0]);
+      calculate_value(packet->child[1]);
+      
+      packet->value = (uint64_t) (packet->child[0]->value == packet->child[1]->value);
+      break;
   }
-  return total;
 }
 
 int main(void) {
@@ -137,9 +196,9 @@ int main(void) {
   free(input);
 
   packet_t* packet = decode_transmission(bits, NULL, -1, 0);
-  uint32_t packet_versions = sum_versions(packet);
   free(bits);
+  calculate_value(packet);
+  printf("Value of outermost packet: %llu\n", packet->value); // 13476220616073
   free_packet(packet);
-  printf("Sum of all version numbers in all packets: %i\n", packet_versions); // 940
   return 0;
 }
