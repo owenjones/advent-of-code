@@ -21,6 +21,6 @@ int main(void) {
   int32_t edge = -min.y - 1;
   uint32_t highest = edge * (edge + 1) / 2;
   
-  printf("Highest point reached: %i\n", highest);
+  printf("Highest point reached: %i\n", highest); // 15931
   return 0;
 }

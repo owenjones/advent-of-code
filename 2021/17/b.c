@@ -57,10 +57,6 @@ int main(void) {
   uint32_t hits = 0;
   for(size_t i = 0; i < p; i++) hits += probes[i].has_hit;
 
-  printf("Possible probes that can hit the target area: %i\n", hits);
+  printf("Possible probes that can hit the target area: %i\n", hits); // 2555
   return 0;
-
-  // 109 = too low
-  // 423 = too low
-  // 931 = too low
 }
