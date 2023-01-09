@@ -151,8 +151,13 @@ image_t *apply_algorithm(char *algorithm, image_t *input)
 uint32_t count_lit_pixels(image_t *image)
 {
   uint32_t count = 0;
-  for (size_t i = 0; i < (image->dimension * image->dimension); i++)
-    count += (image->pixels[i] == '1');
+  for (size_t y = 1; y < (image->dimension - 1); y++)
+  {
+    for (size_t x = 1; x < (image->dimension - 1); x++)
+    {
+      count += (get_pixel(image, x, y) == '1');
+    }
+  }
   return count;
 }
 
@@ -181,7 +186,7 @@ int main(void)
   image = apply_algorithm(algorithm, image);
   image = apply_algorithm(algorithm, image);
 
-  uint32_t total = count_lit_pixels(image) - 3; // -3 a hack to solve problem with edges at infinity...
+  uint32_t total = count_lit_pixels(image);
   free_image(image);
   printf("Lit pixels in the image: %i\n", total); // 5225
   return 0;
