@@ -6,8 +6,8 @@ Here are my solutions :)
 | Year                                  | Language | Stars |
 | :-:                                   | :-:      | :-:   |
 | [2022](https://adventofcode.com/2022) | C        | 50    |
-| [2021](https://adventofcode.com/2021) | C        | 30    |
-| [2020](https://adventofcode.com/2020) |          | 0     |
+| [2021](https://adventofcode.com/2021) | C        | 39    |
+| [2020](https://adventofcode.com/2020) | Ruby     | 4     |
 | [2019](https://adventofcode.com/2019) |          | 0     |
 | [2018](https://adventofcode.com/2018) |          | 0     |
 | [2017](https://adventofcode.com/2017) |          | 0     |
