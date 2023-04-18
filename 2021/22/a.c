@@ -17,14 +17,14 @@ int main(void)
 
   char action[4];
   int32_t min_x, max_x, min_y, max_y, min_z, max_z, limit = 50;
-  while (fscanf(fptr, "%s x=%i..%i,y=%i..%i,z=%i..%i\n", &action, &min_x, &max_x, &min_y, &max_y, &min_z, &max_z) == 7)
+  while (fscanf(fptr, "%s x=%i..%i,y=%i..%i,z=%i..%i\n", action, &min_x, &max_x, &min_y, &max_y, &min_z, &max_z) == 7)
   {
     if (min_x < -(limit) || max_x > limit || min_y < -(limit) || max_y > limit || min_z < -(limit) || max_z > limit)
     {
       continue;
     }
 
-    uint8_t value = (strcmp(action, "on") == 0);
+    uint8_t value = (strcmp(action, "on ") == 0);
 
     for (int32_t x = min_x; x <= max_x; x++)
     {
