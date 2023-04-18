@@ -14,7 +14,7 @@ class Forest
     end
 end
 
-forest = Forest.new()
+forest = Forest.new
 
 File.open("input.txt") do |input|
     forest.readString(input.read)
