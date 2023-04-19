@@ -31,7 +31,7 @@ class Processor
         @acc += value
         @iptr += 1
       when "jmp"
-        @iptr = (@iptr + value) % @instructions.size
+        @iptr = @iptr + value
       end
     end
   end
