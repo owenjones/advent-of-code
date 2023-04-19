@@ -5,7 +5,7 @@ def countQuestions(response)
     response.join.each_char.map { |c| counts[c.ord - 97] += 1}
 
     total = 0
-    counts.each.each do |c| 
+    counts.each do |c| 
         if c == number 
             total += 1 
         end

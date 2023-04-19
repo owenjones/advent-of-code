@@ -1,5 +1,5 @@
 def countQuestions(response)
-    response = response.strip().gsub(/[\r\n]/, "")
+    response = response.strip.gsub(/[\r\n]/, "")
     counts = Array.new(26) { |x| 0 }
     response.each_char.map { |c| counts[c.ord - 97] = 1}
     return counts.sum
