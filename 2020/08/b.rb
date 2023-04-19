@@ -5,6 +5,7 @@ class Processor
     @acc = 0
     @iptr = 0 # instruction pointer
     @pptr = Array.new # previous instruction ptrs
+    @run = true
   end
 
   def load(instructions)
@@ -13,19 +14,23 @@ class Processor
   end
 
   def run
+
+    instructions = @instructions
+
+    # control program flow - run, catch loop, attempt fix, repeat
+
+  end
+  
+  def test_cycle
+    
     while true
       if @iptr > @instructions.size
-        # program ran until the end!
-        return
+        return 1 # program ran until the end!
       end
 
       if @visits[@iptr] == 1
         # we hit an infinite loop
-        puts "Looped initiated by instruction #{@pptr.last} (#{@instructions[@pptr.last]})"
-        break
-
-        # need to step backwards through the execution order and try swapping jmp/nop - if we hit
-        # loop again we need to reset instructions and try next jmp/nop back
+        return 0
       end
 
       @visits[@iptr] += 1
