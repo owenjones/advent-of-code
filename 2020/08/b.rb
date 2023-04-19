@@ -5,7 +5,6 @@ class Processor
     @acc = 0
     @iptr = 0 # instruction pointer
     @pptr = Array.new # previous instruction ptrs
-    @run = true
   end
 
   def load(instructions)
@@ -13,18 +12,51 @@ class Processor
     @visits = Array.new(@instructions.size) { |x| 0 }
   end
 
-  def run
+  def decorrupt
+    run(@instructions) # we know this will loop, but it'll give us the execution order
+    order = @pptr.clone
+    dptr = order.size - 1 # start at end of execution order
 
-    instructions = @instructions
+    while true
+      if dptr < 0
+        puts "Gone back too far"
+        exit
+      end
 
-    # control program flow - run, catch loop, attempt fix, repeat
+      instructions = @instructions.clone
+      i = instructions[order[dptr]].match(/^(\w{3}) ([+-]{1}\d+)$/)
+
+      case i[1]
+      when "acc"
+        dptr -= 1
+        next
+      when "jmp"
+        instructions[order[dptr]] = "nop " + i[2]
+      when "nop"
+        instructions[order[dptr]] = "jmp " + i[2]
+      end
+
+      @acc = 0
+      @iptr = 0
+      @pptr = Array.new
+      @visits = Array.new(@instructions.size) { |x| 0 }
+
+      outcome = run(instructions)
+
+      if outcome == 1
+        return
+      else
+        instructions = @instructions
+        dptr -= 1
+      end
+    end
+
 
   end
   
-  def test_cycle
-    
+  def run(instructions)
     while true
-      if @iptr > @instructions.size
+      if @iptr >= @instructions.size
         return 1 # program ran until the end!
       end
 
@@ -35,7 +67,7 @@ class Processor
 
       @visits[@iptr] += 1
 
-      data = @instructions[@iptr].match(/^(\w{3}) ([+-]{1}\d+)$/)
+      data = instructions[@iptr].match(/^(\w{3}) ([+-]{1}\d+)$/)
       
       instruction = data[1]
       value = Integer(data[2])
@@ -60,6 +92,6 @@ File.open("test_input.txt") do |input|
     processor.load(input.read.split("\n"))
 end
 
-processor.run
+processor.decorrupt
 
 puts "Value in accumulator at execution finish: #{processor.acc}"
