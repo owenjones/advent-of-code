@@ -3,14 +3,7 @@ def countQuestions(response)
     number = response.size
     counts = Array.new(26) { |x| 0 }
     response.join.each_char.map { |c| counts[c.ord - 97] += 1}
-
-    total = 0
-    counts.each do |c| 
-        if c == number 
-            total += 1 
-        end
-    end
-    return total
+    return counts.select { |c| c == number }.size
 end
 
 groups = Array.new
