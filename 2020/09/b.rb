@@ -15,10 +15,6 @@ def findTarget(numbers, preambleLength)
 end
 
 def findWeakness(numbers, target)
-  # start by cutting the set of numbers down - remove everything larger than the target (inclusive) -- next step would make that redundent though?
-  # beginning at first number, step through adjacent numbers summing until either we hit target size, or are above it
-  # move to next number (if takes too long could possibly implement a jump by looking at numbers in the set?)
-
   numbers = numbers.slice(0, numbers.index(target))
   skip = 0
   numbers.each do |a|
