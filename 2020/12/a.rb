@@ -22,13 +22,13 @@ File.open("input.txt") do |input|
             h = (h + amount) % 360
         when "F"
             case h
-            when 0..89
+            when 0
                 y += amount
-            when 90..179
+            when 90
                 x += amount
-            when 180..269
+            when 180
                 y -= amount
-            when 270..359
+            when 270
                 x -= amount
             end
         end

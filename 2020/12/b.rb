@@ -5,13 +5,13 @@ def rotate(waypoint, amount)
   rotated = Array.new
   amount = (amount < 0) ? (360 + amount) : amount
   case amount
-  when 90..179
+  when 90
     rotated[0] = waypoint[1]
     rotated[1] = -waypoint[0]
-  when 180..269
+  when 180
     rotated[0] = -waypoint[0]
     rotated[1] = -waypoint[1]
-  when 270..359
+  when 270
     rotated[0] = -waypoint[1]
     rotated[1] = waypoint[0]
   end
