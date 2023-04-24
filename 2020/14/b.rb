@@ -1,13 +1,13 @@
-def applyMask(mask, value)
+def decodeLocations(mask, coded)
   mask = mask.split("")
   bits = value.to_s(2)
   padded = (("0" * (mask.size - bits.size)) + bits).split("")
-  masked = padded.zip(mask).map { |b| (b[1] == "X") ? b[0] : b[1] }.join
-  return masked.to_i(2)
+
+  
 end
 
 input = Array.new
-File.open("input.txt") { |i| input = i.read.split("\n") }
+File.open("test_input.txt") { |i| input = i.read.split("\n") }
 
 memory = Hash.new { 0 }
 mask = ""
@@ -17,8 +17,10 @@ input.each do |line|
   when "mask"
     mask = ops[2]
   when /mem\[(\d+)\]/
-    location = ops[0].match(/^(mem\[)(\d+)(\])$/)[2]
-    memory[location] = applyMask(mask, Integer(ops[2]))
+    value = Integer(ops[2])
+    coded = ops[0].match(/^(mem\[)(\d+)(\])$/)[2]
+    decoded = decodeLocations(mask, Integer(coded))
+    decoded.each { |location| memory[location] = value }
   end
 end
 
