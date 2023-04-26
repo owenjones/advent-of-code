@@ -1,13 +1,28 @@
 def decodeLocations(mask, coded)
   mask = mask.split("")
-  bits = value.to_s(2)
+  bits = coded.to_s(2)
   padded = (("0" * (mask.size - bits.size)) + bits).split("")
-
-  
+  locations = [[]]
+  mask.zip(padded).each do |pair|
+    case pair[0]
+    when "0" then locations.each { |l| l.push(pair[1]) }
+    when "1" then locations.each { |l| l.push("1") }
+    when "X"
+      n = Array.new
+      locations.each do |l|
+        n.push(l.dup)
+        n.last.push(0)
+        n.push(l.dup)
+        n.last.push(1)
+      end
+      locations = n
+    end
+  end
+  return locations.map { |l| l.join.to_i(2) }
 end
 
 input = Array.new
-File.open("test_input.txt") { |i| input = i.read.split("\n") }
+File.open("input.txt") { |i| input = i.read.split("\n") }
 
 memory = Hash.new { 0 }
 mask = ""
