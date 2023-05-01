@@ -42,7 +42,7 @@ def extractDepartureFields(ticket, fields)
   return summed
 end
 
-blocks = File.open("input.txt").read.split("\n\n")
+blocks = File.open("test_input_2.txt").read.split("\n\n")
 fields = parseFields(blocks[0])
 valid = findValid(blocks[2], fields)
 matched = matchFields(valid, fields)
