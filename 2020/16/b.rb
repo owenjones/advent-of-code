@@ -1,25 +1,28 @@
+require 'set'
+
 def parseFields(fields)
   parsed = Hash.new
   fields.split("\n").map do |field|
     n = field.match(/^([\w ]+): ([\d]+)-([\d]+) or ([\d]+)-([\d]+)$/)
-    parsed[n[1]] = (Integer(n[2])..Integer(n[3])).to_a + (Integer(n[4])..Integer(n[5])).to_a
+    arr = (Integer(n[2])..Integer(n[3])).to_a + (Integer(n[4])..Integer(n[5])).to_a
+    parsed[n[1]] = Set.new(arr)
   end
   return parsed
 end
 
 def findValid(nearby, fields)
-  numbers = fields.map { |k, v| v }.flatten.uniq
+  numbers = fields.map { |k, v| v }.inject(:|) # union individual field sets
   tickets = nearby.split("\n").drop(1).map do |ticket|
     ticket = ticket.split(",").map { |n| Integer(n) }
     valid = ticket.map { |n| numbers.include?(n) }.select { |x| x == true }.size
     (valid == ticket.size) ? ticket : nil
   end
-  return tickets.compact
+  return tickets.compact.transpose.map { |s| Set.new(s.sort!) }
 end
 
 def matchFields(valid, fields)
-  # Can we turn tickets into a matrix, then for each column find a valid field (I assume there
-  # can only be one, or there could be multiple valid permutations of the fields?)
+  # Turn valid ticket values for each field into a set, test if this is a subset of the labelled field set, move to next permutation if it isn't
+
 end
 
 def extractDepartureFields(ticket, fields)
