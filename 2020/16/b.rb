@@ -17,12 +17,32 @@ def findValid(nearby, fields)
     valid = ticket.map { |n| numbers.include?(n) }.select { |x| x == true }.size
     (valid == ticket.size) ? ticket : nil
   end
+
+  # transpose to get a set of numbers for each field - these are the values the field matches
   return tickets.compact.transpose.map { |s| Set.new(s.sort!) }
 end
 
 def matchFields(valid, fields)
-  # Turn valid ticket values for each field into a set, test if this is a subset of the labelled field set, move to next permutation if it isn't
+  # find potentials (the fields that could match the values from the valid tickets)
+  potentials = Array.new(valid.size) { Array.new }
+  valid.each_with_index do |s,i|
+    fields.each do |f|
+      if f[1] >= s
+        potentials[i].push(f[0])
+      end
+    end
+  end
+  
+  # iteratively find entries with a single field - remove this from other entries until
+  # we're left with just single fields - these are the matched fields
+  while potentials.map { |a| a.size }.sum > fields.size
+    singles = potentials.select { |s| s.size == 1 }.flatten
+    singles.each do |single|
+      potentials.map { |p| p.delete(single) if p.size > 1 }
+    end
+  end
 
+  return potentials.flatten
 end
 
 def extractDepartureFields(ticket, fields)
@@ -32,15 +52,10 @@ def extractDepartureFields(ticket, fields)
   return numbers
 end
 
-blocks = File.open("test_input_2.txt").read.split("\n\n")
+blocks = File.open("input.txt").read.split("\n\n")
 fields = parseFields(blocks[0])
 valid = findValid(blocks[2], fields)
-
-puts valid.to_s
-
 matched = matchFields(valid, fields)
 departureValues = extractDepartureFields(blocks[1], matched)
 answer = departureValues.inject(:*)
-puts "Product of the six departure values: #{answer}"
-
-# 1995808337179 - too high
+puts "Product of the six departure values: #{answer}" # 1346570764607
