@@ -57,5 +57,3 @@ size += 1
 for i in 1..6 do
   state = runCycle(state, size, i)
 end
-
-# puts "Number of active cubes after six cycles: #{active}"
