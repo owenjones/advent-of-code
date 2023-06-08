@@ -19,6 +19,7 @@ end
 
 (rules, messages) = File.open("test_input.txt").read.split("\n\n").map { |x| x.split("\n") }
 rules = expandRules(rules)
+puts rules.inspect
 expression = generateRegex(rules)
 matches = messages.map { |x| x.match?(expression) }.select { |x| x == true }.size
 puts "Number of messages which match rule 0: #{matches}"
