@@ -1,30 +1,24 @@
-def transform(s, l)
- return s.pow(l, 20201227)
-end
-
-def findLoops(t)
-  # 7^x ≡ target (mod 20201227)
-  # use baby-step giant-step algorithm to solve for x (the number of loops)
-
-  max = Math.sqrt(20201227 - 1).ceil
+def babyStepGiantStep(alpha, beta, order)
+  # Use Baby-step Giant-step algorithm to solve DLP (https://en.wikipedia.org/wiki/Baby-step_giant-step)
+  m = Math.sqrt(order).ceil
 
   # Baby-step
-  b = Hash.new(false)
-  (0..max).map { |k| b[7.pow(k, 20201227)] = k }
+  alpha_j = Hash.new(false)
+  (0..m).map { |j| alpha_j[alpha.pow(j, order)] = j }
 
   # Giant-step
-  a = 7.pow((max * (20201227 - 2)), 20201227)
-  for n in (0..max)
-    x = (t * a.pow(n, 20201227)) % 20201227
-    if b[x] != false
-      return n * max + b[x]
+  alpha_m = alpha.pow((m * (order - 2)), order)
+  for i in (0..m)
+    x = (beta * alpha_m.pow(i, order)) % order 
+    if alpha_j[x] != false
+      return i * m + alpha_j[x]
     end
   end
 end
 
 (cardKey, doorKey) = File.open("input.txt").read.split("\n").map(&:to_i)
 
-doorLoops = findLoops(doorKey)
-encryptionKey = transform(cardKey, doorLoops)
+doorLoops = babyStepGiantStep(7, doorKey, 20201227) # 7^x ≡ doorKey (mod 20201227) -> solve for x
+encryptionKey = cardKey.pow(doorLoops, 20201227)
 
 puts "Encryption key: #{encryptionKey}" # 18433997
