@@ -23,7 +23,7 @@ tiles = loadTiles("test_input.txt")
 
 counts = Hash.new(0)
 tiles.map { |k, v| v }.flatten.each { |v| counts[v] += 1 }
-puts counts.sort_by(&:last).to_h.reject{ |k, v| v < 2 }.each { |k, v| puts "#{k}: \t#{v}"}
+puts counts.sort_by(&:last).to_h.each { |k, v| puts "#{k}: \t#{v}"}
 
 # what we know so far:
 # each individual 'edge', represented as an integer (taken from 10-bit representation of tile edge)
