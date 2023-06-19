@@ -23,4 +23,10 @@ tiles = loadTiles("test_input.txt")
 
 counts = Hash.new(0)
 tiles.map { |k, v| v }.flatten.each { |v| counts[v] += 1 }
-puts counts.sort_by(&:last).to_h.each { |k, v| puts "#{k}: \t#{v}"}
+puts counts.sort_by(&:last).to_h.reject{ |k, v| v < 2 }.each { |k, v| puts "#{k}: \t#{v}"}
+
+# what we know so far:
+# each individual 'edge', represented as an integer (taken from 10-bit representation of tile edge)
+# appears at maximum twice, so tile-edge-pairs are 1-to-1 (and not multiple possible edge matches)
+# we also have a number of edges appearing only once (which will be edges out of the tile space)
+# - can we identify which tiles have multiple single-edges (these will be corners) which will give us part [a] at least...
