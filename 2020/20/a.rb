@@ -16,12 +16,8 @@ end
 counts = Hash.new(0)
 tiles.map { |k, v| v.flatten.uniq }.flatten.each { |v| counts[v] += 1 }
 
-answer = 1
-tiles.each do |id, tile|
-  sums = tile.map { |t| t.map { |e| counts[e] }.sum }
-  if sums.min == 6
-    answer *= id
-  end
-end
+types = Hash.new(false)
+tiles.each { |id, tile| types[id] = tile.map { |t| t.map { |e| counts[e] }.sum }.min }
 
+answer = types.select { |k, v| v == 6 }.map { |k, v| k }.inject(&:*)
 puts "Product of corner tiles: #{answer}"
