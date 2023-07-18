@@ -1,21 +1,36 @@
 foods = File.open("input.txt").read.split("\n")
 
-ingredients = Array.new
-allergens = Array.new
+allIngredients = Array.new
+allAllergens = Array.new
+appearences = Hash.new(0)
+candidates = Hash.new
 
 foods.each do |food|
   match = food.match(/^([\w ]+)\(contains ([\w, ]+)\)$/)
-  i = match[1].split
-  a = match[2].split(", ")
+  ingredients = match[1].split
+  allergens = match[2].split(", ")
 
-  # need to build sets(?) of which potential ingredients have which allergen, so we can
-  # pick these apart - can we count occurances? if an ingredient appears 5 times it should be against
-  # the same allergen for each
+  allergens.each do |allergen|
+    candidates[allergen] = Array.new if candidates[allergen] == nil
+    candidates[allergen] << ingredients
+  end
 
-  ingredients << i
-  allergens << a
+  ingredients.each { |ingredient| appearences[ingredient] += 1}
+
+  allIngredients << ingredients
+  allAllergens << allergens
 end
 
-# collapse both to get full lists of ingredients and allergens
-ingredients.flatten!.uniq!
-allergens.flatten!.uniq!
+allIngredients.flatten!.uniq!
+allAllergens.flatten!.uniq!
+
+allAllergens.each do |allergen|
+  candidates[allergen] = candidates[allergen].inject(:&)
+end
+
+candidates.flat_map { |k,v| v }.uniq.each do |candidate|
+  allIngredients.delete(candidate)
+end
+
+count = allIngredients.map { |i| appearences[i] }.sum
+puts "Ingredients without allergens appear #{count} times" # 2150
