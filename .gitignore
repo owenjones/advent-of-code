@@ -4,3 +4,5 @@ bin
 .venv
 *.code-workspace
 .vscode
+.clj-kondo
+.lsp
