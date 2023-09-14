@@ -4,5 +4,8 @@ bin
 .venv
 *.code-workspace
 .vscode
+
+# Clojure related
 .clj-kondo
 .lsp
+.calva
