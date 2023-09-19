@@ -1,5 +1,5 @@
 (require '[clojure.string :as str])
-(def masses (map read-string (str/split (slurp "input.txt") #"\n")))
+(def masses (map read-string (str/split-lines (slurp "input.txt"))))
 
 (defn calculateFuelRequirements
   [mass]
