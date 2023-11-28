@@ -22,9 +22,9 @@ tiles.each { |id, tile| types[id] = tile.map { |t| t.map { |e| counts[e] }.sum }
 # from part 1 we can identify corners (6 edge matches), sides (7 edge matches),
 # and internal pieces (8 edge matches)
 
-corners = types.select { |k, v| v == 6 }.keys # 4
-sides = types.select { |k, v| v == 7 }.keys   # 40
-insides = types.select { |k, v| v == 8 }.keys # 100
+corners = types.select { |k, v| v == 6 }.keys.map { |k| tiles[k] }
+sides = types.select { |k, v| v == 7 }.keys.map { |k| tiles[k] }
+insides = types.select { |k, v| v == 8 }.keys.map { |k| tiles[k] }
 
 # possible rough approach - pick a corner, try and work through the sides to another corner
 # work around the outside (like a jigsaw puzzle) building up the border,
@@ -32,4 +32,4 @@ insides = types.select { |k, v| v == 8 }.keys # 100
 # a point where we cannot place a tile then we have an invalid layout: dump and continue
 # with the next one?
 
-puts tiles[corners[0]].to_s
+# puts corners.to_s
