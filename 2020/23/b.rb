@@ -10,48 +10,45 @@ end
 
 class LinkedList
   attr_reader :head
-  attr_reader :tail
-  attr_accessor :cursor
 
   def initialize(array)
     @head = nil
     @tail = nil
     @index = Hash.new
-    insert(array)
+    insertArray(array)
     @tail.next = @head # close the loop
-    @cursor = @head
   end
 
-  def insert(labels, at: false)
+  def insertArray(labels)
     labels.each do |label|
       node = Node.new(label)
       @index[label] = node
 
-      if at
-        node.next = at.next
-        at.next = node
+      if @head == nil
+        @head = node
+        @tail = node
       else
-        if @head == nil
-          @head = node
-          @tail = node
-        else
-          @tail.next = node
-          @tail = node
-        end
+        @tail.next = node
+        @tail = node
       end
     end
   end
 
-  def take(m)
-    after = @cursor
-    taken = Array.new
-    (1..m).each do
-      n = after.next
-      taken.append(n.data)
-      after.next = n.next
-    end
+  def insert(nodes, at:)
+    after = at.next
+    at.next = nodes[0]
+    nodes[-1].next = after
+  end
 
-    return taken
+  def take(m, after:)
+    start = after
+    nodes = Array.new
+    (1..m).each do
+      nodes.append(after.next)
+      after = after.next
+    end
+    start.next = after.next
+    return nodes
   end
 
   def find(label)
@@ -59,25 +56,25 @@ class LinkedList
   end
 end
 
-labels = File.open("input.txt").read.split("").map{ |x| x.to_i }
+labels = File.open("test_input.txt").read.split("").map{ |x| x.to_i }
 labels += ((labels.max + 1)..(1000000)).to_a
 cups = LinkedList.new(labels)
 
+cursor = cups.head
 (1..10000000).each do
-  current = cups.cursor
-  c = cups.take(3)
+  c = cups.take(3, after: cursor)
 
-  destination = current.data
+  destination = cursor.data
   while true
     destination -= 1
     destination = (destination == 0) ? 1000000 : destination
-    if !c.include?(destination)
+    if !c.map{ |x| x.data }.include?(destination)
       break
     end
   end
 
-  cups.insert(c.reverse, at: cups.find(destination))
-  cups.cursor = current.next
+  cups.insert(c, at: cups.find(destination))
+  cursor = cursor.next
 end
 
 position = cups.find(1)
