@@ -56,7 +56,7 @@ class LinkedList
   end
 end
 
-labels = File.open("test_input.txt").read.split("").map{ |x| x.to_i }
+labels = File.open("input.txt").read.split("").map{ |x| x.to_i }
 labels += ((labels.max + 1)..(1000000)).to_a
 cups = LinkedList.new(labels)
 
@@ -79,4 +79,4 @@ end
 
 position = cups.find(1)
 answer = position.next.data * position.next.next.data
-puts "Answer: #{answer}"
+puts "Answer: #{answer}" # 72772522064
