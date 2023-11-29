@@ -63,12 +63,12 @@ cups = LinkedList.new(labels)
 cursor = cups.head
 (1..10000000).each do
   c = cups.take(3, after: cursor)
+  l = c.map{ |x| x.data }
 
   destination = cursor.data
   while true
-    destination -= 1
-    destination = (destination == 0) ? 1000000 : destination
-    if !c.map{ |x| x.data }.include?(destination)
+    destination = (destination == 1) ? 1000000 : (destination - 1)
+    if !l.include?(destination)
       break
     end
   end
