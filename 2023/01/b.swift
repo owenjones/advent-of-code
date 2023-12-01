@@ -1,21 +1,22 @@
 import Foundation
 let input = try String(contentsOfFile: "input.txt").split(separator: "\n")
+let regex = try NSRegularExpression(pattern: #"(?=(\d{1}|one|two|three|four|five|six|seven|eight|nine))"#)
 
 let replacements = [
-  "one": "o1e", "two": "t2o", "three": "t3e", "four": "f4r", "five": "f5e",
-  "six": "s6x", "seven": "s7n", "eight": "e8t", "nine": "n9e"
-  ] // yes I know this is super hacky but they overlap and cba to do it better
+  "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+  "six": "6", "seven": "7", "eight": "8", "nine": "9"
+]
 
 var total = 0
-for str in input {
-  var m = String(str)
+for line in input {
+  let str = String(line)
+  let matches = regex.matches(in: str, range: NSRange(str.startIndex..., in: str))
+  let numbers = matches.compactMap{ Range($0.range(at: 1), in: str) }.map{ str[$0] }
+  var value = String(numbers.first! + numbers.last!)
   for (k, v) in replacements {
-    m = m.replacingOccurrences(of: k, with: v)
+    value = value.replacingOccurrences(of: k, with: v)
   }
-
-  var numbers = m.components(separatedBy: CharacterSet.decimalDigits.inverted)
-  numbers.removeAll{ $0 == "" }
-  total += Int("\(numbers.first!.first!)\(numbers.last!.last!)")!
+  total += Int(value)!
 }
 
 print("Sum of calibration values: \(total)") // 54980
