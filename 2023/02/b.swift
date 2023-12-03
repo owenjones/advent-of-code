@@ -20,4 +20,4 @@ for line in input {
     total = total + power
   }
 }
-print("Sum of IDs from possible games: \(total)")
+print("Sum of cube powers: \(total)") // 63307
