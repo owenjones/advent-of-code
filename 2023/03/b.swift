@@ -33,12 +33,11 @@ for i in (1...(input.count - 1)) {
       let numbers = digits.matches(in: line, range: NSRange(line.startIndex..., in: line))
       for n in numbers {
         // test if range of digit touches/intersects position 4 (the asterisk)
-        let number = line[Range(n.range(at: 1), in: line)!]
         let start = n.range.location
         let end = start + n.range.length - 1
 
         if(start == 5 || end == 3 || start <= 4 && end >= 4) {
-          parts.append(Int(number)!)
+          parts.append(Int(line[Range(n.range(at: 1), in: line)!])!)
         }
       }
     }
