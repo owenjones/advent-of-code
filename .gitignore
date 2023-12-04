@@ -13,4 +13,4 @@ bin
 
 # AOC Specific
 input.txt
-test_input.txt
+test_*.txt
