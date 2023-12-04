@@ -1,3 +1,4 @@
+# Generic
 bin
 *.dSYM
 .DS_Store
@@ -9,3 +10,7 @@ bin
 .clj-kondo
 .lsp
 .calva
+
+# AOC Specific
+input.txt
+test_input.txt
