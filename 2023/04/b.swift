@@ -12,8 +12,7 @@ for line in input {
    cardInstances[id] = cardInstances[id] ?? 1
     if matching > 0 {
       for i in (id+1)...(id+matching) {
-       cardInstances[i] = cardInstances[i] ?? 1
-       cardInstances[i]! += cardInstances[id] ?? 1
+       cardInstances[i] = (cardInstances[i] ?? 1) + (cardInstances[id] ?? 1)
       }
     }
   }
