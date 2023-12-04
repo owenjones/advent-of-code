@@ -12,5 +12,4 @@ bin
 .calva
 
 # AOC Specific
-input.txt
-test_*.txt
+*.txt
