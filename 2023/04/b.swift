@@ -5,8 +5,8 @@ var multiplier: [Int: Int] = [:]
 for line in input {
   if let match = line.wholeMatch(of: #/Card ([\w ]+): ([\w ]*) \| ([\w ]*)/#) {
     let id = Int(match.1.trimmingCharacters(in: .whitespaces)) ?? 0
-    let winning = Set(match.2.split(separator: " ").map{$0.trimmingCharacters(in: .whitespaces)}.map{(Int($0) ?? 0)})
-    let drawn = Set(match.3.split(separator: " ").map{$0.trimmingCharacters(in: .whitespaces)}.map{(Int($0) ?? 0)})
+    let winning = Set(match.2.split(separator: " ").map{Int($0.trimmingCharacters(in: .whitespaces)) ?? 0})
+    let drawn = Set(match.3.split(separator: " ").map{Int($0.trimmingCharacters(in: .whitespaces)) ?? 0})
     let matching = drawn.intersection(winning).count
     
     multiplier[id] = multiplier[id] ?? 1
