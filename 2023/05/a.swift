@@ -64,6 +64,10 @@ class PiecewiseFunction {
     }
 
     for piece in sorted {
+      if piece.start == piece.finish {
+        continue
+      }
+      
       if extended.count > 0 && extended.last!.finish < piece.start {
         extended.append(Piece(start: extended.last!.finish, finish: piece.start))
       }
