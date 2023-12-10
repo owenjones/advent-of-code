@@ -135,7 +135,6 @@ for range in seeds {
 
   for piece in optimusPrime.pieces {
     if piece.finish < range.0 || piece.start > range.1 {
-      // cutting out start == finish pieces is hacky but fixes problems elsewhere...
       continue
     }
 
