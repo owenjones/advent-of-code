@@ -64,6 +64,10 @@ class PiecewiseFunction {
     }
 
     for piece in sorted {
+      if piece.start == piece.finish {
+        continue
+      }
+
       if extended.count > 0 && extended.last!.finish < piece.start {
         extended.append(Piece(start: extended.last!.finish, finish: piece.start))
       }
@@ -130,7 +134,7 @@ for range in seeds {
   var locations: [Double] = []
 
   for piece in optimusPrime.pieces {
-    if piece.finish < range.0 || piece.start > range.1 || piece.start == piece.finish {
+    if piece.finish < range.0 || piece.start > range.1 {
       // cutting out start == finish pieces is hacky but fixes problems elsewhere...
       continue
     }
