@@ -30,7 +30,8 @@ for (i, a) in galaxies.enumerated() {
   }
 }
 
-// Get all lengths and sum -> if we cross a missing row/column, expand
+// Get all lengths and sum -> if we cross an empty row/column add on the length
+// an expansion would have resulted in
 let expand = 1000000
 var sum = 0
 for pair in paired {
