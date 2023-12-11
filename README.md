@@ -13,4 +13,4 @@ Here are my solutions :)
 | [2018](https://adventofcode.com/2018) | Kotlin   | 4     |
 | [2017](https://adventofcode.com/2017) |          | 0     |
 | [2016](https://adventofcode.com/2016) |          | 0     |
-| [2015](https://adventofcode.com/2015) | Lua      | 4     |
+| [2015](https://adventofcode.com/2015) | Lua      | 6     |
