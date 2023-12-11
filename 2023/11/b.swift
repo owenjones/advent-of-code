@@ -1,5 +1,7 @@
 import Foundation
 
+let extend = 1000000
+
 var input = try String(contentsOfFile: "input.txt").split(separator: "\n").map{ String($0) }
 
 // Expand universe
@@ -9,14 +11,18 @@ let emptyColumns = allColumns.symmetricDifference(filledColumns).sorted()
 let emptyRows = input.enumerated().compactMap{ ($0.element.contains("#") == false) ? $0.offset : nil }
 
 for (i, r) in emptyRows.enumerated() {
-  input.insert(String(repeating: ".", count: input[0].count), at: r + i)
+  for j in 0...(extend - 2) {
+    input.insert(String(repeating: ".", count: input[0].count), at: r + (i * (extend - 1)) + j)
+  }
 }
 
 var universe: [[String]] = []
 for r in input.map({ $0.split(separator: "") }) {
   var n = r
   for (i, c) in emptyColumns.enumerated() {
-    n.insert(".", at: c + i)
+    for j in 0...(extend - 2) {
+      n.insert(".", at: c + (i * (extend - 1)) + j)
+    }
   }
 
   universe.append(n.map{ String($0) })
