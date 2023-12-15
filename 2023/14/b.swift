@@ -102,5 +102,3 @@ while i < 1000000000 {
 
 platform.anticlockwise()
 print("Load on north support beams: \(platform.load())")
-
-// 106700 = too high
