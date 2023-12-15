@@ -2,7 +2,7 @@ import Foundation
 
 func HASH(_ input: String) -> Int {
   var value = 0
-  input.split(separator: "").forEach{
+  input.forEach{
     let c = Character(String($0)).asciiValue ?? 0
     value += Int(c)
     value *= 17
