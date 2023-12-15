@@ -1,29 +1,78 @@
 import Foundation
-let input = try String(contentsOfFile: "input.txt").split(separator: "\n").map({ $0.split(separator: "") })
 
-var round: [[Int]] = Array(repeating: [], count: input[0].count)
-var cube: [[Int]] = Array(repeating: [101], count: input[0].count)
-for (x, line) in input.enumerated() {
-  for (y, char) in line.enumerated() {
-    switch char {
-      case "O":
-        round[y].append(100 - x)
+extension Array where Element == String {
+  mutating func transpose() {
+    var transposed: [String] = Array(repeating: "", count: self.first!.count)
+    for l in self {
+      for (i, e) in l.enumerated() {
+        transposed[i].append(e)
+      }
+    }
+    self = transposed
+  }
 
-      case "#":
-        cube[y].append(100 - x)
+  mutating func reverse() {
+    self = self.map{ String($0.reversed()) }
+  }
 
+  mutating func rotate(_ deg: Int) {
+    switch deg {
+      case 90:
+        transpose()
+        reverse()
+      case 180:
+        transpose()
+        reverse()
+        transpose()
+        reverse()
+      case -90:
+        reverse()
+        transpose()
+      case -180:
+        transpose()
+        reverse()
+        transpose()
+        reverse()
       default:
-        continue
+        return
     }
   }
 }
 
-var load = 0
-for (y, l) in round.enumerated() {
-  for x in l {
-    let biggest = cube[y].filter({ $0 > x }).min()! - 1
-    cube[y].append(biggest)
-    load += biggest
+class RockPlatform {
+  var rocks: [String]
+
+  init(_ rocks: [String]) {
+    self.rocks = rocks
+  }
+
+  func clockwise() {
+    rocks.rotate(90)
+  }
+
+  func anticlockwise() {
+    rocks.rotate(-90)
+  }
+
+  func tilt() {
+    // always tilt east (lines of rocks sort that way by default)
+    rocks = rocks.map{ $0.split(separator: "#", omittingEmptySubsequences: false).map{ String($0.sorted()) }.joined(separator: "#") }
+  }
+
+  func display() {
+    print(rocks.joined(separator: "\n"))
+    print()
+  }
+
+  func load() -> Int {
+    let load = rocks.enumerated().map { ($0.element.filter{ $0 == "O" }.count) * (rocks.count - $0.offset) }
+    return load.reduce(0, +)
   }
 }
-print("Load on north support beams: \(load)")
+
+let input = try String(contentsOfFile: "input.txt").split(separator: "\n").map{ String($0) }
+var platform = RockPlatform(input)
+platform.clockwise()
+platform.tilt()
+platform.anticlockwise()
+print("Load on north support beams: \(platform.load())")

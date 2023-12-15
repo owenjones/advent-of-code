@@ -1,128 +1,106 @@
 import Foundation
-let input = try String(contentsOfFile: "test.txt").split(separator: "\n").map({ $0.split(separator: "") })
 
-let DIM = 10
-let CYCLES = 1000000000
+extension Array where Element == String {
+  mutating func transpose() {
+    var transposed: [String] = Array(repeating: "", count: self.first!.count)
+    for l in self {
+      for (i, e) in l.enumerated() {
+        transposed[i].append(e)
+      }
+    }
+    self = transposed
+  }
 
-enum Direction: Int {
-  case None, N, W, S, E
-  var next: Direction {
-    switch self {
-      case .N:
-        return .W
-      case .W:
-        return .S
-      case .S:
-        return .E
-      case .E:
-        return .N
+  mutating func reverse() {
+    self = self.map{ String($0.reversed()) }
+  }
+
+  mutating func rotate(_ deg: Int) {
+    switch deg {
+      case 90:
+        transpose()
+        reverse()
+      case 180:
+        transpose()
+        reverse()
+        transpose()
+        reverse()
+      case -90:
+        reverse()
+        transpose()
+      case -180:
+        transpose()
+        reverse()
+        transpose()
+        reverse()
       default:
-        return .None
+        return
     }
   }
 }
 
-struct Coord: Comparable, Hashable {
-  let x: Int
-  let y: Int
-  let d: Direction
+class RockPlatform {
+  var rocks: [String]
 
-  static func == (_ lhs: Self, _ rhs: Self) -> Bool {
-    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.d == rhs.d
+  init(_ rocks: [String]) {
+    self.rocks = rocks
   }
 
-  static func < (_ lhs: Self, _ rhs: Self) -> Bool {
-    return lhs.x < rhs.x && lhs.y < rhs.y
+  func clockwise() {
+    rocks.rotate(90)
   }
 
-  static func > (_ lhs: Self, _ rhs: Self) -> Bool {
-    return lhs.x > rhs.x && lhs.y > rhs.y
+  func anticlockwise() {
+    rocks.rotate(-90)
   }
 
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(x)
-    hasher.combine(y)
-    hasher.combine(d.rawValue)
+  func tilt() {
+    // always tilt east (lines of rocks sort that way by default)
+    rocks = rocks.map{ $0.split(separator: "#", omittingEmptySubsequences: false).map{ String($0.sorted()) }.joined(separator: "#") }
   }
-}
 
-var round: Set<Coord> = []
-var cubeX: [[Int]] = Array(repeating: [], count: input.count + 1)
-var cubeY: [[Int]] = Array(repeating: [], count: input[0].count)
-for (x, line) in input.enumerated() {
-  for (y, char) in line.enumerated() {
-    switch char {
-      case "O":
-        round.insert(Coord(x: DIM - x, y: y, d: Direction.N))
-
-      case "#":
-        cubeX[DIM - x].append(y)
-        cubeY[y].append(DIM - x)
-
-      default:
-        continue
+  func cycle() {
+    for _ in 1...4 {
+      tilt()
+      clockwise()
     }
   }
+
+  func display() {
+    print(rocks.joined(separator: "\n"))
+    print()
+  }
+
+  func load() -> Int {
+    let load = rocks.enumerated().map { ($0.element.filter{ $0 == "O" }.count) * (rocks.count - $0.offset) }
+    return load.reduce(0, +)
+  }
 }
 
-var states: Set<Set<Coord>> = []
-var dir: Direction = .N
+let input = try String(contentsOfFile: "input.txt").split(separator: "\n").map{ String($0) }
+var platform = RockPlatform(input)
+platform.clockwise()
+
 var i = 0
-while i < 10 {
-  // print(i)
-  // print(round)
-  // print(round.count)
-  // print(dir)
-  if states.contains(round) {
-    // i = CYCLES - (CYCLES/i)
-    print("cache hit") 
+var final = false
+var cache: [String: Int] = [:]
+while i < 1000000000 {
+  platform.cycle()
+
+  let current = platform.rocks.joined()
+  if !final, let previous = cache[current] {
+    let period = i - previous
+    final = true
+    i = 1000000000 - ((1000000000 - i) % period)
   }
-  
-  var next: Set<Coord> = []
-  let nd = dir.next
-  switch dir {
-    case .N:
-      var filled = cubeY
-      for c in round {
-        let biggest = (filled[c.y].filter({ $0 > c.x }).min() ?? DIM + 1) - 1
-        filled[c.y].append(biggest)
-        next.insert(Coord(x: biggest, y: c.y, d: nd))
-      }
-      
-    case .W:
-      var filled = cubeX
-      for c in round {
-        let smallest = (filled[c.x].filter({ $0 < c.y }).min() ?? -1) + 1
-        filled[c.x].append(smallest)
-        next.insert(Coord(x: c.x, y: smallest, d: nd))
-      }
-
-    case .S:
-      var filled = cubeY
-      for c in round {
-        let smallest = (filled[c.y].filter({ $0 < c.x }).min() ?? 0) + 1
-        filled[c.y].append(smallest)
-        next.insert(Coord(x: smallest, y: c.y, d: nd))
-      }
-
-    case .E:
-      var filled = cubeX
-      for c in round {
-        let biggest = (filled[c.x].filter({ $0 > c.y }).min() ?? DIM + 1) - 1
-        filled[c.x].append(biggest)
-        next.insert(Coord(x: c.x, y: biggest, d: nd))
-      }
-
-    default:
-      print("OH NO")
+  else {
+    cache[current] = i
   }
 
-  round = next
-  states.insert(round)
-  print(states.count)
-  dir = nd
   i += 1
 }
 
-let load = round.map{ $0.x }.reduce(0, +)
-print("Load on north support beams: \(load)")
+platform.anticlockwise()
+print("Load on north support beams: \(platform.load())")
+
+// 106700 = too high
