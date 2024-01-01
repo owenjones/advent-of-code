@@ -96,7 +96,8 @@ for d in Direction.allCases {
 
 for start in starts {
   var beams: [Beam] = [Beam(c: start.0, d: start.1)]
-  var energised: [[Int]] = Array(repeating: Array(repeating: 0, count: map.width), count: map.height)
+  // var energised: [[Int]] = Array(repeating: Array(repeating: 0, count: map.width), count: map.height)
+  var energised: [C: Int] = [:]
   var visited: [Direction: [C: Bool]] = [Direction.N: [:], Direction.E: [:], Direction.S: [:], Direction.W: [:]]
 
   while beams.count > 0 {
@@ -105,7 +106,7 @@ for start in starts {
     let seen = visited[beam.d]![n, default: false]
 
     if map.inBounds(n) && !seen {
-      energised[n.y][n.x] = 1
+      energised[n] = 1
       visited[beam.d]![n] = true
 
       switch (map.get(n), beam.d) {
@@ -171,7 +172,8 @@ for start in starts {
     }
   }
 
-  let count = energised.compactMap{ $0.reduce(0, +) }.reduce(0, +)
+  // let count = energised.compactMap{ $0.reduce(0, +) }.reduce(0, +)
+  let count = energised.values.reduce(0, +)
   totals.append(count)
 }
 
