@@ -19,7 +19,7 @@
 | 15   | Lens Library                    |                 |
 | 16   | The Floor Will Be Lava          |                 |
 | 17   | Clumsy Crucible                 |                 |
-| 18   | Lavaduct Lagoon                 |                 |
+| 18   | Lavaduct Lagoon                 | Shoelace formula; Pick's theorem |
 | 19   | Aplenty                         |                 |
 | 20   | Pulse Propagation               |                 |
 | 21   | Step Counter                    |                 |
