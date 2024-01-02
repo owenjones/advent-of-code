@@ -22,7 +22,7 @@
 | 18   | Lavaduct Lagoon                 | Shoelace formula; Pick's theorem |
 | 19   | Aplenty                         |                 |
 | 20   | Pulse Propagation               | LCM             |
-| 21   | Step Counter                    |                 |
+| 21   | Step Counter                    | BFS; parity; geometry  |
 | 22   | Sand Slabs                      |                 |
 | 23   | A Long Walk                     |                 |
 | 24   | Never Tell Me The Odds          |                 |
