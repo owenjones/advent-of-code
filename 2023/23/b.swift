@@ -60,83 +60,49 @@ struct Map {
   }
 }
 
-struct Frontier: Hashable, Comparable {
-  let position: C
-  let steps: Int
-  let distance: Int
-  let path: [C]
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(position)
-    hasher.combine(steps)
-    hasher.combine(path)
-  }
-
-  static func == (_ lhs: Frontier, _ rhs: Frontier) -> Bool {
-    return lhs.steps == rhs.steps && lhs.distance == rhs.distance
-  }
-
-  static func > (_ lhs: Frontier, _ rhs: Frontier) -> Bool {
-    return lhs.steps > rhs.steps || lhs.distance > rhs.distance
-  }
-
-  static func < (_ lhs: Frontier, _ rhs: Frontier) -> Bool {
-    return lhs.steps < rhs.steps || lhs.distance < rhs.distance
-  }
+struct Segment {
+  let start: C
+  let finish: C
+  let length: Int
+  let children: [Segment]
 }
 
-let input = try String(contentsOfFile: "input.txt")
+let input = try String(contentsOfFile: "test.txt")
 let map = Map(tiles: input)
-let start = C(1, 0)
-let finish = C((map.width - 2), (map.height - 1))
 
-var open: [Frontier] = [Frontier(
-  position: start,
-  steps: 0,
-  distance: C.manhattanDistance(start, finish),
-  path: []
-  )]
-var closed: [C: (Int, Int)] = [:]
+let segments: [Segment] = []
 
-var lengths: [Int] = []
+func segmentSearch(_ c: C) -> [Segment] {
+  var previous: C? = nil
+  var current = c
 
-while open.count > 0 {
-  let current = open.removeFirst()
-
-  if(current.position == finish) {
-    print(current.steps)
-    lengths.append(current.steps)
-    continue
-  }
-
-  for d in Direction.allCases {
-    let c = current.position + d.vec()
-    let distance = C.manhattanDistance(c, finish)
-
-    if map.inBounds(c) && map.get(c) != "#" && !current.path.contains(c) {
-      if closed[c] == nil || (closed[c] != nil && (closed[c]!.0 < (current.steps + 1) || closed[c]!.1 <= distance)) {
-        var p = current.path
-        p.append(c)
-
-        let f = Frontier(
-          position: c,
-          steps: current.steps + 1,
-          distance: distance,
-          path: p
-        )
-
-        closed[c] = (f.steps, f.distance)
-        open.append(f)
+  while true {
+    var possible: [C] = []
+    for d in Direction.allCases {
+      let n = current + d.vec()
+      if map.inBounds(n) && map.get(n) != "#" && n != previous {
+        possible.append(n)
       }
     }
-  }
 
-  open.sort(by: >)
+    if possible.count == 0 {
+      // dead end - drop the segment
+    }
+    else if possible.count > 1 {
+      // reached an intersection, close up the current segment and
+      // recursively start search in possible directions
+      print("reached intersection at (\(current.x), \(current.y))")
+      return []
+    }
+    else {
+      // continue along the current line
+      previous = current
+      current = possible[0]
+    }
+  }
 }
 
-let longest = lengths.max() ?? 0
-print("Longest path: \(longest)")
-print(lengths)
+segmentSearch(C(0, 0))
 
 // 6242 = too low
 // 6298 = wrong...
