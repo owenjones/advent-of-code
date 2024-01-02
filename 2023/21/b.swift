@@ -79,8 +79,6 @@ var visited: [C: Int] = [:]
 var queue: [C] = [start]
 while queue.count > 0 {
   let current = queue.removeFirst()
-  visited[C(current.x, current.y, 0)] = current.steps
-
   for d in Direction.allCases {
     let n = current + d.vec()
     if map.inBounds(n) && map.get(n) != "#" && !visited.keys.contains(C(n.x, n.y, 0)) {
