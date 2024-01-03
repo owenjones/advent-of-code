@@ -67,42 +67,72 @@ struct Segment {
   let children: [Segment]
 }
 
-let input = try String(contentsOfFile: "test.txt")
-let map = Map(tiles: input)
-
-let segments: [Segment] = []
-
-func segmentSearch(_ c: C) -> [Segment] {
-  var previous: C? = nil
+func getSegment(_ c: C, _ p: [C] = []) -> (C, Int, [C])? {
+  var previous: [C] = p
   var current = c
+  var length: Int = 0
 
   while true {
+    print(current)
     var possible: [C] = []
     for d in Direction.allCases {
       let n = current + d.vec()
-      if map.inBounds(n) && map.get(n) != "#" && n != previous {
+      if map.inBounds(n) && map.get(n) != "#" && !previous.contains(n) {
         possible.append(n)
       }
     }
 
     if possible.count == 0 {
-      // dead end - drop the segment
+      if current == C(map.width - 2, map.height - 1) {
+        // edge case to make sure we don't miss the end
+        return (current, length, [])
+      }
+      return nil
     }
     else if possible.count > 1 {
       // reached an intersection, close up the current segment and
       // recursively start search in possible directions
-      print("reached intersection at (\(current.x), \(current.y))")
-      return []
+      return (current, length, possible)
     }
     else {
       // continue along the current line
-      previous = current
+      previous.append(current)
       current = possible[0]
+      length += 1
     }
   }
 }
 
-segmentSearch(C(0, 0))
+// ----------------------------
+
+let input = try String(contentsOfFile: "test.txt")
+let map = Map(tiles: input)
+
+var start = C(1, 0)
+var ends: [C] = []
+var beginning: C, length: Int, next: [C]
+while true {
+  let segment = getSegment(start, ends)
+
+  if segment != nil {
+    beginning = segment!.0
+    length = segment!.1
+    next = segment!.2
+
+    print(beginning)
+    print(next)
+    print()
+
+    start = next[0]
+    ends.append(contentsOf: next)
+    if next.count == 0 { break } 
+  }
+  break
+}
+
+
+let segments: [Segment] = []
+
 
 // 6242 = too low
 // 6298 = wrong...
