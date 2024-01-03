@@ -26,7 +26,6 @@ class Workflow {
       id = String(match.1)
       let rStrings = String(match.2).split(separator: ",").map{ String($0) }
       rules = rStrings.map{ expandRule($0) }
-      // print(rules)
     }
     else {
       id = "X"
