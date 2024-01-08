@@ -23,6 +23,21 @@ struct C: Hashable {
   }
 }
 
+struct M: Hashable {
+  let c: C
+  let d: Direction
+
+  init(_ c: C, _ d: Direction) {
+    self.c = c
+    self.d = d
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(c)
+    hasher.combine(d)
+  }
+}
+
 enum Direction: CaseIterable {
   case N, E, S, W
 
@@ -60,79 +75,93 @@ struct Map {
   }
 }
 
-struct Segment {
+class Segment {
   let start: C
-  let finish: C
-  let length: Int
-  let children: [Segment]
+  var finish: C? = nil
+  var length: Int = 0
+  var children: [Segment] = []
+  var visited: [C: Bool] = [:]
+
+  init(start: C) {
+    self.start = start
+  }
+
+  func longestRouteFrom() -> Int {
+    if children.count == 0 { return length }
+    let lengths = children.map { $0.longestRouteFrom() }
+    return length + lengths.max()! + 1 // + 1 as we need to step from this segment to the next
+  }
 }
 
-func getSegment(_ c: C, _ p: [C] = []) -> (C, Int, [C])? {
-  var previous: [C] = p
-  var current = c
-  var length: Int = 0
+func getSegments(_ map: Map, _ start: C) -> Segment {
+  let beginning = Segment(start: start)
+  var incomplete: [Segment] = [beginning]
 
-  while true {
-    print(current)
-    var possible: [C] = []
-    for d in Direction.allCases {
-      let n = current + d.vec()
-      if map.inBounds(n) && map.get(n) != "#" && !previous.contains(n) {
-        possible.append(n)
-      }
-    }
+  func segmentSearch(start: C, visited: [C: Bool]) -> (C?, Int?, [M]?, [C: Bool]?) {
+    var length = 0
+    var current: C = start
+    var visited = visited
 
-    if possible.count == 0 {
-      if current == C(map.width - 2, map.height - 1) {
-        // edge case to make sure we don't miss the end
-        return (current, length, [])
+    while true {
+      // print(current)
+      visited[current] = true
+      var possible: [M] = []
+      for d in Direction.allCases {
+        let n = current + d.vec()
+        if map.inBounds(n) && map.get(n) != "#" && !visited[n, default: false] {
+          possible.append(M(n, d))
+        }
       }
-      return nil
-    }
-    else if possible.count > 1 {
-      // reached an intersection, close up the current segment and
-      // recursively start search in possible directions
-      return (current, length, possible)
-    }
-    else {
-      // continue along the current line
-      previous.append(current)
-      current = possible[0]
-      length += 1
+
+      if possible.count == 0 {
+        if current == C(map.width - 2, map.height - 1) {
+          // edge case to make sure we don't miss the end
+          return (current, length, [], visited)
+        }
+
+        return (nil, nil, nil, nil)
+      }
+      else if possible.count > 1 {
+        // reached an intersection, close up the current segment and
+        // recursively start search in possible directions
+        return (current, length, possible, visited)
+      }
+      else {
+        // continue along the current line
+        current = possible[0].c
+        length += 1
+      }
     }
   }
+
+  while incomplete.count > 0 {
+    print(incomplete.count)
+    let s = incomplete.removeFirst()
+    let (end, length, next, visited) = segmentSearch(start: s.start, visited: s.visited)
+    if end == nil { continue }
+    s.finish = end!
+    s.length = length!
+    s.visited.merge(visited!) { (current, _) in current }
+
+    for child in next! {
+      let n = Segment(start: child.c)
+      n.visited = s.visited
+      s.children.append(n)
+      incomplete.append(n)
+    }
+  }
+
+  return beginning
 }
 
 // ----------------------------
 
-let input = try String(contentsOfFile: "test.txt")
+let input = try String(contentsOfFile: "input.txt")
 let map = Map(tiles: input)
-
-var start = C(1, 0)
-var ends: [C] = []
-var beginning: C, length: Int, next: [C]
-while true {
-  let segment = getSegment(start, ends)
-
-  if segment != nil {
-    beginning = segment!.0
-    length = segment!.1
-    next = segment!.2
-
-    print(beginning)
-    print(next)
-    print()
-
-    start = next[0]
-    ends.append(contentsOf: next)
-    if next.count == 0 { break } 
-  }
-  break
-}
-
-
-let segments: [Segment] = []
-
+let start = C(1, 0)
+let route = getSegments(map, start)
+let longest = route.longestRouteFrom()
+print("Longest possible hike: \(longest)")
 
 // 6242 = too low
 // 6298 = wrong...
