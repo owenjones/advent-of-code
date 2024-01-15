@@ -24,16 +24,19 @@ struct C: Hashable {
 }
 
 struct M: Hashable {
-  let c: C
+  let s: C
+  let e: C
   let d: Direction
 
-  init(_ c: C, _ d: Direction) {
-    self.c = c
+  init(_ s: C, _ e: C, _ d: Direction) {
+    self.s = s
+    self.e = e
     self.d = d
   }
 
   func hash(into hasher: inout Hasher) {
-    hasher.combine(c)
+    hasher.combine(s)
+    hasher.combine(e)
     hasher.combine(d)
   }
 }
@@ -109,7 +112,7 @@ func getSegments(_ map: Map, _ start: C) -> Segment {
       for d in Direction.allCases {
         let n = current + d.vec()
         if map.inBounds(n) && map.get(n) != "#" && !visited[n, default: false] {
-          possible.append(M(n, d))
+          possible.append(M(start, n, d))
         }
       }
 
@@ -128,14 +131,14 @@ func getSegments(_ map: Map, _ start: C) -> Segment {
       }
       else {
         // continue along the current line
-        current = possible[0].c
+        current = possible[0].e
         length += 1
       }
     }
   }
 
+  var complete: [M: Bool] = [:]
   while incomplete.count > 0 {
-    print(incomplete.count)
     let s = incomplete.removeFirst()
     let (end, length, next, visited) = segmentSearch(start: s.start, visited: s.visited)
     if end == nil { continue }
@@ -144,7 +147,9 @@ func getSegments(_ map: Map, _ start: C) -> Segment {
     s.visited.merge(visited!) { (current, _) in current }
 
     for child in next! {
-      let n = Segment(start: child.c)
+      if complete[child, default: false] { continue }
+      complete[child] = true
+      let n = Segment(start: child.e)
       n.visited = s.visited
       s.children.append(n)
       incomplete.append(n)
@@ -156,7 +161,7 @@ func getSegments(_ map: Map, _ start: C) -> Segment {
 
 // ----------------------------
 
-let input = try String(contentsOfFile: "input.txt")
+let input = try String(contentsOfFile: "test.txt")
 let map = Map(tiles: input)
 let start = C(1, 0)
 let route = getSegments(map, start)
