@@ -102,7 +102,7 @@ struct Frontier: Hashable, Comparable {
   }
 }
 
-let input = try String(contentsOfFile: "input.txt")
+let input = try String(contentsOfFile: "input.txt", encoding: String.Encoding.ascii)
 let map = Map(tiles: input)
 let start = C(1, 0)
 let finish = C((map.width - 2), (map.height - 1))
