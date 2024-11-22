@@ -3,9 +3,15 @@
 #include <string.h>
 #include <inttypes.h>
 
-enum pair_type { UNKNOWN, PAIR, NUMBER };
+enum pair_type
+{
+  UNKNOWN,
+  PAIR,
+  NUMBER
+};
 
-typedef struct pair {
+typedef struct pair
+{
   enum pair_type type;
   struct pair *parent, *left, *right;
   int8_t number;
@@ -13,8 +19,9 @@ typedef struct pair {
   int32_t magnitude;
 } pair_t;
 
-pair_t* new_pair(pair_t* parent) {
-  pair_t* pair = calloc(1, sizeof(pair_t));
+pair_t *new_pair(pair_t *parent)
+{
+  pair_t *pair = calloc(1, sizeof(pair_t));
   pair->type = UNKNOWN;
   pair->parent = parent;
   pair->left = NULL;
@@ -25,8 +32,9 @@ pair_t* new_pair(pair_t* parent) {
   return pair;
 }
 
-pair_t* add_pairs(pair_t* left, pair_t* right) {
-  pair_t* pair = new_pair(left->parent);
+pair_t *add_pairs(pair_t *left, pair_t *right)
+{
+  pair_t *pair = new_pair(left->parent);
   pair->type = PAIR;
   pair->left = left;
   pair->right = right;
@@ -35,18 +43,21 @@ pair_t* add_pairs(pair_t* left, pair_t* right) {
   return pair;
 }
 
-void reduce_pairs(pair_t* pair) {
-  
+void reduce_pairs(pair_t *pair)
+{
 }
 
-void explode_pair(pair_t* pair) {
-  if(pair->parent == NULL) return;
-
+void explode_pair(pair_t *pair)
+{
+  if (pair->parent == NULL)
+    return;
 }
 
-int main(void) {
-  FILE* fptr;
-  if((fptr = fopen("test_input_1.txt", "r")) == NULL) {
+int main(void)
+{
+  FILE *fptr;
+  if ((fptr = fopen("test_input_1.txt", "r")) == NULL)
+  {
     printf("Error opening file\n");
     exit(1);
   }
