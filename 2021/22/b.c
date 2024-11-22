@@ -31,13 +31,6 @@ cube_t *make_cube(int32_t min_x, int32_t max_x, int32_t min_y, int32_t max_y, in
 
 cube_t *find_intersection(cube_t *a, cube_t *b)
 {
-  if (!(a->x[0] <= b->x[1] && a->x[1] >= b->x[0]))
-    return NULL;
-  if (!(a->y[0] <= b->y[1] && a->y[1] >= b->y[0]))
-    return NULL;
-  if (!(a->z[0] <= b->z[1] && a->z[1] >= b->z[0]))
-    return NULL;
-
   int32_t min_x = (a->x[0] > b->x[0]) ? a->x[0] : b->x[0];
   int32_t max_x = (a->x[1] > b->x[1]) ? b->x[1] : a->x[1];
   int32_t min_y = (a->y[0] > b->y[0]) ? a->y[0] : b->y[0];
@@ -45,23 +38,18 @@ cube_t *find_intersection(cube_t *a, cube_t *b)
   int32_t min_z = (a->z[0] > b->z[0]) ? a->z[0] : b->z[0];
   int32_t max_z = (a->z[1] > b->z[1]) ? b->z[1] : a->z[1];
 
-  int8_t value;
-  if (a->value == b->value)
-    value = -(a->value);
-  else if (a->value == 1 && b->value == -1)
-    value = 1;
-  else
-    value = a->value * b->value;
+  if ((min_x > max_x) || (min_y > max_y) || (min_z > max_z))
+    return NULL;
 
-  return make_cube(min_x, max_x, min_y, max_y, min_z, max_z, value);
+  return make_cube(min_x, max_x, min_y, max_y, min_z, max_z, -(b->value));
 }
 
 int64_t volume(cube_t *cube)
 {
   return (
-      (int64_t)(cube->x[1] - cube->x[0]) *
-      (int64_t)(cube->y[1] - cube->y[0]) *
-      (int64_t)(cube->z[1] - cube->z[0]) *
+      (int64_t)(cube->x[1] - cube->x[0] + 1) *
+      (int64_t)(cube->y[1] - cube->y[0] + 1) *
+      (int64_t)(cube->z[1] - cube->z[0] + 1) *
       (int64_t)cube->value);
 }
 
@@ -90,52 +78,56 @@ void append(list_t *list, cube_t *cube)
 int main(void)
 {
   FILE *fptr;
-  if ((fptr = fopen("test_input_2.txt", "r")) == NULL)
+  if ((fptr = fopen("input.txt", "r")) == NULL)
   {
     printf("Error opening file\n");
     exit(1);
   }
 
-  list_t *cubes = make_list(), *intersections;
-  cube_t *cube, *intersection;
+  list_t *cubes = make_list();
+  cube_t *cube;
   char action[4];
   int32_t min_x, max_x, min_y, max_y, min_z, max_z;
   int8_t value;
-  size_t c, i;
   while (fscanf(fptr, "%s x=%i..%i,y=%i..%i,z=%i..%i\n", action, &min_x, &max_x, &min_y, &max_y, &min_z, &max_z) == 7)
   {
-    intersections = make_list();
-    value = (strcmp(action, "on") == 0) ? 1 : -1;
+    value = (strcmp(action, "on") == 0) ? 1 : 0;
     cube = make_cube(min_x, max_x, min_y, max_y, min_z, max_z, value);
-
-    for (c = 0; c < cubes->elements; c++)
-    {
-      intersection = find_intersection(cube, cubes->element[c]);
-      if (intersection != NULL)
-        append(intersections, intersection);
-    }
-
-    for (i = 0; i < intersections->elements; i++)
-    {
-      intersection = pop(intersections);
-      append(cubes, intersection);
-    }
-
-    if (cube->value == 1)
-      append(cubes, cube);
-
-    free(intersections->element);
-    free(intersections);
+    append(cubes, cube);
   }
   fclose(fptr);
 
+  list_t *cores = make_list();
+
+  list_t *add;
+  cube_t *intersection;
+  size_t i, j;
+  for (i = 0; i < cubes->elements; i++) // for cube in cubes
+  {
+    add = make_list();
+
+    if (cubes->element[i]->value == 1)
+      append(add, cubes->element[i]);
+
+    for (j = 0; j < cores->elements; j++)
+    {
+      intersection = find_intersection(cubes->element[i], cores->element[j]);
+      if (intersection != NULL)
+        append(add, intersection);
+    }
+
+    for (j = 0; j < add->elements; j++)
+    {
+      append(cores, add->element[j]);
+    }
+
+    free(add);
+  }
+
   int64_t count = 0;
-  for (size_t c = 0; c < cubes->elements; c++)
-    count += volume(cubes->element[c]);
+  for (size_t c = 0; c < cores->elements; c++)
+    count += volume(cores->element[c]);
 
-  printf("Total cubes on: %lli\n", count);
+  printf("Total cubes on: %li\n", count);
   return 0;
-
-  // 1373732982918688 = too high
-  // 2134361332352877
 }
