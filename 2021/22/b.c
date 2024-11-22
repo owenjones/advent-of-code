@@ -31,9 +31,12 @@ cube_t *make_cube(int32_t min_x, int32_t max_x, int32_t min_y, int32_t max_y, in
 
 cube_t *find_intersection(cube_t *a, cube_t *b)
 {
-  if(!(a->x[0] <= b->x[1] && a->x[1] >= b->x[0])) return NULL;
-  if(!(a->y[0] <= b->y[1] && a->y[1] >= b->y[0])) return NULL;
-  if(!(a->z[0] <= b->z[1] && a->z[1] >= b->z[0])) return NULL;
+  if (!(a->x[0] <= b->x[1] && a->x[1] >= b->x[0]))
+    return NULL;
+  if (!(a->y[0] <= b->y[1] && a->y[1] >= b->y[0]))
+    return NULL;
+  if (!(a->z[0] <= b->z[1] && a->z[1] >= b->z[0]))
+    return NULL;
 
   int32_t min_x = (a->x[0] > b->x[0]) ? a->x[0] : b->x[0];
   int32_t max_x = (a->x[1] > b->x[1]) ? b->x[1] : a->x[1];
@@ -43,9 +46,9 @@ cube_t *find_intersection(cube_t *a, cube_t *b)
   int32_t max_z = (a->z[1] > b->z[1]) ? b->z[1] : a->z[1];
 
   int8_t value;
-  if(a->value == b->value)
+  if (a->value == b->value)
     value = -(a->value);
-  else if(a->value == 1 && b->value == -1)
+  else if (a->value == 1 && b->value == -1)
     value = 1;
   else
     value = a->value * b->value;
@@ -73,7 +76,7 @@ list_t *make_list()
 cube_t *pop(list_t *list)
 {
   cube_t *head = list->element[0];
-  for(size_t i = 0; i < (list->elements - 1); i++)
+  for (size_t i = 0; i < (list->elements - 1); i++)
     list->element[i] = list->element[(i + 1)];
   list->elements--;
   return head;
@@ -105,20 +108,20 @@ int main(void)
     value = (strcmp(action, "on") == 0) ? 1 : -1;
     cube = make_cube(min_x, max_x, min_y, max_y, min_z, max_z, value);
 
-    for(c = 0; c < cubes->elements; c++) 
+    for (c = 0; c < cubes->elements; c++)
     {
       intersection = find_intersection(cube, cubes->element[c]);
-      if(intersection != NULL)
+      if (intersection != NULL)
         append(intersections, intersection);
     }
-    
-    for(i = 0; i < intersections->elements; i++)
+
+    for (i = 0; i < intersections->elements; i++)
     {
       intersection = pop(intersections);
       append(cubes, intersection);
     }
 
-    if(cube->value == 1)
+    if (cube->value == 1)
       append(cubes, cube);
 
     free(intersections->element);
@@ -127,12 +130,11 @@ int main(void)
   fclose(fptr);
 
   int64_t count = 0;
-  for(size_t c = 0; c < cubes->elements; c++)
+  for (size_t c = 0; c < cubes->elements; c++)
     count += volume(cubes->element[c]);
 
   printf("Total cubes on: %lli\n", count);
   return 0;
-
 
   // 1373732982918688 = too high
   // 2134361332352877
