@@ -102,7 +102,7 @@ int main(void)
   list_t *add;
   cube_t *intersection;
   size_t i, j;
-  for (i = 0; i < cubes->elements; i++) // for cube in cubes
+  for (i = 0; i < cubes->elements; i++)
   {
     add = make_list();
 
