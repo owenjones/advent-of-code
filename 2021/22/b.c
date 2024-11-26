@@ -128,6 +128,6 @@ int main(void)
   for (size_t c = 0; c < cores->elements; c++)
     count += volume(cores->element[c]);
 
-  printf("Total cubes on: %li\n", count);
+  printf("Total cubes on: %" PRId64 "\n", count);
   return 0;
 }
