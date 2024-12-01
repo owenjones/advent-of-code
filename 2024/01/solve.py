@@ -2,14 +2,14 @@ from collections import defaultdict
 
 input = open("input.txt").read()
 l = list(map(lambda x: tuple(map((lambda i: int(i)), x.split())), input.split("\n")))
-m = list(map(lambda x: sorted(x), list(zip(*l))))
+x, y = list(map(lambda x: sorted(x), list(zip(*l))))
 
-a = sum([abs(m[0][i] - m[1][i]) for i in range(len(m[0]))])
+a = sum([abs(x[i] - y[i]) for i in range(len(x))])
 print(f"Part 1: {a}")
 
 c = defaultdict(lambda: 0)
-for n in m[1]:
+for n in y:
     c[n] += 1
 
-b = sum([x * c[x] for x in m[0]])
+b = sum([i * c[i] for i in x])
 print(f"Part 2: {b}")
