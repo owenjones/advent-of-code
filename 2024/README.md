@@ -1,8 +1,8 @@
-# 2024 (????)
+# 2024 (Python)
 
 | Day  | Title                           | Keywords |
 | :-:  | :-:                             | :-:      |
-| 1    | ||
+| 1    | Historian Hysteria ||
 | 2    | ||
 | 3    | ||
 | 4    | ||
