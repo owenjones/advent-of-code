@@ -3,7 +3,7 @@
 | Day  | Title                           | Keywords |
 | :-:  | :-:                             | :-:      |
 | 1    | Historian Hysteria ||
-| 2    | ||
+| 2    | Red-Nosed Reports ||
 | 3    | ||
 | 4    | ||
 | 5    | ||
