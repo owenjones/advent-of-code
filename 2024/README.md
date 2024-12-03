@@ -4,7 +4,7 @@
 | :-:  | :-:                             | :-:      |
 | 1    | Historian Hysteria ||
 | 2    | Red-Nosed Reports ||
-| 3    | ||
+| 3    | Mull It Over ||
 | 4    | ||
 | 5    | ||
 | 6    | ||
