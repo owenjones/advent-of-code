@@ -10,7 +10,6 @@ class Lab:
 
     def reset(self):
         self.guard = self.start
-        self.visited.clear()
         self.loop.clear()
 
     def _locate_guard(self):
@@ -33,25 +32,30 @@ class Lab:
         y = self.guard[1] + c[1]
         return (x, y)
 
-    def walk(self):
-        self.visited.add((self.guard[0], self.guard[1]))
-        self.loop.add(self.guard)
+    def walk(self, part2=False):
+        if not part2:
+            self.visited.add((self.guard[0], self.guard[1]))
+
+        if part2:
+            self.loop.add(self.guard)
         (x, y) = self._next()
         n = self._get(x, y)
 
         while n != None:
             if n == ".":
-                self.visited.add((x, y))
+                if not part2:
+                    self.visited.add((x, y))
                 self.guard = (x, y, self.guard[2])
 
             elif n == "#":
                 r = (self.guard[2] + 1) % 4
                 self.guard = (self.guard[0], self.guard[1], r)
 
-            if self.guard in self.loop:
-                return 1
+                if self.guard in self.loop:
+                    return 1
 
-            self.loop.add(self.guard)
+                self.loop.add(self.guard)
+
             (x, y) = self._next()
             n = self._get(x, y)
 
@@ -70,12 +74,12 @@ total = lab.count_visited()
 print(f"Part 1: {total}")
 
 count = 0
-locations = lab.visited.copy()
+locations = lab.visited
 for l in locations:
     lab.reset()
     temp = lab.grid[l[1]][l[0]]
     lab.grid[l[1]][l[0]] = "#"
-    count += lab.walk()
+    count += lab.walk(True)
     lab.grid[l[1]][l[0]] = temp
 
 print(f"Part 2: {count}")
