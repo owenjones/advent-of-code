@@ -1,13 +1,13 @@
 # 2024 (Python)
 
-| Day  | Title                           | Keywords |
-| :-:  | :-:                             | :-:      |
-| 1    | Historian Hysteria ||
-| 2    | Red-Nosed Reports ||
-| 3    | Mull It Over ||
-| 4    | Ceres Search ||
-| 5    | Print Queue ||
-| 6    | Guard Gallivant ||
+| Day  | Title                           | Runtime | Keywords |
+| :-:  | :-:                             | :-:     | :-:      |
+| 1    | Historian Hysteria              | 27.3ms  ||
+| 2    | Red-Nosed Reports               | 34.9ms  ||
+| 3    | Mull It Over                    | 31.1ms  ||
+| 4    | Ceres Search                    | 45.4ms  ||
+| 5    | Print Queue                     | 30.2ms  ||
+| 6    | Guard Gallivant                 | 12.2s   ||
 | 7    | ||
 | 8    | ||
 | 9    | ||
