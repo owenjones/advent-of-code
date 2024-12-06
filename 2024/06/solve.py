@@ -8,8 +8,8 @@ class Lab:
         self.xdim = len(self.grid[0])
         self.ydim = len(self.grid)
         self._locate_guard()
-        self.visited = defaultdict(lambda: False)
-        self.loop = defaultdict(lambda: False)
+        self.visited = set()
+        self.loop = set()
 
     def _locate_guard(self):
         for y in range(self.ydim):
@@ -26,42 +26,37 @@ class Lab:
         return self.grid[y][x]
 
     def _next(self):
-        match(self.guard[2]):
-            case 0: c = (0, -1)
-            case 1: c = (1, 0)
-            case 2: c = (0, 1)
-            case 3: c = (-1, 0)
-
+        c = [(0, -1), (1, 0), (0, 1), (-1, 0)][self.guard[2]]
         x = self.guard[0] + c[0]
         y = self.guard[1] + c[1]
         return (x, y)
     
     def walk(self):
-        self.visited[(self.guard[0], self.guard[1])] = True
-        self.loop[self.guard] = True
+        self.visited.add((self.guard[0], self.guard[1]))
+        self.loop.add(self.guard)
         (x, y) = self._next()
         n = self._get(x, y)
 
         while n != None:
             if n == ".":
-                self.visited[(x, y)] = True
+                self.visited.add((x, y))
                 self.guard = (x, y, self.guard[2])
 
             elif n == "#":
                 r = (self.guard[2] + 1) % 4
                 self.guard = (self.guard[0], self.guard[1], r)
 
-            if self.loop[self.guard] == True:
+            if self.guard in self.loop:
                 return 1
 
-            self.loop[self.guard] = True
+            self.loop.add(self.guard)
             (x, y) = self._next()
             n = self._get(x, y)
 
         return 0
 
     def count_visited(self):
-        return len(self.visited.keys())
+        return len(self.visited)
 
 lab = Lab(input)
 lab.walk()
@@ -69,10 +64,9 @@ total = lab.count_visited()
 print(f"Part 1: {total}")
 
 count = 0
-locations = lab.visited.keys()
+locations = lab.visited
 for l in locations:
     lab = Lab(input)
     lab.grid[l[1]][l[0]] = "#"
     count += lab.walk()
-
 print(f"Part 2: {count}")
