@@ -7,7 +7,7 @@
 | 3    | Mull It Over ||
 | 4    | Ceres Search ||
 | 5    | ||
-| 6    | ||
+| 6    | Guard Gallivant ||
 | 7    | ||
 | 8    | ||
 | 9    | ||
