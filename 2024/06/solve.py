@@ -1,7 +1,3 @@
-from collections import defaultdict
-
-input = open("input.txt").read()
-
 class Lab:
     def __init__(self, input):
         self.grid = list(map(lambda x: list(x), input.split("\n")))
@@ -57,6 +53,8 @@ class Lab:
 
     def count_visited(self):
         return len(self.visited)
+
+input = open("input.txt").read()
 
 lab = Lab(input)
 lab.walk()
