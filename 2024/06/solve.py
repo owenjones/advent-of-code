@@ -4,8 +4,14 @@ class Lab:
         self.xdim = len(self.grid[0])
         self.ydim = len(self.grid)
         self._locate_guard()
+        self.start = self.guard
         self.visited = set()
         self.loop = set()
+
+    def reset(self):
+        self.guard = self.start
+        self.visited.clear()
+        self.loop.clear()
 
     def _locate_guard(self):
         for y in range(self.ydim):
@@ -18,7 +24,7 @@ class Lab:
     def _get(self, x, y):
         if not ((0 <= x < self.xdim) and 0 <= y < self.ydim):
             return None
-        
+
         return self.grid[y][x]
 
     def _next(self):
@@ -26,7 +32,7 @@ class Lab:
         x = self.guard[0] + c[0]
         y = self.guard[1] + c[1]
         return (x, y)
-    
+
     def walk(self):
         self.visited.add((self.guard[0], self.guard[1]))
         self.loop.add(self.guard)
@@ -54,17 +60,22 @@ class Lab:
     def count_visited(self):
         return len(self.visited)
 
+
 input = open("input.txt").read()
 
 lab = Lab(input)
+start = lab.guard
 lab.walk()
 total = lab.count_visited()
 print(f"Part 1: {total}")
 
 count = 0
-locations = lab.visited
+locations = lab.visited.copy()
 for l in locations:
-    lab = Lab(input)
+    lab.reset()
+    temp = lab.grid[l[1]][l[0]]
     lab.grid[l[1]][l[0]] = "#"
     count += lab.walk()
+    lab.grid[l[1]][l[0]] = temp
+
 print(f"Part 2: {count}")
