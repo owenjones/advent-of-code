@@ -7,7 +7,7 @@
 | 3    | Mull It Over                    | 31.1ms  ||
 | 4    | Ceres Search                    | 45.4ms  ||
 | 5    | Print Queue                     | 30.2ms  ||
-| 6    | Guard Gallivant                 | 4.45s   ||
+| 6    | Guard Gallivant                 | 4.29s   ||
 | 7    | ||
 | 8    | ||
 | 9    | ||

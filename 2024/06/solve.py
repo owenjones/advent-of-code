@@ -48,8 +48,7 @@ class Lab:
                 self.guard = (x, y, self.guard[2])
 
             elif n == "#":
-                r = (self.guard[2] + 1) % 4
-                self.guard = (self.guard[0], self.guard[1], r)
+                self.guard = (self.guard[0], self.guard[1], (self.guard[2] + 1) % 4)
 
                 if self.guard in self.loop:
                     return 1
@@ -68,7 +67,6 @@ class Lab:
 input = open("input.txt").read()
 
 lab = Lab(input)
-start = lab.guard
 lab.walk()
 total = lab.count_visited()
 print(f"Part 1: {total}")
@@ -77,9 +75,8 @@ count = 0
 locations = lab.visited
 for l in locations:
     lab.reset()
-    temp = lab.grid[l[1]][l[0]]
     lab.grid[l[1]][l[0]] = "#"
     count += lab.walk(True)
-    lab.grid[l[1]][l[0]] = temp
+    lab.grid[l[1]][l[0]] = "."
 
 print(f"Part 2: {count}")
