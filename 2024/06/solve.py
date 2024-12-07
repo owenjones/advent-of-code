@@ -20,31 +20,38 @@ class Lab:
                     self.grid[y][x] = "."
                     return
 
-    def _get(self, x, y):
-        if not ((0 <= x < self.xdim) and 0 <= y < self.ydim):
-            return None
-
-        return self.grid[y][x]
-
     def _next(self):
         c = [(0, -1), (1, 0), (0, 1), (-1, 0)][self.guard[2]]
         x = self.guard[0] + c[0]
         y = self.guard[1] + c[1]
-        return (x, y)
 
-    def walk(self, part2=False):
-        if not part2:
-            self.visited.add((self.guard[0], self.guard[1]))
+        if not ((0 <= x < self.xdim) and 0 <= y < self.ydim):
+            n = None
+        else:
+            n = self.grid[y][x]
 
-        if part2:
-            self.loop.add(self.guard)
-        (x, y) = self._next()
-        n = self._get(x, y)
+        return (x, y, n)
+
+    def initial_walk(self):
+        self.visited.add((self.guard[0], self.guard[1]))
+        (x, y, n) = self._next()
 
         while n != None:
             if n == ".":
-                if not part2:
-                    self.visited.add((x, y))
+                self.visited.add((x, y))
+                self.guard = (x, y, self.guard[2])
+
+            elif n == "#":
+                self.guard = (self.guard[0], self.guard[1], (self.guard[2] + 1) % 4)
+
+            (x, y, n) = self._next()
+
+    def walk(self):
+        self.loop.add(self.guard)
+        (x, y, n) = self._next()
+
+        while n != None:
+            if n == ".":
                 self.guard = (x, y, self.guard[2])
 
             elif n == "#":
@@ -55,20 +62,16 @@ class Lab:
 
                 self.loop.add(self.guard)
 
-            (x, y) = self._next()
-            n = self._get(x, y)
+            (x, y, n) = self._next()
 
         return 0
-
-    def count_visited(self):
-        return len(self.visited)
 
 
 input = open("input.txt").read()
 
 lab = Lab(input)
-lab.walk()
-total = lab.count_visited()
+lab.initial_walk()
+total = len(lab.visited)
 print(f"Part 1: {total}")
 
 count = 0
@@ -76,7 +79,7 @@ locations = lab.visited
 for l in locations:
     lab.reset()
     lab.grid[l[1]][l[0]] = "#"
-    count += lab.walk(True)
+    count += lab.walk()
     lab.grid[l[1]][l[0]] = "."
 
 print(f"Part 2: {count}")
