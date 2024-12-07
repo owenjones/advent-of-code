@@ -21,7 +21,16 @@ class Lab:
                     return
 
     def _next(self):
-        c = [(0, -1), (1, 0), (0, 1), (-1, 0)][self.guard[2]]
+        match (self.guard[2]):
+            case 0:
+                c = (0, -1)
+            case 1:
+                c = (1, 0)
+            case 2:
+                c = (0, 1)
+            case 3:
+                c = (-1, 0)
+
         x = self.guard[0] + c[0]
         y = self.guard[1] + c[1]
 
