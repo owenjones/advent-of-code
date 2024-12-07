@@ -23,16 +23,17 @@ class Lab:
     def _next(self):
         match (self.guard[2]):
             case 0:
-                c = (0, -1)
+                x = self.guard[0]
+                y = self.guard[1] - 1
             case 1:
-                c = (1, 0)
+                x = self.guard[0] + 1
+                y = self.guard[1]
             case 2:
-                c = (0, 1)
+                x = self.guard[0]
+                y = self.guard[1] + 1
             case 3:
-                c = (-1, 0)
-
-        x = self.guard[0] + c[0]
-        y = self.guard[1] + c[1]
+                x = self.guard[0] - 1
+                y = self.guard[1]
 
         if not ((0 <= x < self.xdim) and 0 <= y < self.ydim):
             n = None
