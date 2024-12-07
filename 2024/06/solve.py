@@ -35,10 +35,10 @@ class Lab:
                 x = self.guard[0] - 1
                 y = self.guard[1]
 
-        if not ((0 <= x < self.xdim) and 0 <= y < self.ydim):
+        try:
+            n = None if (x < 0 or y < 0) else self.grid[y][x]
+        except IndexError:
             n = None
-        else:
-            n = self.grid[y][x]
 
         return (x, y, n)
 
