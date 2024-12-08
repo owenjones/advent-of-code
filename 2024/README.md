@@ -8,7 +8,7 @@
 | 4    | Ceres Search                    | 45.4ms  ||
 | 5    | Print Queue                     | 30.2ms  ||
 | 6    | Guard Gallivant                 | 2.82s   ||
-| 7    | ||
+| 7    | Bridge Repair                   | 87.3ms |
 | 8    | ||
 | 9    | ||
 | 10   | ||
