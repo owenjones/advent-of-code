@@ -10,7 +10,7 @@
 | 6    | Guard Gallivant                 | 2.82s   ||
 | 7    | Bridge Repair                   | 87.3ms  ||
 | 8    | Resonant Collinearity           | 50.3ms  ||
-| 9    | ||
+| 9    | Disk Fragmenter                 | 480.6ms ||
 | 10   | ||
 | 11   | ||
 | 12   | ||
