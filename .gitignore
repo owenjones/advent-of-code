@@ -13,4 +13,4 @@ bin
 
 # AOC Specific
 *.txt
-.env
+config.json
