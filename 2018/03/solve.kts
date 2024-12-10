@@ -5,7 +5,7 @@ data class Pattern(val id: Int, val t: Pair<Int, Int>, val b: Pair<Int, Int>)
 val regex = Regex("""^#(\d+) @ (\d+),(\d+): (\d+)x(\d+)$""")
 
 fun splitPattern(pattern: String): Pattern {
-  val match = regex.find(pattern)!!.destructured.toList().map({ m -> m.toInt() })
+  val match = regex.find(pattern)!!.destructured.toList().map({ it.toInt() })
   return Pattern(
     match[0],
     Pair(match[1], match[2]),
@@ -13,7 +13,7 @@ fun splitPattern(pattern: String): Pattern {
   )
 }
 
-val patterns = File("input.txt").readLines().map{ p -> splitPattern(p) }
+val patterns = File("input.txt").readLines().map{ splitPattern(it) }
 var fabric = Array(1000) { Array(1000) { 0 } }
 
 for (pattern in patterns) {
@@ -36,18 +36,21 @@ for (x in 0..999) {
   }
 }
 
-fun testPattern(pattern: Pattern): Unit {
+fun testPattern(pattern: Pattern): Boolean {
   for (x in pattern.t.first..pattern.b.first) {
     for (y in pattern.t.second..pattern.b.second) {
       if (!single.contains(Pair(x, y))) {
-        return
+        return false
       }
     }
   }
 
   println(pattern.id)
+  return true
 }
 
 for (p in patterns) {
-  testPattern(p)
+  if (testPattern(p)) {
+    break
+  }
 }
