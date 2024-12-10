@@ -11,7 +11,7 @@
 | 7    | Bridge Repair                   | 87.3ms  ||
 | 8    | Resonant Collinearity           | 50.3ms  ||
 | 9    | Disk Fragmenter                 | 480.6ms ||
-| 10   | ||
+| 10   | Hoof It                         | 75.8ms  ||
 | 11   | ||
 | 12   | ||
 | 13   | ||
