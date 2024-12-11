@@ -12,7 +12,7 @@
 | 8    | Resonant Collinearity           | 17.4ms  ||
 | 9    | Disk Fragmenter                 | 305.2ms ||
 | 10   | Hoof It                         | 22.3ms  ||
-| 11   | ||
+| 11   | Plutonian Pebbles               | 171.5ms ||
 | 12   | ||
 | 13   | ||
 | 14   | ||
