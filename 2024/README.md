@@ -13,8 +13,8 @@
 | 9    | Disk Fragmenter                 | 305.2ms ||
 | 10   | Hoof It                         | 22.3ms  ||
 | 11   | Plutonian Pebbles               | 171.5ms ||
-| 12   | ||
-| 13   | ||
+| 12   | Garden Groups                   | 228.4ms ||
+| 13   | Claw Contraption                | 72.2ms  ||
 | 14   | ||
 | 15   | ||
 | 16   | ||
