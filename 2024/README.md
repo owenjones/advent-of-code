@@ -15,7 +15,7 @@
 | 11   | Plutonian Pebbles               | 171.5ms ||
 | 12   | Garden Groups                   | 228.4ms ||
 | 13   | Claw Contraption                | 72.2ms  ||
-| 14   | ||
+| 14   | Restroom Redoubt                | 863.9ms ||
 | 15   | ||
 | 16   | ||
 | 17   | ||
