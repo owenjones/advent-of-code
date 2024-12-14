@@ -51,6 +51,13 @@ while True:
         ps.add((x, y))
 
     if len(ps) == nr:
+        # g = [[" " for _ in range(xdim)] for _ in range(ydim)]
+        # for x, y in ps:
+        #     g[y][x] = "*"
+
+        # for r in g:
+        #     print("".join(r))
+
         break
 
     shift += 1
