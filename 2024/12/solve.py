@@ -1,41 +1,44 @@
 from collections import deque
 
+
 def floodFill(x, y):
-  region = grid[y][x]
-  contents = set([(x, y)])
+    region = grid[y][x]
+    contents = set([(x, y)])
 
-  search = deque([(x, y)])
-  while search:
-    s = search.popleft()
-    for n in neighbours:
-      x, y = s[0] + n[0], s[1] + n[1]
+    search = deque([(x, y)])
+    while search:
+        s = search.popleft()
+        for n in neighbours:
+            x, y = s[0] + n[0], s[1] + n[1]
 
-      if (x, y) in contents:
-        continue
+            if (x, y) in contents:
+                continue
 
-      if not ((0 <= x < xdim) and (0 <= y < ydim)):
-        continue
+            if not ((0 <= x < xdim) and (0 <= y < ydim)):
+                continue
 
-      if grid[y][x] != region:
-        continue
+            if grid[y][x] != region:
+                continue
 
-      contents.add((x, y))
-      search.append((x, y))
+            contents.add((x, y))
+            search.append((x, y))
 
-  return contents
-  
+    return contents
+
+
 def findRegions():
-  visited = set()
-  regions = []
+    visited = set()
+    regions = []
 
-  for y in range(ydim):
-    for x in range(xdim):
-      if not (x, y) in visited:
-        region = floodFill(x, y)
-        visited.update(region)
-        regions.append(region)
+    for y in range(ydim):
+        for x in range(xdim):
+            if (x, y) not in visited:
+                region = floodFill(x, y)
+                visited.update(region)
+                regions.append(region)
 
-  return regions
+    return regions
+
 
 grid = list(map(list, open("input.txt").read().split("\n")))
 ydim = len(grid)
@@ -45,42 +48,47 @@ regions = findRegions()
 
 price = 0
 for r in regions:
-  perimeter = 0
+    perimeter = 0
 
-  for p in r:
-    for n in neighbours:
-      if (p[0] + n[0], p[1] + n[1]) not in r:
-        perimeter += 1
+    for p in r:
+        for n in neighbours:
+            if (p[0] + n[0], p[1] + n[1]) not in r:
+                perimeter += 1
 
-  price += perimeter * len(r)
+    price += perimeter * len(r)
 
 print(f"Part 1: {price}")
 
 price = 0
 for r in regions:
-  corners = 0
-  visited = set()
+    corners = 0
+    visited = set()
 
-  for p in r:
-    for n in [(0.5, -0.5), (-0.5, 0.5), (0.5, 0.5), (-0.5, -0.5)]:
-      x, y = p[0] + n[0], p[1] + n[1]
+    for p in r:
+        for n in [(0.5, -0.5), (-0.5, 0.5), (0.5, 0.5), (-0.5, -0.5)]:
+            x, y = p[0] + n[0], p[1] + n[1]
 
-      if (x, y) in visited:
-        continue
+            if (x, y) in visited:
+                continue
 
-      visited.add((x, y))
+            visited.add((x, y))
 
-      adjacent = sum((x + dx, y + dy) in r for dx, dy in [(0.5, -0.5), (-0.5, 0.5), (0.5, 0.5), (-0.5, -0.5)])
+            adjacent = sum(
+                (x + dx, y + dy) in r
+                for dx, dy in [(0.5, -0.5), (-0.5, 0.5), (0.5, 0.5), (-0.5, -0.5)]
+            )
 
-      if adjacent in [1, 3]:
-        corners += 1
+            if adjacent in [1, 3]:
+                corners += 1
 
-      elif adjacent == 2:
-        pattern = [(dx, dy) in r for dx, dy in [(x - 0.5, y - 0.5), (x + 0.5, y + 0.5)]]
+            elif adjacent == 2:
+                pattern = [
+                    (dx, dy) in r for dx, dy in [(x - 0.5, y - 0.5), (x + 0.5, y + 0.5)]
+                ]
 
-        if pattern == [True, True] or pattern == [False, False]:
-          corners += 2
+                if pattern == [True, True] or pattern == [False, False]:
+                    corners += 2
 
-  price += corners * len(r)
+    price += corners * len(r)
 
 print(f"Part 2: {price}")
