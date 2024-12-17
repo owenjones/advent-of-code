@@ -17,7 +17,7 @@
 | 13   | Claw Contraption                | 72.2ms  ||
 | 14   | Restroom Redoubt                | 863.9ms ||
 | 15   | Warehouse Woes                  |         ||
-| 16   | Reindeer Maze                   | 448.9ms ||
+| 16   | Reindeer Maze                   | 398.8ms ||
 | 17   | ||
 | 18   | ||
 | 19   | ||
