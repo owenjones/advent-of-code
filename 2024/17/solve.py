@@ -17,14 +17,14 @@ def run(program, a, b, c):
             case 7: exit("Invalid program")
 
         match(o):
-            case 0: a = a // 2**v
+            case 0: a = a >> v
             case 1: b = b ^ l
             case 2: b = v % 8
             case 3: i = i if a == 0 else l
             case 4: b = b ^ c
             case 5: out.append(v % 8)
-            case 6: b = a // 2**v
-            case 7: c = a // 2**v
+            case 6: b = a >> v
+            case 7: c = a >> v
         
         if o != 3 or (o == 3 and a == 0):
             i += 2
