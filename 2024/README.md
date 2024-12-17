@@ -18,7 +18,7 @@
 | 14   | Restroom Redoubt                | 863.9ms ||
 | 15   | Warehouse Woes                  |         ||
 | 16   | Reindeer Maze                   | 398.8ms ||
-| 17   | ||
+| 17   | Chronospatial Computer          | 62.4ms  ||
 | 18   | ||
 | 19   | ||
 | 20   | ||
