@@ -26,21 +26,18 @@ def search(bytes, steps, size):
     return None
     
 
-def predictFuture(bytes, steps, size):
-    for i in reversed(range(steps, len(bytes))):
-        steps = search(bytes, i, size)
-
-        if steps:
+def predictFuture(bytes, size):
+    for i in reversed(range(len(bytes))):
+        if search(bytes, i, size):
             return ",".join(map(str, bytes[i]))
 
 
-FILE = "input.txt"
-SIZE = 70
-SIM = 1024
-bytes = list(map(lambda x: tuple(map(int, x.split(","))), open(FILE).read().split("\n")))
+bytes = list(map(lambda x: tuple(map(int, x.split(","))), open("input.txt").read().split("\n")))
+size = 70 if len(bytes) > 25 else 6
+steps = 1024 if len(bytes) > 25 else 12
 
-steps = search(bytes, SIM, SIZE)
+steps = search(bytes, steps, size)
 print(f"Part 1: {steps}")
 
-blocker = predictFuture(bytes, SIM, SIZE)
+blocker = predictFuture(bytes, size)
 print(f"Part 2: {blocker}")
