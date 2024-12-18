@@ -4,7 +4,7 @@
 Here are my solutions :)
 
 | Year                                  | Language | Stars |
-| :-:                                   | :-:      | :-:   |
+| :-:                                   | :-       | :-:   |
 | [2024](https://adventofcode.com/2024) | Python   | 34    |
 | [2023](https://adventofcode.com/2023) | Swift    | 42    |
 | [2022](https://adventofcode.com/2022) | C        | 50    |
