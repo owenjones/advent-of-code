@@ -3,8 +3,9 @@ from heapq import heappush, heappop
 def search(bytes, steps, size):
     end = (size, size)
     neighbours = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-    heap = [(0, (0, 0, set([(0, 0), *bytes[:steps]])))]
+    blocked = set(bytes[:steps])
 
+    heap = [(0, (0, 0, set([(0, 0)])))]
     while heap:
         (s, (x, y, path)) = heappop(heap)
 
@@ -16,6 +17,7 @@ def search(bytes, steps, size):
 
             if (
                 (nx, ny) in path or
+                (nx, ny) in blocked or
                 not (0 <= nx <= size and 0 <= ny <= size)
             ):
                 continue
