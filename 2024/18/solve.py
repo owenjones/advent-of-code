@@ -8,7 +8,8 @@ def simulate(steps, size):
 
     return grid
 
-def search(grid, size):
+def search(grid):
+    size = len(grid) - 1
     end = (size, size)
     neighbours = [(1, 0), (0, 1), (-1, 0), (0, -1)]
     heap = [(0, (0, 0, set([(0, 0)])))]
@@ -38,7 +39,7 @@ def search(grid, size):
 def predictFuture(steps, size):
     for i in reversed(range(steps, len(bytes))):
         grid = simulate(i, size)
-        steps = search(grid, size)
+        steps = search(grid)
 
         if steps:
             return ",".join(map(str, bytes[i]))
@@ -47,10 +48,10 @@ def predictFuture(steps, size):
 FILE = "input.txt"
 SIZE = 70
 SIM = 1024
-
 bytes = list(map(lambda x: tuple(map(int, x.split(","))), open(FILE).read().split("\n")))
+
 grid = simulate(SIM, SIZE)
-steps = search(grid, SIZE)
+steps = search(grid)
 print(f"Part 1: {steps}")
 
 blocker = predictFuture(SIM, SIZE)
