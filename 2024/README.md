@@ -1,7 +1,7 @@
 # 2024 (Python)
 
 | Day  | Title                           | Runtime |
-| :-   | :-                              | :-      |
+| -:   | :-                              | :-      |
 | 1    | Historian Hysteria              | 27.3ms  |
 | 2    | Red-Nosed Reports               | 34.9ms  |
 | 3    | Mull It Over                    | 31.1ms  |
