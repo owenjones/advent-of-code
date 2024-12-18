@@ -19,7 +19,7 @@
 | 15   | Warehouse Woes                  |         |
 | 16   | Reindeer Maze                   | 398.8ms |
 | 17   | Chronospatial Computer          | 62.4ms  |
-| 18   | RAM Run                         | 195.6ms |
+| 18   | RAM Run                         | 111.3ms |
 | 19   |  |  |
 | 20   |  |  |
 | 21   |  |  |
