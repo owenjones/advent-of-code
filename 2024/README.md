@@ -20,7 +20,7 @@
 | 16   | Reindeer Maze                   | 398.8ms |
 | 17   | Chronospatial Computer          | 62.4ms  |
 | 18   | RAM Run                         | 111.3ms |
-| 19   |  |  |
+| 19   | Linen Layout                    | 63.7ms  |
 | 20   |  |  |
 | 21   |  |  |
 | 22   |  |  |
