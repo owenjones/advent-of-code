@@ -21,7 +21,7 @@
 | 17   | Chronospatial Computer          | 62.4ms  |
 | 18   | RAM Run                         | 111.3ms |
 | 19   | Linen Layout                    | 63.7ms  |
-| 20   |  |  |
+| 20   | Race Condition                  | 3.87s   |
 | 21   |  |  |
 | 22   |  |  |
 | 23   |  |  |
