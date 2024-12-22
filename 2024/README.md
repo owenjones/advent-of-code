@@ -23,7 +23,7 @@
 | 19   | Linen Layout                    | 63.7ms  |
 | 20   | Race Condition                  | 3.87s   |
 | 21   | Keypad Conundrum                | 44.3ms  |
-| 22   |  |  |
+| 22   | Monkey Market                   | 6.39s   |
 | 23   |  |  |
 | 24   |  |  |
 | 25   |  |  |
