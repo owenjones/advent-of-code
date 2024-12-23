@@ -54,7 +54,8 @@ class Graph:
                 p.remove(v)
                 x.add(v)
 
-        bron_kerbosch(set([]), self.nodes, set([]))
+        nodes = self.nodes.copy()
+        bron_kerbosch(set([]), nodes, set([]))
         return found
 
 
