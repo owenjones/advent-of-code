@@ -38,7 +38,7 @@ class Graph:
     def max_clique(self):
         found = []
 
-        def bors_kerbosch(r, p, x):
+        def bron_kerbosch(r, p, x):
             if len(p) == 0 and len(x) == 0:
                 if len(r) > 2:
                     found.append(sorted(r))
@@ -46,7 +46,7 @@ class Graph:
                 return
 
             for v in p.union(set([])):
-                bors_kerbosch(
+                bron_kerbosch(
                     r.union(set([v])),
                     p.intersection(self.adjacent[v]),
                     x.intersection(self.adjacent[v]),
@@ -54,7 +54,7 @@ class Graph:
                 p.remove(v)
                 x.add(v)
 
-        bors_kerbosch(set([]), self.nodes, set([]))
+        bron_kerbosch(set([]), self.nodes, set([]))
         return found
 
 
