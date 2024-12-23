@@ -24,6 +24,6 @@
 | 20   | Race Condition                  | 3.87s   |
 | 21   | Keypad Conundrum                | 44.3ms  |
 | 22   | Monkey Market                   | 6.39s   |
-| 23   |  |  |
+| 23   | LAN Party                       | 1.39s   |
 | 24   |  |  |
 | 25   |  |  |
