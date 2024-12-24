@@ -2,17 +2,6 @@ from collections import deque
 import re
 
 
-def extractbits(d):
-    return "".join(
-        list(
-            map(
-                lambda x: str(x[1]),
-                sorted(d.items(), key=lambda x: x[0], reverse=True),
-            )
-        )
-    )
-
-
 def forwards(initial, gates):
     available = set()
     value = {}
@@ -42,14 +31,31 @@ def forwards(initial, gates):
         else:
             process.append((x, op, y, z))
 
-    return output
+    return int(
+        "".join(
+            list(
+                map(
+                    lambda x: str(x[1]),
+                    sorted(output.items(), key=lambda x: x[0], reverse=True),
+                )
+            )
+        ),
+        2,
+    )
 
 
 def backwards(gates):
-    highest_z = "z45"
+    highest = 0
+    for _, _, _, z in gates:
+        if z.startswith("z"):
+            n = int(z[1:])
+            highest = max(n, highest)
+
+    highest = f"z{highest}"
+
     wrong = set()
     for x, op, y, z in gates:
-        if z.startswith("z") and op != "XOR" and z != highest_z:
+        if z.startswith("z") and op != "XOR" and z != highest:
             wrong.add(z)
 
         if (
@@ -60,14 +66,14 @@ def backwards(gates):
         ):
             wrong.add(z)
 
-        if op == "AND" and "x00" not in [x, y]:
-            for x2, op2, y2, _ in gates:
-                if (z == x2 or z == y2) and op2 != "OR":
+        elif op == "AND" and "x00" not in [x, y]:
+            for x, op, y, _ in gates:
+                if (z == x or z == y) and op != "OR":
                     wrong.add(z)
 
-        if op == "XOR":
-            for x2, op2, y2, _ in gates:
-                if (z == x2 or z == y2) and op2 == "OR":
+        elif op == "XOR":
+            for x, op, y, _ in gates:
+                if (z == x or z == y) and op == "OR":
                     wrong.add(z)
 
     return ",".join(sorted(wrong))
@@ -77,9 +83,5 @@ initial, gates = open("input.txt").read().split("\n\n")
 gates = list(
     map(lambda g: re.findall(r"(.*) (.*) (.*) -> (.*)", g)[0], gates.split("\n"))
 )
-
-bits = forwards(initial, gates)
-number = int(extractbits(bits), 2)
-print(f"Part 1: {number}")
-
+print(f"Part 1: {forwards(initial, gates)}")
 print(f"Part 2: {backwards(gates)}")
