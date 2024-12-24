@@ -11,7 +11,7 @@ def forwards(initial, gates):
         available.add(k)
 
     process = deque(gates)
-    output = {}
+    output = []
     while process:
         x, op, y, z = process.popleft()
 
@@ -25,21 +25,15 @@ def forwards(initial, gates):
                     value[z] = value[x] ^ value[y]
 
             if z.startswith("z"):
-                output[int(z[1:])] = value[z]
+                output.append(value[z])
+
             available.add(z)
 
         else:
             process.append((x, op, y, z))
 
     return int(
-        "".join(
-            list(
-                map(
-                    lambda x: str(x[1]),
-                    sorted(output.items(), key=lambda x: x[0], reverse=True),
-                )
-            )
-        ),
+        "".join(map(str, list(reversed(output)))),
         2,
     )
 
