@@ -1,30 +1,16 @@
-def process_input(file):
-    input = open(file).read().split("\n\n")
-    locks = []
-    keys = []
+input = map(lambda x: x.split("\n"), open("input.txt").read().split("\n\n"))
+locks = []
+keys = []
 
-    for block in input:
-        block = block.split("\n")
-        lines = [list(x) for x in zip(*block)]
-        counts = tuple([line.count("#") - 1 for line in lines])
+for block in input:
+    lines = [list(x) for x in zip(*block)]
+    counts = tuple([line.count("#") - 1 for line in lines])
+    locks.append(counts) if block[0] == "#####" else keys.append(counts)
 
-        if block[0] == "#####":
-            locks.append(counts)
-        else:
-            keys.append(counts)
-
-    return locks, keys
-
-
-def compatable(lock, key):
-    return not any(lock[i] + key[i] > 5 for i in range(len(lock)))
-
-
-locks, keys = process_input("input.txt")
 fits = 0
 for lock in locks:
     for key in keys:
-        if compatable(lock, key):
+        if all(lock[i] + key[i] <= 5 for i in range(len(lock))):
             fits += 1
 
 print(f"Part 1: {fits}")

@@ -26,4 +26,4 @@
 | 22   | Monkey Market                   | 6.39s   |
 | 23   | LAN Party                       | 1.39s   |
 | 24   | Crossed Wires                   | 70.2ms  |
-| 25   | Code Chronicle                  | 122.6ms |
+| 25   | Code Chronicle                  | 86.9ms  |
