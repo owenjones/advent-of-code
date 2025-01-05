@@ -103,7 +103,7 @@ def bigSimulate(grid, moves):
                     stack = None
                     break
 
-                if line == ["."] * len(frontier):
+                elif line == ["."] * len(frontier):
                     stack.append([((n, ny), (n, ny + dy)) for n in frontier])
                     break
 
