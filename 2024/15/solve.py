@@ -103,8 +103,6 @@ def bigSimulate(grid, moves):
                     stack = None
                     break
 
-                boxes |= set((n, ny + dy) for n in frontier)
-
                 if line == ["."] * len(frontier):
                     stack.append([((n, ny), (n, ny + dy)) for n in frontier])
                     break
@@ -112,6 +110,7 @@ def bigSimulate(grid, moves):
                 else:
                     chunk = []
                     for n in frontier:
+                        boxes.add((n, ny + dy))
                         chunk.append(((n, ny), (n, ny + dy)))
 
                         match (grid[ny][n], grid[ny + dy][n]):
