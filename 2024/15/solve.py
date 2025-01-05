@@ -30,7 +30,7 @@ def coordinates(grid):
     return count
 
 
-def simulate(grid, moves):
+def start(grid):
     x, y = [
         (x, y)
         for y in range(len(grid))
@@ -39,6 +39,11 @@ def simulate(grid, moves):
     ][0]
     grid[y][x] = "."
 
+    return x, y
+
+
+def simulate(grid, moves):
+    x, y = start(grid)
     for move in moves:
         dx, dy = changes[move]
         nx, ny = x + dx, y + dy
@@ -64,14 +69,7 @@ def simulate(grid, moves):
 
 
 def bigSimulate(grid, moves):
-    x, y = [
-        (x, y)
-        for y in range(len(grid))
-        for x in range(len(grid[0]))
-        if grid[y][x] == "@"
-    ][0]
-    grid[y][x] = "."
-
+    x, y = start(grid)
     for move in moves:
         dx, dy = changes[move]
         nx, ny = x + dx, y + dy
@@ -84,7 +82,7 @@ def bigSimulate(grid, moves):
             continue
 
         elif move in "><":
-            ox, oy = nx, ny
+            ox = nx
 
             while grid[ny][nx] in "[]":
                 nx += dx
@@ -94,21 +92,19 @@ def bigSimulate(grid, moves):
                     grid[ny][nx] = grid[ny][nx - dx]
                     nx -= dx
 
-                grid[oy][ox] = "."
+                grid[ny][ox] = "."
                 x = ox
 
         elif move in "^v":
-            ox, oy = nx, ny
+            oy = ny
             ov = (nx, nx + 1) if grid[ny][nx] == "[" else (nx - 1, nx)
             all = set()
             xs = set(ov)
             stack = []
 
             while xs:
-                for n in xs:
-                    all.add((n, ny + dy))
-
                 chunk = []
+                all |= set((n, ny + dy) for n in xs)
                 nxs = set()
                 line = [grid[ny + dy][n] for n in xs]
 
@@ -118,7 +114,6 @@ def bigSimulate(grid, moves):
 
                 elif line == ["."] * len(xs):
                     for n in xs:
-                        all.add((n, ny + dy))
                         chunk.append(((n, ny), (n, ny + dy)))
 
                     stack.append(chunk)
@@ -131,10 +126,8 @@ def bigSimulate(grid, moves):
                         match (grid[ny][n], grid[ny + dy][n]):
                             case ("[", "["):
                                 nxs.add(n)
-                                nxs.add(n + 1)
 
                             case ("]", "]"):
-                                nxs.add(n - 1)
                                 nxs.add(n)
 
                             case ("]", "["):
