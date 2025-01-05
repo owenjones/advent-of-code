@@ -3,7 +3,17 @@ changes = {">": (1, 0), "v": (0, 1), "<": (-1, 0), "^": (0, -1)}
 
 def biggify(grid):
     extend = {"#": "##", "O": "[]", ".": "..", "@": "@."}
-    return list(map(lambda row: list("".join([extend[c] for c in row])), grid))
+    big = []
+
+    for row in grid:
+        line = ""
+
+        for c in row:
+            line += extend[c]
+
+        big.append(list(line))
+
+    return big
 
 
 def coordinates(grid):
