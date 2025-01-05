@@ -2,48 +2,32 @@ changes = {">": (1, 0), "v": (0, 1), "<": (-1, 0), "^": (0, -1)}
 
 
 def biggify(grid):
-    big = []
-    for row in grid:
-        line = ""
-        for c in row:
-            match c:
-                case "#":
-                    line += "##"
-                case "O":
-                    line += "[]"
-                case ".":
-                    line += ".."
-                case "@":
-                    line += "@."
-        big.append(list(line))
-
-    return big
+    extend = {"#": "##", "O": "[]", ".": "..", "@": "@."}
+    return list(map(lambda row: list("".join([extend[c] for c in row])), grid))
 
 
 def coordinates(grid):
     count = 0
+
     for y, row in enumerate(grid):
         for x, c in enumerate(row):
-            if c in ("O", "["):
+            if c in "O[":
                 count += x + 100 * y
 
     return count
 
 
 def start(grid):
-    x, y = [
-        (x, y)
-        for y in range(len(grid))
-        for x in range(len(grid[0]))
-        if grid[y][x] == "@"
-    ][0]
-    grid[y][x] = "."
-
-    return x, y
+    for y, row in enumerate(grid):
+        for x, c in enumerate(row):
+            if c == "@":
+                grid[y][x] = "."
+                return x, y
 
 
 def simulate(grid, moves):
     x, y = start(grid)
+
     for move in moves:
         dx, dy = changes[move]
         nx, ny = x + dx, y + dy
@@ -70,6 +54,7 @@ def simulate(grid, moves):
 
 def bigSimulate(grid, moves):
     x, y = start(grid)
+
     for move in moves:
         dx, dy = changes[move]
         nx, ny = x + dx, y + dy
@@ -77,13 +62,13 @@ def bigSimulate(grid, moves):
         if grid[ny][nx] == "#":
             continue
 
-        elif grid[ny][nx] == ".":
+        if grid[ny][nx] == ".":
             x, y = nx, ny
             continue
 
-        elif move in "><":
-            ox = nx
+        ox, oy = nx, ny
 
+        if move in "><":
             while grid[ny][nx] in "[]":
                 nx += dx
 
@@ -92,62 +77,59 @@ def bigSimulate(grid, moves):
                     grid[ny][nx] = grid[ny][nx - dx]
                     nx -= dx
 
-                grid[ny][ox] = "."
+                grid[oy][ox] = "."
                 x = ox
 
         elif move in "^v":
-            oy = ny
-            ov = (nx, nx + 1) if grid[ny][nx] == "[" else (nx - 1, nx)
-            all = set()
-            xs = set(ov)
+            boxes = set()
             stack = []
+            frontier = set((nx, nx + 1) if grid[ny][nx] == "[" else (nx - 1, nx))
 
-            while xs:
-                chunk = []
-                all |= set((n, ny + dy) for n in xs)
-                nxs = set()
-                line = [grid[ny + dy][n] for n in xs]
+            while frontier:
+                nfrontier = set()
+                line = [grid[ny + dy][n] for n in frontier]
 
                 if "#" in line:
                     stack = None
                     break
 
-                elif line == ["."] * len(xs):
-                    for n in xs:
-                        chunk.append(((n, ny), (n, ny + dy)))
+                boxes |= set((n, ny + dy) for n in frontier)
 
-                    stack.append(chunk)
+                if line == ["."] * len(frontier):
+                    stack.append([((n, ny), (n, ny + dy)) for n in frontier])
                     break
 
                 else:
-                    for n in xs:
+                    chunk = []
+                    for n in frontier:
                         chunk.append(((n, ny), (n, ny + dy)))
 
                         match (grid[ny][n], grid[ny + dy][n]):
                             case ("[", "["):
-                                nxs.add(n)
+                                nfrontier.add(n)
 
                             case ("]", "]"):
-                                nxs.add(n)
+                                nfrontier.add(n)
 
                             case ("]", "["):
-                                nxs.add(n)
-                                nxs.add(n + 1)
+                                nfrontier.add(n)
+                                nfrontier.add(n + 1)
 
                             case ("[", "]"):
-                                nxs.add(n - 1)
-                                nxs.add(n)
+                                nfrontier.add(n - 1)
+                                nfrontier.add(n)
 
-                stack.append(chunk)
+                    stack.append(chunk)
+
                 ny += dy
-                xs = nxs
+                frontier = nfrontier
 
             if stack:
                 for chunk in reversed(stack):
                     for (ax, ay), (bx, by) in chunk:
                         grid[by][bx] = grid[ay][ax]
 
-                        if (ax, ay) not in all:
+                        if (ax, ay) not in boxes:
                             grid[ay][ax] = "."
 
                 y = oy
