@@ -1,9 +1,4 @@
-numbers = Array.new
-File.open("input.txt") do |input|
-  numbers = input.read.split.map { |x| Integer(x) }
-end
-
-numbers = numbers.sort
+numbers = File.open("input.txt").read.split.map { |x| Integer(x) }.sort
 numbers.insert(0, 0)
 numbers.push(numbers.max + 3)
 

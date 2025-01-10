@@ -38,11 +38,7 @@ class Processor
 end
 
 processor = Processor.new
-
-File.open("input.txt") do |input|
-    processor.load(input.read.split("\n"))
-end
-
+processor.load(File.open("input.txt").read.split("\n"))
 processor.run
 
 puts "Value in accumulator at end of first loop: #{processor.acc}"

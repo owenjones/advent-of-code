@@ -38,11 +38,7 @@ def findWeakness(numbers, target)
   end
 end
 
-numbers = Array.new
-File.open("input.txt") do |input|
-  numbers = input.read.split("\n").map { |x| Integer(x) }
-end
-
+numbers = File.open("input.txt").read.split("\n").map { |x| Integer(x) }
 target = findTarget(numbers, 25)
 weakness = findWeakness(numbers, target)
 

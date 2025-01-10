@@ -71,11 +71,7 @@ def modelArrivals(input)
     return output
 end
 
-floor = Array.new
-File.open("input.txt") do |input|
-    floor = input.read.split
-end
-floor = floor.map { |x| x.split("") }
+floor = File.open("input.txt").read.split.map { |x| x.split("") }
 final = modelArrivals(floor)
 occupied = countOccupied(final)
 

@@ -21,9 +21,7 @@ def decodeLocations(mask, coded)
   return locations.map { |l| l.join.to_i(2) }
 end
 
-input = Array.new
-File.open("input.txt") { |i| input = i.read.split("\n") }
-
+input = File.open("input.txt").read.split("\n")
 memory = Hash.new { 0 }
 mask = ""
 input.each do |line|

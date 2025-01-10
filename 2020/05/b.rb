@@ -33,11 +33,7 @@ def getID(pass)
     return (getRow(p[:row]) * 8) + getColumn(p[:column])
 end
 
-ids = Array.new
-
-File.open("input.txt") do |input|
-    ids = input.read.split.map { |ticket| getID(ticket) }
-end
+ids = File.open("input.txt").read.split.map { |ticket| getID(ticket) }
 
 ids.sort.each do |id|
     if ids.index(id + 1).nil?

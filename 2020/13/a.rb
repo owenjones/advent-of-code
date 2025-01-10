@@ -12,11 +12,7 @@ def findBus(time, buses)
   end
 end
 
-note = Array.new
-File.open("input.txt") do |input|
-  note = input.read.split
-end
-
+note = File.open("input.txt").read.split
 time = Integer(note[0])
 buses = note[1].split(",").reject { |x| x == "x" }.map { |x| Integer(x) }
 result = findBus(time, buses)

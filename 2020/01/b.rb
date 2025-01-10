@@ -11,13 +11,6 @@ def solve(lines)
 end
 
 
-lines = Array.new
-
-File.open("input.txt") do |input|
-  lines = input.read.split
-end
-
-lines = lines.map { |line| Integer(line) }
-
+lines = File.open("input.txt").read.split.map { |line| Integer(line) }
 answer = solve(lines)
 puts "Expense report: #{answer}"

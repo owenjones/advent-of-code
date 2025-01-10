@@ -29,10 +29,7 @@ class Forest
 end
 
 forest = Forest.new
-
-File.open("input.txt") do |input|
-    forest.readString(input.read)
-end
+forest.readString(File.open("input.txt").read)
 
 slopes = [[1, 1], [3, 1], [5, 1], [7, 1], [1, 2]]
 trees = slopes.map { |s| forest.slopeFrom(s[0], s[1]) }

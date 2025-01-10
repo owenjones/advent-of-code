@@ -5,11 +5,6 @@ def countQuestions(response)
     return counts.sum
 end
 
-groups = Array.new
-
-File.open("input.txt") do |input|
-    groups = input.read.split("\n\n")
-end
-
+groups = File.open("input.txt").read.split("\n\n")
 counts = groups.map { |g| countQuestions(g) }
 puts "Sum of all counts: #{counts.sum}"

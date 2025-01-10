@@ -15,10 +15,7 @@ class Forest
 end
 
 forest = Forest.new
-
-File.open("input.txt") do |input|
-    forest.readString(input.read)
-end
+forest.readString(File.open("input.txt").read)
 
 x = 3
 y = 1

@@ -38,9 +38,6 @@ class RuleList
 end
 
 rules = RuleList.new
-
-File.open("input.txt") do |input|
-    input.read.split("\n").map { |r| rules.addRule(r) }
-end
+File.open("input.txt").read.split("\n").map { |r| rules.addRule(r) }
 
 puts "Number of bags inside shiny gold bag: #{rules.getShinyGoldBagCount}"

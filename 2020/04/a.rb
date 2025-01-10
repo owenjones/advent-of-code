@@ -21,12 +21,7 @@ class Passport
     end
 end
 
-passports = Array.new
-
-File.open("input.txt") do |input|
-    passports = input.read.split("\n\n")
-end
-
+passports = File.open("input.txt").read.split("\n\n")
 valid = 0
 
 passports.each do |passport|

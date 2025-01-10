@@ -26,11 +26,7 @@ def findSequenceStart(buses)
   return s.sum % pn # t = sum of all b_i/N_i/x_i products, mod N
 end
 
-note = Array.new
-File.open("input.txt") do |input|
-  note = input.read.split
-end
 
-buses = note[1].split(",")
+buses = File.open("input.txt").read.split[1].split(",")
 time = findSequenceStart(buses)
 puts "Start time of first sequence of bus departures: #{time}"
