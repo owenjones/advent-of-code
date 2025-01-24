@@ -17,21 +17,12 @@ int main(int argc, char **argv)
   char line[256];
   fgets(line, sizeof(line), fptr);
 
-  node_t *root = parse_line(line);
-
-  node_t *next;
+  node_t *next, *root = parse_line(line);
   while (fgets(line, sizeof(line), fptr))
   {
-    debug("  ");
-    to_string(root);
     next = parse_line(line);
-    debug("+ ");
-    to_string(next);
     root = add_numbers(root, next);
     reduce(root);
-    debug("= ");
-    to_string(root);
-    debug("\n");
   }
   fclose(fptr);
 
