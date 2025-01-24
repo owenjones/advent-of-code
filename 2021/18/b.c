@@ -46,10 +46,8 @@ int main(int argc, char **argv)
       uint32_t mag_x = calculate_magnitude(x);
       uint32_t mag_y = calculate_magnitude(y);
 
-      free_tree(a);
-      free_tree(b);
-      free_tree(c);
-      free_tree(d);
+      free_tree(x);
+      free_tree(y);
 
       maximum_magnitude = (mag_x > maximum_magnitude) ? mag_x : maximum_magnitude;
       maximum_magnitude = (mag_y > maximum_magnitude) ? mag_y : maximum_magnitude;
