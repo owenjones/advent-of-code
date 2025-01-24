@@ -8,7 +8,7 @@ Here are my solutions :)
 | [2024](https://adventofcode.com/2024) | Python   | **50** |
 | [2023](https://adventofcode.com/2023) | Swift    | 42     |
 | [2022](https://adventofcode.com/2022) | C        | **50** |
-| [2021](https://adventofcode.com/2021) | C        | 40     |
+| [2021](https://adventofcode.com/2021) | C        | 42     |
 | [2020](https://adventofcode.com/2020) | Ruby     | 44     |
 | [2019](https://adventofcode.com/2019) | Clojure  | 2      |
 | [2018](https://adventofcode.com/2018) | Kotlin   | 4      |
