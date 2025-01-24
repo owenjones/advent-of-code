@@ -23,40 +23,42 @@ void debug(const char *format, ...)
   return;
 }
 
-void init_node(node_t *node)
+node_t *init_node(node_t *parent, uint8_t depth)
 {
+  node_t *node = malloc(sizeof(node_t));
   node->value = -1;
-  node->depth = 1;
-  node->parent = NULL;
+  node->parent = parent;
+  node->depth = depth;
   node->left = NULL;
   node->right = NULL;
   node->lr = 0;
+  return node;
 }
 
-void parse_line(node_t *root, char *line)
+void free_tree(node_t *root)
 {
+  if (root->left != NULL)
+    free_tree(root->left);
+
+  if (root->right != NULL)
+    free_tree(root->right);
+
+  free(root);
+}
+
+node_t *parse_line(char *line)
+{
+  node_t *root = init_node(NULL, 1);
   node_t *current = root;
 
   size_t len = strlen(line);
   for (size_t i = 1; i < len - 1; i++)
   {
     if (current->left == NULL)
-    {
-      node_t *n = malloc(sizeof(node_t));
-      init_node(n);
-      n->depth = current->depth + 1;
-      n->parent = current;
-      current->left = n;
-    }
+      current->left = init_node(current, (current->depth + 1));
 
     if (current->right == NULL)
-    {
-      node_t *n = malloc(sizeof(node_t));
-      init_node(n);
-      n->depth = current->depth + 1;
-      n->parent = current;
-      current->right = n;
-    }
+      current->right = init_node(current, (current->depth + 1));
 
     if (line[i] == '[')
     {
@@ -69,8 +71,6 @@ void parse_line(node_t *root, char *line)
     else if (line[i] == ']')
     {
       current = current->parent;
-      if (current == NULL)
-        return;
     }
     else if (line[i] == '0' || isdigit(line[i]) > 0)
     {
@@ -85,6 +85,8 @@ void parse_line(node_t *root, char *line)
       }
     }
   }
+
+  return root;
 }
 
 uint8_t explode(node_t *node)
@@ -93,16 +95,12 @@ uint8_t explode(node_t *node)
   {
     if (node->depth > 4 && node->left != NULL && node->right != NULL && node->left->value > -1 && node->right->value > -1)
     {
-      // we now have a pair of two numbers to explode
-      // debug("%i, %i\n", node->left->value, node->right->value);
-
       node_t *n;
 
       // LHS
       n = node;
       while (n->depth > 1)
       {
-        // debug("at depth %i (%i, %i)\n", n->depth, n->parent->left->value, n->parent->left->value);
         if (n->parent->left != n)
         {
           n = n->parent->left;
@@ -111,8 +109,6 @@ uint8_t explode(node_t *node)
 
         n = n->parent;
       }
-
-      // debug("got past climb\n");
 
       if (n->parent != NULL)
       {
@@ -169,20 +165,11 @@ uint8_t split(node_t *node)
     {
       float v = (float)node->value / 2.0;
 
-      node_t *n;
-      n = malloc(sizeof(node_t));
-      init_node(n);
-      n->parent = node;
-      n->depth = node->depth + 1;
-      n->value = (int)floor(v);
-      node->left = n;
+      node->left = init_node(node, (node->depth + 1));
+      node->left->value = (int)floor(v);
 
-      n = malloc(sizeof(node_t));
-      init_node(n);
-      n->parent = node;
-      n->depth = node->depth + 1;
-      n->value = (int)ceil(v);
-      node->right = n;
+      node->right = init_node(node, (node->depth + 1));
+      node->right->value = (int)ceil(v);
 
       node->value = -1;
       return 1;
@@ -204,12 +191,9 @@ uint8_t split(node_t *node)
 
 void reduce(node_t *root)
 {
-  uint8_t exploding = 1;
-  uint8_t splitting;
-
   while (1)
   {
-    exploding = explode(root);
+    explode(root);
     if (split(root))
       continue;
 
@@ -230,8 +214,7 @@ void increase_depth(node_t *node)
 
 node_t *add_numbers(node_t *left, node_t *right)
 {
-  node_t *root = malloc(sizeof(node_t));
-  init_node(root);
+  node_t *root = init_node(NULL, 1);
   root->left = left;
   root->right = right;
   increase_depth(root->left);

@@ -32,30 +32,24 @@ int main(int argc, char **argv)
       if (i == j)
         continue;
 
-      node_t a = {};
-      init_node(&a);
-      parse_line(&a, lines[i]);
+      node_t *a = parse_line(lines[i]);
+      node_t *b = parse_line(lines[j]);
+      node_t *c = parse_line(lines[i]);
+      node_t *d = parse_line(lines[j]);
 
-      node_t b = {};
-      init_node(&b);
-      parse_line(&b, lines[j]);
-
-      node_t c = {};
-      init_node(&c);
-      parse_line(&c, lines[i]);
-
-      node_t d = {};
-      init_node(&d);
-      parse_line(&d, lines[j]);
-
-      node_t *x = add_numbers(&a, &b);
+      node_t *x = add_numbers(a, b);
       reduce(x);
 
-      node_t *y = add_numbers(&d, &c);
+      node_t *y = add_numbers(d, c);
       reduce(y);
 
       uint32_t mag_x = calculate_magnitude(x);
       uint32_t mag_y = calculate_magnitude(y);
+
+      free_tree(a);
+      free_tree(b);
+      free_tree(c);
+      free_tree(d);
 
       maximum_magnitude = (mag_x > maximum_magnitude) ? mag_x : maximum_magnitude;
       maximum_magnitude = (mag_y > maximum_magnitude) ? mag_y : maximum_magnitude;

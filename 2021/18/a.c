@@ -17,18 +17,14 @@ int main(int argc, char **argv)
   char line[256];
   fgets(line, sizeof(line), fptr);
 
-  node_t *root = malloc(sizeof(node_t));
-  init_node(root);
-  parse_line(root, line);
+  node_t *root = parse_line(line);
 
   node_t *next;
   while (fgets(line, sizeof(line), fptr))
   {
     debug("  ");
     to_string(root);
-    next = malloc(sizeof(node_t));
-    init_node(next);
-    parse_line(next, line);
+    next = parse_line(line);
     debug("+ ");
     to_string(next);
     root = add_numbers(root, next);
@@ -41,5 +37,6 @@ int main(int argc, char **argv)
 
   uint32_t result = calculate_magnitude(root);
   printf("Part 1: %i\n", result);
+  free_tree(root);
   return 0;
 }

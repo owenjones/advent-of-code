@@ -15,8 +15,9 @@ void debug(const char *format, ...);
 void to_string(node_t *node);
 void _to_string(node_t *node);
 
-void init_node(node_t *node);
-void parse_line(node_t *root, char *line);
+node_t *init_node(node_t *parent, uint8_t depth);
+void free_tree(node_t *);
+node_t *parse_line(char *line);
 
 void reduce(node_t *root);
 
