@@ -10,8 +10,8 @@ struct P {
 fn part1(input: &String) -> i32 {
   let mut p = P { x: 0, y: 0 };
   let mut visited: HashSet<P> = HashSet::new();
-  let mut delivered = 1;
 
+  visited.insert(p);
   for c in input.chars() {
     match c {
       '>' => p.x += 1,
@@ -20,22 +20,18 @@ fn part1(input: &String) -> i32 {
       'v' => p.y -= 1,
       _ => panic!("unknown")
     }
-
-    if !visited.contains(&p) {
-      delivered += 1;
-      visited.insert(p);
-    }
+    visited.insert(p);
   }
 
-  return delivered;
+  return visited.iter().count() as i32;
 }
 
 fn part2(input: &String) -> i32 {
   let mut s = P { x: 0, y: 0 };
   let mut r = P { x: 0, y: 0 };
   let mut visited: HashSet<P> = HashSet::new();
-  let mut delivered = 0;
 
+  visited.insert(s);
   for (i, c) in input.chars().enumerate() {
     let a = if i % 2 == 0 { &mut s } else { &mut r };
 
@@ -47,13 +43,10 @@ fn part2(input: &String) -> i32 {
       _ => panic!("unknown")
     }
 
-    if !visited.contains(&a) {
-      delivered += 1;
-      visited.insert(*a);
-    }
+    visited.insert(*a);
   }
 
-  return delivered;
+  return visited.iter().count() as i32;
 }
 
 fn main() {
