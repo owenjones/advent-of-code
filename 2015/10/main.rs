@@ -36,4 +36,11 @@ fn main() {
 
     let n = sequence.len();
     println!("After 40 rounds: {n}");
+
+    for _ in 0..10 {
+        sequence = look_and_say(sequence);
+    }
+
+    let n = sequence.len();
+    println!("After 50 rounds: {n}");
 }
