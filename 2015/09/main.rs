@@ -37,21 +37,27 @@ fn find_shortest(nodes: &BTreeSet<&str>, edges: &HashMap<(&str, &str), u32>) -> 
         heap.push(search);
     }
 
-    while let s = heap.pop().unwrap() {
-        if s.nodes.len() == 0 {
-            return Some(s.cost);
-        }
-
-        for n in s.nodes.iter() {
-            let mut ns = s.clone();
-            let c = edges.get(&(ns.position, n));
-
-            if c.is_some() {
-                ns.nodes.remove(n);
-                ns.cost += c.unwrap();
-                ns.position = n;
-                heap.push(ns);
+    loop {
+        let s = heap.pop();
+        if s.is_some() {
+            let s = s.unwrap();
+            if s.nodes.len() == 0 {
+                return Some(s.cost);
             }
+
+            for n in s.nodes.iter() {
+                let mut ns = s.clone();
+                let c = edges.get(&(ns.position, n));
+
+                if c.is_some() {
+                    ns.nodes.remove(n);
+                    ns.cost += c.unwrap();
+                    ns.position = n;
+                    heap.push(ns);
+                }
+            }
+        } else {
+            break;
         }
     }
 
@@ -73,7 +79,8 @@ fn find_longest(nodes: &BTreeSet<&str>, edges: &HashMap<(&str, &str), u32>) -> O
 
     let mut costs: Vec<u32> = Vec::new();
 
-    while let s = heap.pop() {
+    loop {
+        let s = heap.pop();
         if s.is_some() {
             let s = s.unwrap();
             if s.nodes.len() == 0 {
