@@ -1,17 +1,20 @@
-use std::fs;
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BTreeSet, BinaryHeap, HashMap};
+use std::fs;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct Search<'a> {
     cost: u32,
-    position: u32,
-    nodes: HashSet<&'a str>
+    position: &'a str,
+    nodes: BTreeSet<&'a str>,
 }
 
 impl Ord for Search<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.cost.cmp(&self.cost).then_with(|| self.position.cmp(&other.position))
+        other
+            .cost
+            .cmp(&self.cost)
+            .then_with(|| other.position.cmp(&self.position))
     }
 }
 
@@ -21,11 +24,86 @@ impl PartialOrd for Search<'_> {
     }
 }
 
+fn find_shortest(nodes: &BTreeSet<&str>, edges: &HashMap<(&str, &str), u32>) -> Option<u32> {
+    let mut heap: BinaryHeap<Search> = BinaryHeap::new();
+
+    for node in nodes {
+        let mut search = Search {
+            cost: 0,
+            nodes: nodes.clone(),
+            position: node,
+        };
+        search.nodes.remove(node);
+        heap.push(search);
+    }
+
+    while let s = heap.pop().unwrap() {
+        if s.nodes.len() == 0 {
+            return Some(s.cost);
+        }
+
+        for n in s.nodes.iter() {
+            let mut ns = s.clone();
+            let c = edges.get(&(ns.position, n));
+
+            if c.is_some() {
+                ns.nodes.remove(n);
+                ns.cost += c.unwrap();
+                ns.position = n;
+                heap.push(ns);
+            }
+        }
+    }
+
+    return None;
+}
+
+fn find_longest(nodes: &BTreeSet<&str>, edges: &HashMap<(&str, &str), u32>) -> Option<u32> {
+    let mut heap: BinaryHeap<Search> = BinaryHeap::new();
+
+    for node in nodes {
+        let mut search = Search {
+            cost: 0,
+            nodes: nodes.clone(),
+            position: node,
+        };
+        search.nodes.remove(node);
+        heap.push(search);
+    }
+
+    let mut costs: Vec<u32> = Vec::new();
+
+    while let s = heap.pop() {
+        if s.is_some() {
+            let s = s.unwrap();
+            if s.nodes.len() == 0 {
+                costs.push(s.cost);
+                continue;
+            }
+
+            for n in s.nodes.iter() {
+                let mut ns = s.clone();
+                let c = edges.get(&(ns.position, n));
+
+                if c.is_some() {
+                    ns.nodes.remove(n);
+                    ns.cost += c.unwrap();
+                    ns.position = n;
+                    heap.push(ns);
+                }
+            }
+        } else {
+            break;
+        }
+    }
+
+    return costs.iter().max().copied();
+}
+
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input not found");
-    let mut nodes: HashSet<&str> = HashSet::new();
+    let mut nodes: BTreeSet<&str> = BTreeSet::new();
     let mut edges: HashMap<(&str, &str), u32> = HashMap::new();
-    let mut heap: BinaryHeap<Search> = BinaryHeap::new();
 
     for line in input.split("\n") {
         let a: Vec<&str> = line.split(" to ").collect();
@@ -37,17 +115,13 @@ fn main() {
         edges.insert((&b[0], &a[0]), d);
     }
 
-    // println!("{nodes:?}");
-    // println!("{edges:?}");
+    let p1 = find_shortest(&nodes, &edges);
+    if p1.is_some() {
+        println!("Shortest route: {}", p1.unwrap());
+    }
 
-    for node in &nodes {
-        let mut search = Search{
-            cost: 0,
-            nodes: nodes.clone(),
-            position: 0,
-        };
-        search.nodes.remove(node);
-
-        println!("{search:?}");
+    let p2 = find_longest(&nodes, &edges);
+    if p2.is_some() {
+        println!("Longest route: {}", p2.unwrap());
     }
 }
