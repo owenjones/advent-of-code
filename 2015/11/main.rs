@@ -26,6 +26,11 @@ fn is_valid(password: &Vec<u32>) -> bool {
             c += 1;
             i += 2;
         }
+
+        if c == 2 {
+            break;
+        }
+
         i += 1;
     }
 
@@ -33,15 +38,20 @@ fn is_valid(password: &Vec<u32>) -> bool {
         return false;
     }
 
-    let mut c = 0;
-    for ref mut i in 0..(password.len() - 2) {
-        if password[*i+1] == (password[*i] + 1 % 26) && password[*i+2] == (password[*i] + 2 % 26) {
-            c += 1;
-            *i += 2;
+    let mut i = 0;
+    while i < (password.len() - 2) {
+        if password[i+1] == (password[i] + 1 % 26) && password[i+2] == (password[i] + 2 % 26) {
+            return true;
         }
+
+        i += 1;
     }
     
-    return c == 1;
+    return false;
+}
+
+fn v2s(v: &Vec<u32>) -> String {
+    v.clone().into_iter().map(|c| char::from_u32(c + 97).unwrap()).collect()
 }
 
 fn main() {
@@ -53,7 +63,7 @@ fn main() {
         v = increment(v);
 
         if is_valid(&v) {
-            let s: String = v.clone().into_iter().map(|c| char::from_u32(c + 97).unwrap()).collect();
+            let s: String = v2s(&v);
             println!("Next valid password: {s}");
             break;
         }
@@ -63,7 +73,7 @@ fn main() {
         v = increment(v);
 
         if is_valid(&v) {
-            let s: String = v.into_iter().map(|c| char::from_u32(c + 97).unwrap()).collect();
+            let s: String = v2s(&v);
             println!("Next valid password after that: {s}");
             break;
         }
