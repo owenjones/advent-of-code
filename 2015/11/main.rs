@@ -53,8 +53,18 @@ fn main() {
         v = increment(v);
 
         if is_valid(&v) {
-            let s: String = v.into_iter().map(|c| char::from_u32(c + 97).unwrap()).collect();
+            let s: String = v.clone().into_iter().map(|c| char::from_u32(c + 97).unwrap()).collect();
             println!("Next valid password: {s}");
+            break;
+        }
+    }
+
+    loop {
+        v = increment(v);
+
+        if is_valid(&v) {
+            let s: String = v.into_iter().map(|c| char::from_u32(c + 97).unwrap()).collect();
+            println!("Next valid password after that: {s}");
             break;
         }
     }
