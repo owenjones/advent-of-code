@@ -16,7 +16,7 @@ fn jsonsum(v: &Value) -> i64 {
     }
 
     if v.is_array() {
-        return v.as_array().unwrap().into_iter().map(|n| jsonsum(n)).into_iter().sum();
+        return v.as_array().unwrap().into_iter().map(|n| jsonsum(n)).sum();
     }
 
     if v.is_number() {
@@ -29,9 +29,8 @@ fn jsonsum(v: &Value) -> i64 {
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input not found");
 
-    let inner = Regex::new(r#"(-?\d+)"#).unwrap();
-    let numbers: Vec<i32> = inner.find_iter(&input).map(|n| n.as_str().parse::<i32>().expect("NaN")).collect();
-    let s: i32 = numbers.into_iter().sum();
+    let r = Regex::new(r#"(-?\d+)"#).unwrap();
+    let s: i32 = r.find_iter(&input).map(|n| n.as_str().parse::<i32>().expect("NaN")).sum();
     println!("Sum of all numbers: {s}");
 
     let v: Value = serde_json::from_str(&input).unwrap();
