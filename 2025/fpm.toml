@@ -4,16 +4,21 @@ license = "license"
 author = "Owen Jones"
 maintainer = "owen@owenjones.net"
 copyright = "Copyright 2025, Owen Jones"
+
 [build]
 auto-executables = true
 auto-tests = true
 auto-examples = true
 module-naming = false
+
+[dependencies]
+M_strings = { git = "https://github.com/urbanjost/M_strings.git" }
+
 [install]
 library = false
 test = false
+
 [fortran]
 implicit-typing = false
 implicit-external = false
 source-form = "free"
-

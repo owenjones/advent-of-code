@@ -1,4 +1,4 @@
-module aoc
+module aoc_lib
   implicit none
 
   private
@@ -27,4 +27,4 @@ contains
         close(io)
 
     end function load_input
-end module aoc
+end module aoc_lib
