@@ -13,6 +13,7 @@ module-naming = false
 
 [dependencies]
 M_strings = { git = "https://github.com/urbanjost/M_strings.git" }
+forgex = { git = "https://github.com/shinobuamasaki/forgex" }
 
 [install]
 library = false
