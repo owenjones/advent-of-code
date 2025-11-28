@@ -1,6 +1,5 @@
 module day01
     use aoc_lib, only: load_input
-    use M_strings, only: split
     implicit none
 
     private
@@ -8,12 +7,14 @@ module day01
 
 contains
     subroutine main
-        character(len=:), allocatable :: input, array(:)
+        character(len=:), allocatable :: input
+        integer :: answer
 
         input = load_input("inputs/day01.txt")
-        call split(input, array, delimiters=achar(10))
-        write(*,*) size(array)
-        print*, array(1)
+
+        answer = 0
+        write(*, '(a, i0)') "Part 1: ", answer
+        ! write(*, '(a, i0)') "Part 2: ", answer
 
     end subroutine main
 end module day01
