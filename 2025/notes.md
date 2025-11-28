@@ -1,5 +1,7 @@
 # Quick Reference
 
+[stdlib documentation](https://stdlib.fortran-lang.org/index.html)
+
 ## Splitting input
 For a newline we need to use value in [ASCII table](https://en.wikipedia.org/wiki/ASCII#/media/File:ASCII_Table_(suitable_for_printing).svg) - `achar(10)`
 
