@@ -8,3 +8,6 @@ use M_strings, only: split
 
 call split(input, array, delimiters=achar(10))
 ```
+
+## regex
+Refer to [documentation](https://shinobuamasaki.github.io/forgex/)
