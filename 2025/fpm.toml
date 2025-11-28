@@ -12,6 +12,7 @@ auto-examples = true
 module-naming = false
 
 [dependencies]
+stdlib = "*"
 M_strings = { git = "https://github.com/urbanjost/M_strings.git" }
 forgex = { git = "https://github.com/shinobuamasaki/forgex" }
 
